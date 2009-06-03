@@ -1,0 +1,69 @@
+* {
+	padding: 0px;
+	margin: 0px;
+}
+body {
+	font-family: Georgia, serif;
+}
+#name{
+	position: absolute;
+	top: 190px;
+	left: 33%;
+	text-align: center;
+}
+#first{ font-size: 2em;}
+#second{font-size: 5em;}
+#third{ font-size: 2em;}
+a {color: #00696F; font-family: "Georgia", san-serif;}
+#info{
+	position: absolute;
+	top: 225px;
+	left: 63%;
+	font-size: 1.5em;
+}
+#press{
+	position: absolute;
+	top: 240px;
+	left: 23%;
+	font-size: 1.4em;
+}
+#council{
+	position: absolute;
+	top: 181px;
+	left: 61%;
+	font-size: 1.4em;
+}
+#teachersroom{
+	position: absolute;
+	top: 180px;
+	left: 22%;
+	font-size: 1.4em;
+}
+#pride{
+	position: absolute;
+	top: 315px;
+	left: 67%;
+	font-size: 1.4em;
+}
+#science{
+	position: absolute;
+	top: 317px;
+	left: 24%;
+	font-size: 1.4em;
+}
+#footer{
+	height: 5%;
+	width: 90%;
+	top: 95%;
+	position: absolute;
+	margin: 0 5%;
+	font-size: 0.9em;
+	font-family: Arial, sans-serif;
+}
+#footer table{
+	width: 100%;
+	color: #8F8F8F;
+}
+#footer table #adress{
+	text-align: right;
+}
