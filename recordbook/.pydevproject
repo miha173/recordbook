@@ -3,8 +3,12 @@
 
 <pydev_project>
 <pydev_pathproperty name="org.python.pydev.PROJECT_SOURCE_PATH">
-<path>/lyc01/src</path>
+<path>/recordbook/src</path>
 </pydev_pathproperty>
 <pydev_property name="org.python.pydev.PYTHON_PROJECT_VERSION">python 2.6</pydev_property>
 <pydev_property name="org.python.pydev.PYTHON_PROJECT_INTERPRETER">Default</pydev_property>
+<pydev_pathproperty name="org.python.pydev.PROJECT_EXTERNAL_SOURCE_PATH">
+<path>/usr/share/python-support/python-django/django</path>
+<path>/usr/lib/python-django/bin</path>
+</pydev_pathproperty>
 </pydev_project>

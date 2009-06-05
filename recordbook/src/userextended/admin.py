@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 from django.contrib import admin
-from lyc01.userextended.models import Grade, Subject, Teacher, Pupil
+from src.userextended.models import Grade, Subject, Teacher, Pupil
 
 class GradeAdmin(admin.ModelAdmin):
     list_display = ('long_name',)

@@ -1,4 +1,4 @@
-# Django settings for lyc01 project.
+# Django settings for src project.
 
 import os
 
@@ -14,7 +14,7 @@ MANAGERS = ADMINS
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__));
 
 DATABASE_ENGINE = 'mysql'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-DATABASE_NAME = 'lyc01'             # Or path to database file if using sqlite3.
+DATABASE_NAME = 'src'             # Or path to database file if using sqlite3.
 DATABASE_USER = 'root'             # Not used with sqlite3.
 DATABASE_PASSWORD = '123'         # Not used with sqlite3.
 DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
@@ -39,7 +39,7 @@ USE_I18N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = '/home/entropius/GTD/job/lyceum/sait/sait/media'
+MEDIA_ROOT = '/home/entropius/GTD/job/src/src/sait/media'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -67,7 +67,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
 )
 
-ROOT_URLCONF = 'lyc01.urls'
+ROOT_URLCONF = 'src.urls'
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
@@ -83,8 +83,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.admindocs',
-    'lyc01',
-    'lyc01.pages',
-    'lyc01.press',
-    'lyc01.userextended'
+    'src',
+    'src.pages',
+    'src.userextended'
 )
