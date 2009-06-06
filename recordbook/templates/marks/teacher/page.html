@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+<head>
+	<title>Отметки</title>
+	<style>
+		.content{
+			width: 100%;
+			height: 100%;
+		}
+	</style>
+</head>
+<body>
+<table class="content">
+	<tr>
+		<td></td>
+		<td>{{teacher.grades}}</td>
+	</tr>
+	<tr>
+		<td>
+			<a href="/marks/lessons">Уроки</a> <br />
+			<a href="/marks/grades">Классы</a>
+		</td>
+		<td>{%include page%}</td>
+	</tr>
+</table>
+</body>
+</html>
