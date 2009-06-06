@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+<head>
+	<title>Авторизируйтесь</title>
+	<style>
+		#content{
+			position: absolute;
+			top: 200px;
+			left: 35%;
+			text-align: center;
+		}
+		input{
+			width: 300px;
+			height: 30px;
+			text-align: center;
+			font-size: 24px;
+		}
+	</style>
+</head>
+<body>
+{{form.errors}}<br />
+<div id="content">
+<form action="/auth/login" method="post">
+{{form.username}}<br />
+{{form.password}}<br />
+<input type="submit" style="font-size: 14px;" name="OK" value="Войти">
+</form>
+</div>
+</body>
+</html>

@@ -1,29 +1,27 @@
-# Create your views here.
 # -*- coding: UTF-8 -*-
 
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.template.loader import render_to_string
-from django.core.cache import cache
-from django.http import HttpResponse
+#from django.core.cache import cache
+from django.http import HttpResponse, HttpResponseRedirect
+from models import Teacher
+from forms import LoginForm
 
+def login(request):
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            request.session['username'] = form.cleaned_data['username']
+            return HttpResponseRedirect('/')
+        else:
+            return render_to_response('userextended/login.html', {'form': form})
+    else: 
+        if not request.session.get('username'):
+            return render_to_response('userextended/login.html',{'form': LoginForm()})
+        else: 
+            return HttpResponseRedirect('/')
 
-from models import Probe, Pupil, Subject
-
-def main(request):
-#    pupil = Pupil.objects.get(username='p.komkov.aleksandr')
-#    subject = Subject.objects.get(name=u'Физика')
-#    Probe.objects.all().delete()
-#    for i in xrange(1000001, 2000000):
-#        pr = Probe()
-#        pr.stars = i
-#        pr.pupil = pupil
-#        pr.subject = subject
-#        pr.save()
-    output = ''
-    pr = Probe.objects.all().filter(stars__in=xrange(0, 40))
-    i = 0
-    for p in pr:
-        i = i + 1
-        output = output + str(p.pupil.username) + '-' + unicode(p.subject.name) + '-' + str(p.stars) + '-' + u'<br />'
-    return HttpResponse(output)
+def logout(request):
+    del request.session['username']
+    return HttpResponseRedirect('/auth/login')

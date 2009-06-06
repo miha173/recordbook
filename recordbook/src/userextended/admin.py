@@ -26,10 +26,9 @@ class PupilAdmin(admin.ModelAdmin):
     def fio(obj):
         return obj.last_name+' '+obj.first_name+' '+obj.middle_name
     fio.short_description = u'Фамилия, имя, отчество'
-    list_display = (fio, 'grade')
+    list_display = (fio,)
     fields = ('last_name', 'first_name', 'middle_name', 'grade')
     search_fields = ['first_name', 'last_name']
-    list_filter = ('grade',)
     ordering = ('last_name',)
     
 admin.site.register(Grade, GradeAdmin)
