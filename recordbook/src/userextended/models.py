@@ -53,6 +53,7 @@ class Clerk(User):
         self.username = username + last_name + '.' + first_name
         #Пароль по умолчанию
         self.set_password("1")
+        self.groups.clear()
         super(Clerk, self).save(force_insert, force_update)
     class Meta:
         abstract = True
@@ -62,6 +63,7 @@ class Teacher(Clerk):
     subjects = models.ManyToManyField('userextended.Subject', blank = True, verbose_name = u"Предметы")
     grades = models.ManyToManyField('userextended.Grade', blank = True, verbose_name = u"Классы", related_name = "grades")
     grade = models.ForeignKey('userextended.Grade', verbose_name="Класс", blank = True)
+    current_subject = models.ForeignKey('userextended.Subject', blank = True, related_name = 'current_subject')
     prefix = "t"
 
 class Pupil(Clerk):

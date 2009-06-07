@@ -1,0 +1,8 @@
+{% extends 'marks/teacher/page.html' %}
+
+{% block content %}
+	<a href="/marks/lessons/add">Добавить урок</a><br />
+	{% for lesson in lissons %}
+		{{ lesson.topic }}<br />
+	{% endfor %}
+{% endblock %}

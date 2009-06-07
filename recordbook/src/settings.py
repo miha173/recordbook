@@ -85,5 +85,6 @@ INSTALLED_APPS = (
     'django.contrib.admindocs',
     'src',
     'src.pages',
-    'src.userextended'
+    'src.userextended',
+    'src.marks'
 )
