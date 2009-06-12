@@ -1,20 +1,18 @@
 {% extends 'marks/page.html' %}
 
-{% if user.current_subject %}
 {% block menu %}
 	<a href="/marks/lessons/">Уроки</a> <br />
 	<a href="/marks/grades/">Выставить отметки</a>
 {% endblock %}
-{% else %}
-Выберите предмет
-{% endif %}
 
 {% block topmenu %} 
+	{% spaceless %}
 	{% for subject in subjects %}
 		{% ifequal subject.id user.current_subject.id %}
-			{{ subject.name }}
+			<span>{{ subject.name }}</span>
 		{% else %}
 			<a href="/marks/set_current_subject/{{ subject.id }}?next={{ next }}">{{ subject.name }}</a>
 		{% endifequal %}
 	{% endfor %}
+	{% endspaceless %}
 {% endblock %}

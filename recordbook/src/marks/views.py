@@ -1,4 +1,5 @@
 # -*- coding: UTF-8 -*-
+from datetime import date
 from django.template import RequestContext
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
@@ -10,30 +11,38 @@ from src.marks.models import Lesson, Mark
 from src.marks.forms import LessonForm, MarkForm
 
 def render_options(request):
+    options = render_objects = options['render_objects'] = {}
     if request.user.username[0] == 't':
         user = Teacher.objects.get(id = request.user.id)
         subjects = []
         for subject in user.subjects.all():
             subjects.append({'id': subject.id, 'name': subject.name})
-        try:
-            user.current_subject
-        except ObjectDoesNotExist:
-            if subjects.__len__()==1:
-                user.current_subject = Subject.objects.get(id = subjects[0]['id'])
-        options = {}
-        render_objects = {}
+        if subjects.__len__() and not user.current_subject>0:
+            user.current_subject = Subject.objects.get(id = subjects[0]['id'])
+            user.save()
         render_objects['user'] = user
         render_objects['subjects'] = subjects
         render_objects['next'] = request.path
         options['render_objects'] = render_objects
         options['usertype'] = 'teacher'
-        return options
+        options['current_subject'] = user.current_subject
     else:
-        pass
+        user = Pupil.objects.get(id = request.user.id)
+        options['usertype'] = 'pupil'
+    return options
 
 @login_required
 def index(request):
     render = render_options(request)
+    if render['usertype'] == 'pupil':
+        marks = Mark.objects.filter(pupil = Pupil.objects.get(id = request.user.id)).order_by('lesson__date')
+#        marks_list = {}
+#        for mark in marks:
+#            if not mark.lesson.date.strftime('%d.%m.%Y') in marks_list:
+#                marks_list[mark.lesson.date.strftime('%d.%m.%Y')] = []
+#            marks_list[mark.lesson.date.strftime('%d.%m.%Y')].append({'absent': mark.absent, 'mark': mark.mark})
+#        render['render_objects']['marks'] = marks_list
+        render['render_objects']['marks'] = marks
     return render_to_response('marks/%s/index.html' % render['usertype'], render['render_objects'])
 
 def set_current_subject(request, subject_id):
@@ -47,11 +56,12 @@ def lessonsList(request):
     teacher = Teacher.objects.get(id = request.user.id)
     try:
         render['render_objects']['lessons'] = Lesson.objects.filter(teacher = teacher,
-                                                                    subject = teacher.current_subject())
+                                                                    subject = teacher.current_subject)
     except ObjectDoesNotExist:
         render['render_objects']['lessons'] = {}
     return render_to_response('marks/teacher/lessons.html', render['render_objects']) 
 
+#Помни, нужно фильтровать список класса
 def lessonEdit(request, mode, id = 0):
     render = render_options(request)
     if request.method == 'GET':
@@ -100,8 +110,11 @@ def gradesList(request):
 
 def gradeLessonsList(request, grade_id):
     render = render_options(request)
+    teacher = Teacher.objects.get(id = request.user.id)
     render['render_objects']['grade_id'] = grade_id
-    render['render_objects']['lessons'] = Lesson.objects.filter(grade = Grade.objects.get(id = grade_id))
+    render['render_objects']['lessons'] = Lesson.objects.filter(grade = Grade.objects.get(id = grade_id),
+                                                                teacher = teacher,
+                                                                subject = teacher.current_subject)
     return render_to_response('marks/teacher/gradeLessonsList.html', render['render_objects'])
 
 def marksList(request, grade_id, lesson_id):

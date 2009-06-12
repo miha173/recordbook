@@ -17,7 +17,8 @@ class TeacherAdmin(admin.ModelAdmin):
     list_display = (fio, 'grade')
     fieldsets = [
                  (u'Общая информация', {'fields': ['last_name', 'first_name', 'middle_name', 'grade']}),
-                 (u'Преподавание', {'fields': ['grades', 'subjects']})
+                 (u'Преподавание', {'fields': ['grades', 'subjects']}),
+                 (u'Другое', {'fields': ['administrator']})
                 ]
     search_fields = ['first_name', 'last_name']
     ordering = ('last_name',)
@@ -27,7 +28,8 @@ class PupilAdmin(admin.ModelAdmin):
         return obj.last_name+' '+obj.first_name+' '+obj.middle_name
     fio.short_description = u'Фамилия, имя, отчество'
     list_display = (fio,)
-    fields = ('last_name', 'first_name', 'middle_name', 'grade')
+    fieldsets = [(u'Общая информация', {'fields': ['last_name', 'first_name', 'middle_name', 'sex']}),
+                 (u'Учёба', {'fields': ['grade', 'group', 'special']})]
     search_fields = ['first_name', 'last_name']
     ordering = ('last_name',)
     
