@@ -2,7 +2,18 @@
 
 {% block content %}
 	<a href="/marks/lessons/add">Добавить урок</a><br />
-	{% for lesson in lissons %}
-		{{ lesson.topic }}<br />
-	{% endfor %}
+		<table class="list">
+		    <tr>
+		        <td>Тема урока</td>
+		        <td>Класс</td>
+		        <td>Действия</td>
+		    </tr>
+		{% for lesson in lessons %}
+		    <tr>
+		        <td>{{ lesson.topic }}</td>
+		        <td>{{ lesson.grade.long_name }}</td>
+		        <td><a href="/marks/lessons/edit/{{ lesson.id }}/">Редактировать</a>, <a href="/marks/lessons/delete/{{ lesson.id }}/">удалить</a></td>
+		    </tr>
+		{% endfor %}
+		</table>
 {% endblock %}

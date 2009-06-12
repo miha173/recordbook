@@ -1,0 +1,10 @@
+{% extends 'marks/teacher/page.html' %}
+{% block content %}
+<form method="post" action=".">
+	<table class="form">
+	{{ form }}
+	<tr><td colspan="2"><input type="submit" value="Сохранить" /></td></tr>
+	</table>
+	<input type="hidden" name="current_subject" value="{{ user.current_subject.id }}" />
+</form>
+{% endblock %}

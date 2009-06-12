@@ -1,0 +1,14 @@
+{% extends 'marks/teacher/page.html' %}
+
+{% block content %}
+<form method="post" action=".">
+<table>
+{% for mark in marks %}
+<tr><td colspan="2">{{ mark.name }}</td></tr>
+{{ mark.form }}
+{% endfor %}
+<tr><td colspan="2"><input type="submit" name="send"></td></tr>
+</table>
+<input type="hidden" value="{{ lesson_id }}" name="lesson_id" />
+</form>
+{% endblock %}

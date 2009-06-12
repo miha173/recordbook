@@ -20,6 +20,9 @@
 			width: 100px;
 			background-color: #FFFFCF;
 		}
+		table.form{
+			text-align: left;
+		}
 	</style>
 </head>
 <body>
@@ -32,7 +35,7 @@
 		<td class="left">
 			{% block menu %}{% endblock %}
 		</td>
-		<td>{% block content %}{% endblock %}</td>
+		<td class="content">{% block content %}{% endblock %}</td>
 	</tr>
 </table>
 </body>

@@ -1,0 +1,11 @@
+{% extends 'marks/teacher/page.html' %}
+
+{% block content %}
+<table>
+	{% for grade in grades %}
+	<tr>
+		<td><a href="/marks/grades/{{ grade.id }}/">{{ grade.long_name }}</a></td>
+	</tr>
+	{% endfor %}
+</table>
+{% endblock %}

@@ -11,12 +11,12 @@ class Grade(models.Model):
     def __unicode__(self):
         return self.long_name
 
-class School(models.Model):
-    name = models.CharField(u"Имя школы (номер)", max_length = 100)
-    adress = models.CharField(u"Почтовый адрес", max_length = 255)
-    country = models.CharField(u"Страна", max_length = 255)
-    phone = models.CharField(u"Телефон", max_length = 255)
-    url = models.URLField(u"Сайт")
+#class School(models.Model):
+#    name = models.CharField(u"Имя школы (номер)", max_length = 100)
+#    adress = models.CharField(u"Почтовый адрес", max_length = 255)
+#    country = models.CharField(u"Страна", max_length = 255)
+#    phone = models.CharField(u"Телефон", max_length = 255)
+#    url = models.URLField(u"Сайт")
 
 class Subject(models.Model):
     name = models.CharField(u"Предмет", max_length = 100)
@@ -28,12 +28,16 @@ class Clerk(User):
     first_name = models.CharField(u"Имя", max_length = 30)
     middle_name = models.CharField(u"Отчество", max_length = 30, blank = True)
     password_journal = models.CharField(u"Пароль доступа к дневнику", max_length = 255)
-    school = models.ForeignKey("userextended.School", verbose_name = "Школа", blank = True)
+    #school = models.ForeignKey(School, verbose_name = "Школа", blank = True)
     def __unicode__(self):
         result = self.last_name + ' ' + self.first_name + ' ' + self.middle_name
         if self.grade:
             result = result + ' (' + self.grade.small_name + ')'
         return result
+    def fio(self):
+        return self.last_name + ' ' + self.first_name + ' ' + self.middle_name
+    def fi(self):
+        return self.last_name + ' ' + self.first_name
     def save(self, force_insert=False, force_update=False):
         #Генерация имени пользователя
         username = self.prefix + "."
@@ -53,19 +57,18 @@ class Clerk(User):
         self.username = username + last_name + '.' + first_name
         #Пароль по умолчанию
         self.set_password("1")
-        self.groups.clear()
         super(Clerk, self).save(force_insert, force_update)
     class Meta:
         abstract = True
 
 class Teacher(Clerk):
     administrator = models.BooleanField(u"Администратор")
-    subjects = models.ManyToManyField('userextended.Subject', blank = True, verbose_name = u"Предметы")
-    grades = models.ManyToManyField('userextended.Grade', blank = True, verbose_name = u"Классы", related_name = "grades")
-    grade = models.ForeignKey('userextended.Grade', verbose_name="Класс", blank = True)
-    current_subject = models.ForeignKey('userextended.Subject', blank = True, related_name = 'current_subject')
+    subjects = models.ManyToManyField(Subject, verbose_name = u"Предметы", related_name = 'subjects')
+    grades = models.ManyToManyField(Grade, blank = True, verbose_name = u"Классы", related_name = "grades")
+    grade = models.ForeignKey(Grade, verbose_name="Класс", blank = True, related_name = 'grade')
+    current_subject = models.ForeignKey(Subject, blank = True, related_name = 'current_subject')
     prefix = "t"
 
 class Pupil(Clerk):
-    grade = models.ForeignKey('userextended.Grade', verbose_name="Класс")
+    grade = models.ForeignKey(Grade, verbose_name="Класс")
     prefix = "p"
