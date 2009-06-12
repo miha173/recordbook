@@ -10,6 +10,7 @@ urlpatterns = patterns("src.marks.views",
                        (r'lessons/edit/(?P<id>\d+)/$', 'lessonEdit', {'mode': 'edit'}),
                        (r'lessons/delete/(?P<id>\d+)/$', 'lessonEdit', {'mode': 'delete'}),
                        (r'grades/$', 'gradesList'),
-                       (r'grades/(?P<grade_id>\d+)/$', 'pupilsList'),
-                       (r'grades/(?P<grade_id>\d+)/give/$', 'giveMark')
+                       (r'grades/(?P<grade_id>\d+)/$', 'gradeLessonsList'),
+                       (r'grades/(?P<grade_id>\d+)/(?P<lesson_id>\d+)/$', 'marksList'),
+                       (r'grades/(?P<grade_id>\d+)/(?P<lesson_id>\d+)/give/$', 'giveMark'),
                        )

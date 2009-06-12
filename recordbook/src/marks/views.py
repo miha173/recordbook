@@ -93,13 +93,30 @@ def gradesList(request):
     render['render_objects']['grades'] = teacher.grades.all()
     return render_to_response('marks/teacher/gradesList.html', render['render_objects'])
 
-def pupilsList(request, grade_id):
+def gradeLessonsList(request, grade_id):
     render = render_options(request)
-    render['render_objects']['pupils'] = Pupil.objects.filter(grade__id = grade_id).order_by('last_name')
-    render['render_objects']['lessons'] = Lesson.objects.filter(teacher__id = request.user.id, grade__id = grade_id).order_by('-date')
-    return render_to_response('marks/teacher/pupilsList.html', render['render_objects'])
+    render['render_objects']['grade_id'] = grade_id
+    render['render_objects']['lessons'] = Lesson.objects.filter(grade = Grade.objects.get(id = grade_id))
+    return render_to_response('marks/teacher/gradeLessonsList.html', render['render_objects'])
 
-def giveMark(request, grade_id):
+def marksList(request, grade_id, lesson_id):
+    render = render_options(request)
+    pupils = Pupil.objects.filter(grade = Grade.objects.get(id = grade_id))
+    pupils_list = []
+    for pupil in pupils:
+        try:
+            mark_ = Mark.objects.get(lesson = Lesson.objects.get(id = lesson_id),
+                                    pupil = pupil)
+            mark = mark_.mark
+            absent = mark_.absent
+        except ObjectDoesNotExist:
+            mark = 0
+            absent = False
+        pupils_list.append({'id': pupil.id, 'name': pupil.fi(), 'mark': mark, 'absent': absent})
+    render['render_objects']['pupils'] = pupils_list
+    return render_to_response('marks/teacher/marksList.html', render['render_objects'])
+
+def giveMark(request, grade_id, lesson_id):
     #Очень сомнительное место, наверное самое сомнительное в коде
     #Каждая строчка полна отборного бреда
     #При выводе убрать списки! Это же полный ахтунг выводить всех учеников
@@ -136,16 +153,22 @@ def giveMark(request, grade_id):
     #Здесь есть скользкий момент, заключающийся в способе определения кому нужно выставлять отметки
     render = render_options(request)
     grade_id = int(grade_id)
+    lesson_id = int(lesson_id)
     if not request.POST.get('send'):
         marks = []
         pupilsForMarks = []
         for pupil in Pupil.objects.filter(grade = grade_id):
             if request.POST.get('pupil-%d' % pupil.id):
-                marks.append({'name': pupil.fi(), 'form': MarkForm(prefix = pupil.id)})
+                try:
+                    mark = Mark.objects.get(lesson = Lesson.objects.get(id = lesson_id),
+                                            pupil = pupil)
+                    markForm = MarkForm(prefix = pupil.id, instance = mark)
+                except ObjectDoesNotExist:
+                    markForm = MarkForm(prefix = pupil.id)
+                marks.append({'name': pupil.fi(), 'form': markForm})
                 pupilsForMarks.append(pupil.id)
         #request.session['pupilsForMarks'] = pupilsForMarks
         render['render_objects']['marks'] = marks
-        render['render_objects']['lesson_id'] = request.POST.get('lesson')
         return render_to_response('marks/teacher/giveMark.html', render['render_objects'])
     else:
         #session = request.session.get('pupilsForMarks')
@@ -154,11 +177,16 @@ def giveMark(request, grade_id):
             if request.POST.get('%d-mark' % pupil.id) or request.POST.get('%d-absent' % pupil.id) or request.POST.get('%d-comment' % pupil.id):
                 form = MarkForm(request.POST, prefix = pupil.id)
                 if form.is_valid():
-                    mark = Mark(pupil = Pupil.objects.get(id = pupil.id),
-                                lesson = Lesson.objects.get(id = request.POST.get('lesson_id')),
-                                mark = form.cleaned_data['mark'],
-                                absent = form.cleaned_data['absent'],
-                                comment = form.cleaned_data['comment'])
+                    try:
+                        mark = Mark.objects.get(pupil = Pupil.objects.get(id = pupil.id), 
+                                                lesson = Lesson.objects.get(id = lesson_id))
+                    except ObjectDoesNotExist:
+                        mark = Mark()
+                    mark.pupil = Pupil.objects.get(id = pupil.id)
+                    mark.lesson = Lesson.objects.get(id = lesson_id)
+                    mark.mark = form.cleaned_data['mark']
+                    mark.absent = form.cleaned_data['absent']
+                    mark.comment = form.cleaned_data['comment']
                     mark.save()
                 else:
                     error = 1
@@ -171,6 +199,5 @@ def giveMark(request, grade_id):
                 if request.POST.get('%d-mark' % pupil.id) or request.POST.get('%d-absent' % pupil.id) or request.POST.get('%d-comment' % pupil.id):
                     marks.append({'name': pupil.fi(), 'form': MarkForm(request.POST, prefix = pupil.id)})
             render['render_objects']['marks'] = marks
-            render['render_objects']['lesson_id'] = request.POST.get('lesson')
             return render_to_response('marks/teacher/giveMark.html', render['render_objects'])
         

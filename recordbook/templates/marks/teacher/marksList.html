@@ -3,18 +3,14 @@
 {% block content %}
 <form method="post" action="give/">
 	<table>
-		<tr><td colspan="2">
-			<select name="lesson">
-			{% for lesson in lessons %}
-			<option value="{{ lesson.id }}">{{ lesson.topic }}</option>
-			{% endfor %}
-			</select>
+		<tr><td colspan="3">
 			<input type="submit" value="Выставить отметки" />
 		</td></tr>
 		{% for pupil in pupils %}
 		<tr>
 			<td><input type="checkbox" name="pupil-{{ pupil.id }}" /></td>
-			<td>{{ pupil.last_name }} {{ pupil.first_name }}</td>
+			<td>{{ pupil.name }}</td>
+			<td>{% if pupil.absent %}H{% else %}{{ pupil.mark|default:"" }}{% endif %}</td>
 		</tr>
 		{% endfor %}
 	</table>
