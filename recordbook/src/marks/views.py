@@ -44,7 +44,12 @@ def set_current_subject(request, subject_id):
 
 def lessonsList(request):
     render = render_options(request)
-    render['render_objects']['lessons'] = Lesson.objects.all()
+    teacher = Teacher.objects.get(id = request.user.id)
+    try:
+        render['render_objects']['lessons'] = Lesson.objects.filter(teacher = teacher,
+                                                                    subject = teacher.current_subject())
+    except ObjectDoesNotExist:
+        render['render_objects']['lessons'] = {}
     return render_to_response('marks/teacher/lessons.html', render['render_objects']) 
 
 def lessonEdit(request, mode, id = 0):
