@@ -1,0 +1,15 @@
+{% extends 'marks/teacher/page.html' %}
+
+{% block content %}
+	<a href="/marks/connections/wizard/1/">Добавить связку</a>
+	<table>
+	{% for connection in connections %}
+		<tr>
+			<td>{{ connection.teacher }}</td>
+			<td>{{ connection.subject }}</td>
+			<td>{{ connection.type }}</td>
+			<td><a href="/marks/connections/delete/{{ connection.id }}">Удалить</a></td>
+		</tr>
+	{% endfor %}
+	</table>
+{% endblock %}
