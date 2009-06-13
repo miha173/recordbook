@@ -43,7 +43,9 @@ class Clerk(User):
         username = self.prefix + "."
         last_name = pytils.translit.translify(self.last_name.lower())
         last_name = last_name.replace("'","")
+        last_name = last_name.replace("`","")
         first_name = pytils.translit.translify(self.first_name.lower())
+        first_name = first_name.replace("'","")
         first_name = first_name.replace("`","")
         if len(last_name)+len(first_name)>28:
             if len(last_name)>25:

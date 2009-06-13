@@ -61,12 +61,13 @@ def lessonsList(request):
         render['render_objects']['lessons'] = {}
     return render_to_response('marks/teacher/lessons.html', render['render_objects']) 
 
-#Помни, нужно фильтровать список класса
+#Нужно проверять возможность учителя добавления записи к данному классу
 def lessonEdit(request, mode, id = 0):
     render = render_options(request)
     if request.method == 'GET':
         if mode == 'edit':
             render['render_objects']['form'] = LessonForm(instance = get_object_or_404(Lesson, id = id))
+            render['render_objects']['form'].fields['grade'].queryset = Teacher.objects.get(id = request.user.id).grades.all()
             render['render_objects']['lesson_id'] = id
             return render_to_response('marks/teacher/lesson.html', render['render_objects'])
         elif mode == 'delete': 
@@ -75,6 +76,7 @@ def lessonEdit(request, mode, id = 0):
              return HttpResponseRedirect('/marks/lessons/')
         else:
             render['render_objects']['form'] = LessonForm()
+            render['render_objects']['form'].fields['grade'].queryset = Teacher.objects.get(id = request.user.id).grades.all()
             return render_to_response('marks/teacher/lesson.html', render['render_objects'])
     else:
         if mode == 'edit':
