@@ -65,10 +65,10 @@ class Clerk(User):
 
 class Teacher(Clerk):
     administrator = models.BooleanField(u"Администратор")
-    subjects = models.ManyToManyField(Subject, verbose_name = u"Предметы", related_name = 'subjects', blank = True)
-    grades = models.ManyToManyField(Grade, blank = True, verbose_name = u"Классы", related_name = "grades")
-    grade = models.ForeignKey(Grade, verbose_name="Класс", blank = True, related_name = 'grade')
-    current_subject = models.ForeignKey(Subject, blank = True, related_name = 'current_subject')
+    subjects = models.ManyToManyField(Subject, verbose_name = u"Предметы", related_name = 'subjects', blank = True, null = True)
+    grades = models.ManyToManyField(Grade, blank = True, verbose_name = u"Классы", related_name = "grades", null = True)
+    grade = models.ForeignKey(Grade, verbose_name="Класс", blank = True, related_name = 'grade', null = True)
+    current_subject = models.ForeignKey(Subject, blank = True, related_name = 'current_subject', null = True)
     prefix = "t"
 
 class Pupil(Clerk):
@@ -82,7 +82,10 @@ class Connection(models.Model):
     teacher = models.ForeignKey(Teacher, verbose_name = u'Учитель')
     subject = models.ForeignKey(Subject, verbose_name = u'Предмет')
     grade = models.ForeignKey(Grade, verbose_name = u'Класс')
-    type = models.CharField(max_length = 1, choices = (('1', u'По группам'), 
-                                                       ('2', u'По полу'), 
-                                                       ('3', u'Специальная группа')))
-    connection = models.CharField(max_length = 1, choices = (('0', '0'), ('1', '1'), ('2', '2')))
+    connection = models.CharField(max_length = 1, choices = (('0', 'Весь класс'),
+                                                             ('1', '1 группа'), 
+                                                             ('2', '2 группа'), 
+                                                             ('3', 'Юноши'),
+                                                             ('4', 'Девушки'),
+                                                             ('5', 'Спец. группа'),
+                                                             ))

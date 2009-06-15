@@ -5,23 +5,29 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
-from src.userextended.models import Pupil, Teacher, Subject, Grade
-from django.forms.models import modelformset_factory
+from src.userextended.models import Pupil, Teacher, Subject, Grade, Connection
 from src.marks.models import Lesson, Mark
-from src.marks.forms import LessonForm, MarkForm
+from src.marks.forms import LessonForm, MarkForm, ConnectionStep1Wizard, ConnectionStep2Wizard, ConnectionStep3Wizard
 
 def render_options(request):
     options = render_objects = options['render_objects'] = {}
     if request.user.username[0] == 't':
         user = Teacher.objects.get(id = request.user.id)
         subjects = []
-        for subject in user.subjects.all():
-            subjects.append({'id': subject.id, 'name': subject.name})
-        if subjects.__len__() and not user.current_subject>0:
-            user.current_subject = Subject.objects.get(id = subjects[0]['id'])
-            user.save()
+        last_subject = None
+        for connection in Connection.objects.filter(teacher = user).order_by('subject'):
+            if last_subject != connection.subject:
+                last_subject = connection.subject
+                subjects.append({'id': connection.subject.id, 'name': connection.subject.name})
+        try:
+            current_subject = user.current_subject
+        except ObjectDoesNotExist:
+            if subjects.__len__() != 0:
+                user.current_subject = Subject.objects.get(id = subjects[0]['id'])
+                user.save()
         render_objects['user'] = user
         render_objects['subjects'] = subjects
+        render_objects['grade'] = user.grade
         render_objects['next'] = request.path
         options['render_objects'] = render_objects
         options['usertype'] = 'teacher'
@@ -67,7 +73,10 @@ def lessonEdit(request, mode, id = 0):
     if request.method == 'GET':
         if mode == 'edit':
             render['render_objects']['form'] = LessonForm(instance = get_object_or_404(Lesson, id = id))
-            render['render_objects']['form'].fields['grade'].queryset = Teacher.objects.get(id = request.user.id).grades.all()
+            grades_id = []
+            for connection in Connection.objects.filter(teacher = request.user):
+                grades_id.append(connection.grade.id)
+            render['render_objects']['form'].fields['grade'].queryset = Grade.objects.filter(id__in = grades_id)
             render['render_objects']['lesson_id'] = id
             return render_to_response('marks/teacher/lesson.html', render['render_objects'])
         elif mode == 'delete': 
@@ -76,7 +85,10 @@ def lessonEdit(request, mode, id = 0):
              return HttpResponseRedirect('/marks/lessons/')
         else:
             render['render_objects']['form'] = LessonForm()
-            render['render_objects']['form'].fields['grade'].queryset = Teacher.objects.get(id = request.user.id).grades.all()
+            grades_id = []
+            for connection in Connection.objects.filter(teacher = request.user):
+                grades_id.append(connection.grade.id)
+            render['render_objects']['form'].fields['grade'].queryset = Grade.objects.filter(id__in = grades_id)
             return render_to_response('marks/teacher/lesson.html', render['render_objects'])
     else:
         if mode == 'edit':
@@ -122,6 +134,17 @@ def gradeLessonsList(request, grade_id):
 def marksList(request, grade_id, lesson_id):
     render = render_options(request)
     pupils = Pupil.objects.filter(grade = Grade.objects.get(id = grade_id))
+    connection = Connection.objects.get(grade = Grade.objects.get(id = grade_id), teacher = request.user)
+    if connection.connection == '1':
+        pupils = pupils.filter(group = '1')
+    if connection.connection == '2':
+        pupils = pupils.filter(group = '2')
+    if connection.connection == '3':
+        pupils = pupils.filter(sex = '1')
+    if connection.connection == '4':
+        pupils = pupils.filter(sex = '2')
+    if connection.connection == '5':
+        pupils = pupils.filter(special = True)
     pupils_list = []
     for pupil in pupils:
         try:
@@ -220,4 +243,65 @@ def giveMark(request, grade_id, lesson_id):
                     marks.append({'name': pupil.fi(), 'form': MarkForm(request.POST, prefix = pupil.id)})
             render['render_objects']['marks'] = marks
             return render_to_response('marks/teacher/giveMark.html', render['render_objects'])
-        
+
+def connectionsList(request):
+    render = render_options(request)
+    teacher = Teacher.objects.get(id = request.user.id)
+    render['render_objects']['connections'] = Connection.objects.filter(grade = teacher.grade)
+    return render_to_response('marks/teacher/connectionsList.html', render['render_objects'])
+
+def connectionWizard(request, step):
+    render = render_options(request)
+    step = int(step)
+    if step == 1:
+        if request.method == 'GET':
+            user = Teacher.objects.get(id = request.user.id)
+            render['render_objects']['form'] = ConnectionStep1Wizard()
+            render['render_objects']['form'].fields['teacher'].queryset = Teacher.objects.filter(grades = user.grade)
+            return render_to_response('marks/teacher/connectionWizard.html', render['render_objects'])
+        else:
+            render['render_objects']['form'] = ConnectionStep1Wizard(request.POST)
+            if render['render_objects']['form'].is_valid():
+                request.session['teacher'] = render['render_objects']['form'].cleaned_data['teacher']
+                return HttpResponseRedirect('/marks/connections/wizard/2/')
+            else:
+                user = Teacher.objects.get(id = request.user.id)
+                render['render_objects']['form'].fields['teacher'].queryset = Teacher.objects.filter(grades = user.grade)
+                return render_to_response('marks/teacher/connectionWizard.html', render['render_objects'])
+    if step == 2:
+        if request.method == 'GET':
+            render['render_objects']['form'] = ConnectionStep2Wizard()
+            render['render_objects']['form'].fields['subject'].queryset = request.session['teacher'].subjects
+            return render_to_response('marks/teacher/connectionWizard.html', render['render_objects'])
+        else:
+            render['render_objects']['form'] = ConnectionStep2Wizard(request.POST)
+            if render['render_objects']['form'].is_valid():
+                request.session['subject'] = render['render_objects']['form'].cleaned_data['subject']
+                return HttpResponseRedirect('/marks/connections/wizard/3')
+            else:
+                render['render_objects']['form'].fields['subject'].queryset = Subject.objects.filter(teacher = request.session['teacher'])
+                return render_to_response('marks/teacher/connectionWizard.html', render['render_objects'])
+    if step == 3:
+        if request.method == 'GET':
+            render['render_objects']['form'] = ConnectionStep3Wizard()
+            return render_to_response('marks/teacher/connectionWizard.html', render['render_objects'])
+        else:
+            render['render_objects']['form'] = ConnectionStep3Wizard(request.POST)
+            if render['render_objects']['form'].is_valid():
+                user = Teacher.objects.get(id = request.user.id)
+                connection = Connection(teacher = request.session['teacher'],
+                                        subject = request.session['subject'],
+                                        grade = user.grade,
+                                        connection = render['render_objects']['form'].cleaned_data['connection'])
+                connection.save()
+                del request.session['teacher']
+                del request.session['subject']
+                return HttpResponseRedirect('/marks/connections/')
+            else:
+                return render_to_response('marks/teacher/connectionWizard.html', render['render_objects'])
+            
+def connectionEdit(request, connection_id, mode):
+    if mode == 'delete':
+        connection = get_object_or_404(Connection, id = connection_id)
+        connection.delete()
+        return HttpResponseRedirect('/marks/connections/')

@@ -3,8 +3,11 @@
 <head>
 	<title>{% block title %}Отметки{% endblock %}</title>
 	<style>
+		body{
+			font-family: Verdana, Tahoma;
+		}
 		.content{
-			width: 100%;
+			width: 90%;
 			height: 100%;
 		}
 		td.topmenu a, span{
@@ -18,16 +21,24 @@
 			text-align: right;
 		}
 		td.left{
-			width: 100px;
+			width: 10%;
 			background-color: #FFFFCF;
 		}
 		table.form{
 			text-align: left;
 		}
+		td{
+			vertical-align: top;
+		}
+		td.left ul{padding: 0px;}
+		td.left li{
+			list-style: none;
+			padding: 3px 0px 3px 5px;
+		}
 	</style>
 </head>
 <body>
-<table class="content">
+<table style="width: 100%">
 	<tr>
 		<td class="left">{% block logo %} {% endblock %}</td>
 		<td class="topmenu">{% block topmenu %}{% endblock %}</td>

@@ -1,11 +1,15 @@
 {% extends 'marks/page.html' %}
 
 {% block menu %}
-	<a href="/marks/lessons/">Уроки</a> <br />
-	<a href="/marks/grades/">Выставить отметки</a>
-	{% if grade %}
-		<a href="/marks/connections/">Связки</a>
+	<ul>
+	{% if subjects %}
+		<li><a href="/marks/lessons/">Уроки</a></li>
+		<li><a href="/marks/grades/">Выставить отметки</li>
 	{% endif %}
+	{% if grade %}
+		<li><a href="/marks/connections/">Связки</a></li>
+	{% endif %}
+	</ul>
 {% endblock %}
 
 {% block topmenu %} 

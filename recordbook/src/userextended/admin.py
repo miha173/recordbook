@@ -14,7 +14,11 @@ class TeacherAdmin(admin.ModelAdmin):
     def fio(obj):
         return obj.last_name+' '+obj.first_name+' '+obj.middle_name
     fio.short_description = u'Фамилия, имя, отчество'
-    list_display = (fio, 'grade')
+    def grade(obj):
+        return obj.grade.long_name if obj.grade else u'Нет классного руководства'
+    grade.short_description = u'Класс'
+    #Если не вызывать функцию grade, а писать 'grade', то выводится не все записи.
+    list_display = (fio, grade)
     fieldsets = [
                  (u'Общая информация', {'fields': ['last_name', 'first_name', 'middle_name', 'grade']}),
                  (u'Преподавание', {'fields': ['grades', 'subjects']}),
