@@ -6,7 +6,7 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-                       (r"^$", "src.views.index"),
+                       (r"^$", "src.marks.views.index"),
                        (r'^admin/doc/', include('django.contrib.admindocs.urls')),
                        (r'^admin/(.*)', admin.site.root),
                        (r'^accounts/', include('src.userextended.urls')),

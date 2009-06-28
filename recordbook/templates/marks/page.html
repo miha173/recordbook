@@ -3,6 +3,7 @@
 <head>
 	<title>{% block title %}Отметки{% endblock %}</title>
 	<style>
+/*
 		body{
 			font-family: Verdana, Tahoma;
 		}
@@ -35,20 +36,27 @@
 			list-style: none;
 			padding: 3px 0px 3px 5px;
 		}
-	</style>
+
+*/	</style>
+	<link rel="stylesheet" type="text/css" href="/css/default.css" />
 </head>
 <body>
-<table style="width: 100%">
-	<tr>
-		<td class="left">{% block logo %} {% endblock %}</td>
-		<td class="topmenu">{% block topmenu %}{% endblock %}</td>
-	</tr>
-	<tr>
-		<td class="left">
-			{% block menu %}{% endblock %}
-		</td>
-		<td class="content">{% block content %}{% endblock %}</td>
-	</tr>
-</table>
+{% block topmenu %}{% endblock %}
+    <div id="navigation">
+        <div id="sidebar">
+            <div id="menu">
+				{% block menu %}{% endblock %}
+				<ul style="padding-top: 15px;">
+					<li><a href="/accounts/logout">Выйти</a></li>
+				</ul>
+            </div>
+            <div class="copyright">
+                 2009 &copy;
+            </div>
+        </div>
+	</div>
+    <div id="content">
+		{% block content %}{% endblock %}
+	</div>
 </body>
 </html>

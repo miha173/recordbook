@@ -3,23 +3,25 @@
 {% block menu %}
 	<ul>
 	{% if subjects %}
-		<li><a href="/marks/lessons/">Уроки</a></li>
-		<li><a href="/marks/grades/">Выставить отметки</li>
+		<li{% ifequal path "lessons" %} class="active"{% endifequal %}><a href="/marks/lessons/">Уроки</a></li>
+		<li{% ifequal path "grades" %} class="active"{% endifequal %}><a href="/marks/grades/">Выставить отметки</li>
 	{% endif %}
 	{% if grade %}
-		<li><a href="/marks/connections/">Связки</a></li>
+		<li{% ifequal path "connections" %} class="active"{% endifequal %}><a href="/marks/connections/">Связки</a></li>
 	{% endif %}
 	</ul>
 {% endblock %}
 
 {% block topmenu %} 
 	{% spaceless %}
+	<ul id="topmenu">
 	{% for subject in subjects %}
 		{% ifequal subject.id user.current_subject.id %}
-			<span>{{ subject.name }}</span>
+			<li class="active">{{ subject.name }}</li>
 		{% else %}
-			<a href="/marks/set_current_subject/{{ subject.id }}?next={{ next }}">{{ subject.name }}</a>
+			<li><a href="/marks/set_current_subject/{{ subject.id }}?next={{ next }}">{{ subject.name }}</a></li>
 		{% endifequal %}
 	{% endfor %}
+	</ul>
 	{% endspaceless %}
 {% endblock %}

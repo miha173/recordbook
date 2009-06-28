@@ -3,11 +3,11 @@
 {% block content %}
 	<a href="/marks/lessons/add">Добавить урок</a><br />
 		<table class="list">
-		    <tr>
+		    <thead>
 		        <td>Тема урока</td>
 		        <td>Класс</td>
 		        <td>Действия</td>
-		    </tr>
+		    </thead>
 		{% for lesson in lessons %}
 		    <tr>
 		        <td>{{ lesson.topic }}</td>

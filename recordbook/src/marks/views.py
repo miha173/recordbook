@@ -11,6 +11,8 @@ from src.marks.forms import LessonForm, MarkForm, ConnectionStep1Wizard, Connect
 
 def render_options(request):
     options = render_objects = options['render_objects'] = {}
+    pathes = request.path.split('/')
+    render_objects['path'] = pathes[pathes.__len__()-2]
     if request.user.username[0] == 't':
         user = Teacher.objects.get(id = request.user.id)
         subjects = []

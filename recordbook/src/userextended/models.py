@@ -59,6 +59,8 @@ class Clerk(User):
         self.username = username + last_name + '.' + first_name
         #Пароль по умолчанию
         self.set_password("1")
+        if self.administrator:
+            self.is_                        
         super(Clerk, self).save(force_insert, force_update)
     class Meta:
         abstract = True
