@@ -1,0 +1,7 @@
+{% extends 'page.html' %}
+
+{% block curatorship_menu %}
+<ul>
+	<li{% ifequal path "connections" %} class="active"{% endifequal %}><a href="/curatorship/connections/">Связки</a></li>
+</ul>
+{% endblock %}

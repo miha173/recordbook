@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+<head>
+	<title>{% block title %}Отметки{% endblock %}</title>
+	<style>
+/*
+		body{
+			font-family: Verdana, Tahoma;
+		}
+		.content{
+			width: 90%;
+			height: 100%;
+		}
+		td.topmenu a, span{
+			padding: 0px 20px;
+			border-width: 0 1px;
+			border-style: solid;
+			border-color: gray;
+			margin: 0px;
+		}
+		td.topmenu{
+			text-align: right;
+		}
+		td.left{
+			width: 10%;
+			background-color: #FFFFCF;
+		}
+		table.form{
+			text-align: left;
+		}
+		td{
+			vertical-align: top;
+		}
+		td.left ul{padding: 0px;}
+		td.left li{
+			list-style: none;
+			padding: 3px 0px 3px 5px;
+		}
+
+*/	</style>
+	<link rel="stylesheet" type="text/css" href="/css/default.css" />
+</head>
+<body>
+{% block topmenu %}{% endblock %}
+    <div id="navigation">
+        <div id="sidebar">
+            <div id="menu"> 
+				<ul>
+					<li><a href="/marks/">Выставление отметок</a>{% block marks_menu %}{% endblock %}</li>
+					{% if grade %}<li><a href="/curatorship/">Классное руководство</a>{% block curatorship_menu %}{% endblock %}</li>{% endif %}
+				</ul>
+				<ul style="padding-top: 15px;">
+					<li><a href="/accounts/password_change">Сменить пароль</a></li>
+					<li><a href="/accounts/logout">Выйти</a></li>
+				</ul>
+            </div>
+            <div class="copyright">
+                 2009 &copy;
+            </div>
+        </div>
+	</div>
+    <div id="content">
+		{% block content %}{% endblock %}
+	</div>
+</body>
+</html>

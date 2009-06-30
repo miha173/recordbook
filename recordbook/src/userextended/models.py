@@ -5,21 +5,19 @@ from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 import pytils
 
+class School(models.Model):
+    name = models.CharField(u"Имя учебного заведения", max_length = 100)
+
 class Grade(models.Model):
     long_name = models.CharField(u"Длинное имя", max_length = 100)
     small_name = models.CharField(u"Короткое имя", max_length = 10)
+    school = models.ForeignKey(School, verbose_name = "Школа", blank = True)
     def __unicode__(self):
         return self.long_name
 
-#class School(models.Model):
-#    name = models.CharField(u"Имя школы (номер)", max_length = 100)
-#    adress = models.CharField(u"Почтовый адрес", max_length = 255)
-#    country = models.CharField(u"Страна", max_length = 255)
-#    phone = models.CharField(u"Телефон", max_length = 255)
-#    url = models.URLField(u"Сайт")
-
 class Subject(models.Model):
     name = models.CharField(u"Предмет", max_length = 100)
+    school = models.ForeignKey(School, verbose_name = "Школа", blank = True)
     def __unicode__(self):
         return self.name
 
@@ -28,7 +26,7 @@ class Clerk(User):
     first_name = models.CharField(u"Имя", max_length = 30)
     middle_name = models.CharField(u"Отчество", max_length = 30, blank = True)
     password_journal = models.CharField(u"Пароль доступа к дневнику", max_length = 255)
-    #school = models.ForeignKey(School, verbose_name = "Школа", blank = True)
+    school = models.ForeignKey(School, verbose_name = "Школа", blank = True)
     def __unicode__(self):
         result = self.last_name + ' ' + self.first_name + ' ' + self.middle_name
         if self.grade:
@@ -80,14 +78,3 @@ class Pupil(Clerk):
     special = models.BooleanField(verbose_name = u'Специальная группа')
     prefix = "p"
 
-class Connection(models.Model):
-    teacher = models.ForeignKey(Teacher, verbose_name = u'Учитель')
-    subject = models.ForeignKey(Subject, verbose_name = u'Предмет')
-    grade = models.ForeignKey(Grade, verbose_name = u'Класс')
-    connection = models.CharField(max_length = 1, choices = (('0', 'Весь класс'),
-                                                             ('1', '1 группа'), 
-                                                             ('2', '2 группа'), 
-                                                             ('3', 'Юноши'),
-                                                             ('4', 'Девушки'),
-                                                             ('5', 'Спец. группа'),
-                                                             ))

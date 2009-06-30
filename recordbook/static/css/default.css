@@ -50,6 +50,11 @@ a{
 	padding: 3px 4px;
 }
 
+#menu li li{
+	font-size: 90%;
+	padding-left: 20px;
+}
+
 #menu a {
 	color: #949599;
 	text-decoration: none;

@@ -86,5 +86,6 @@ INSTALLED_APPS = (
     'src',
     'src.pages',
     'src.userextended',
-    'src.marks'
+    'src.marks',
+    'src.curatorship',
 )

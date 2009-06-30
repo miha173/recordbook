@@ -1,13 +1,10 @@
 {% extends 'marks/page.html' %}
 
-{% block menu %}
+{% block marks_menu %}
 	<ul>
 	{% if subjects %}
 		<li{% ifequal path "lessons" %} class="active"{% endifequal %}><a href="/marks/lessons/">Уроки</a></li>
 		<li{% ifequal path "grades" %} class="active"{% endifequal %}><a href="/marks/grades/">Выставить отметки</li>
-	{% endif %}
-	{% if grade %}
-		<li{% ifequal path "connections" %} class="active"{% endifequal %}><a href="/marks/connections/">Связки</a></li>
 	{% endif %}
 	</ul>
 {% endblock %}

@@ -1,18 +1,10 @@
-<html>
-<head>
-<title></title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-</head>
-<body>
-{{user.username}}<br />
-<a href="/marks/">Отметки</a><br />
-<a href="/accounts/login">Войти</a><br />
-<a href="/admin">Войти в админку</a><br />
-<a href="/accounts/logout">Выйти</a><br />
-<div style="position: absolute; top: 40%; left: 0px; right: 0px; vertical-align: center; text-align: center; font-size: 30px; font-family: Verdana,Tahoma;">
-Всё будет, скоро.
-<br />
-=)
-</div>
-</body>
-</html>
+{% extends 'page.html' %}
+
+{% comment %}
+{% block menu %}
+<ul>
+	<li><a href="/marks/">Выставление отметок</a>{% block marks_menu %}{% endblock %}</li>
+	<li><a href="/curator/">Классное руководство</a>{% block curator_menu %}{% endblock %}</li>
+</ul>
+{% endblock %}
+{% endcomment %}

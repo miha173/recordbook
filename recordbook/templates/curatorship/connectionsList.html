@@ -1,14 +1,14 @@
-{% extends 'marks/teacher/page.html' %}
+{% extends 'curatorship/page.html' %}
 
 {% block content %}
-	<a href="/marks/connections/wizard/1/">Добавить связку</a>
+	<a href="/curatorship/connections/wizard/1/">Добавить связку</a>
 	<table>
 	{% for connection in connections %}
 		<tr>
 			<td>{{ connection.teacher.fio }}</td>
 			<td>{{ connection.subject }}</td>
 			<td>{{ connection.type }}</td>
-			<td><a href="/marks/connections/delete/{{ connection.id }}">Удалить</a></td>
+			<td><a href="/curatorship/connections/delete/{{ connection.id }}">Удалить</a></td>
 		</tr>
 	{% endfor %}
 	</table>

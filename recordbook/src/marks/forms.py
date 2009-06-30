@@ -5,7 +5,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render_to_response
 from django.forms.util import ErrorList
 from src.marks.models import Lesson, Mark
-from src.userextended.models import Connection
+from src.curatorship.models import Connection
 
 class LessonForm(forms.ModelForm):
     class Meta:
@@ -26,17 +26,3 @@ class MarkForm(forms.ModelForm):
         model = Mark
         fields = ('mark', 'absent', 'comment')
 
-class ConnectionStep1Wizard(forms.ModelForm):
-    class Meta:
-        model = Connection
-        fields = ('teacher',)
-
-class ConnectionStep2Wizard(forms.ModelForm):
-    class Meta:
-        model = Connection
-        fields = ('subject',)
-
-class ConnectionStep3Wizard(forms.ModelForm):
-    class Meta:
-        model = Connection
-        fields = ('connection',)

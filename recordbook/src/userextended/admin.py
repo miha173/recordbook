@@ -1,7 +1,11 @@
 # -*- coding: UTF-8 -*-
 
 from django.contrib import admin
-from src.userextended.models import Grade, Subject, Teacher, Pupil
+from src.userextended.models import Grade, Subject, Teacher, Pupil, School
+
+class SchoolAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    fields = ('name',)
 
 class GradeAdmin(admin.ModelAdmin):
     list_display = ('long_name',)
@@ -37,6 +41,7 @@ class PupilAdmin(admin.ModelAdmin):
     search_fields = ['first_name', 'last_name']
     ordering = ('last_name',)
     
+admin.site.register(School, SchoolAdmin)
 admin.site.register(Grade, GradeAdmin)
 admin.site.register(Subject, SubjectAdmin)
 admin.site.register(Pupil, PupilAdmin)
