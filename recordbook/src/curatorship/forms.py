@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 from django import forms
-from src.curatorship.models import Connection
+from models import Connection
 
 
 class ConnectionStep1Wizard(forms.ModelForm):

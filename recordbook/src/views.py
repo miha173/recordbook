@@ -2,7 +2,7 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
 
-from src.userextended.models import Pupil, Teacher
+from src.userextended.models import Pupil, Teacher, Subject
 from src.curatorship.models import Connection
 
 def render_options(request):
@@ -17,15 +17,14 @@ def render_options(request):
             if last_subject != connection.subject:
                 last_subject = connection.subject
                 subjects.append({'id': connection.subject.id, 'name': connection.subject.name})
-        try:
-            current_subject = user.current_subject
-        except ObjectDoesNotExist:
+        if not user.current_subject:
             if subjects.__len__() != 0:
                 user.current_subject = Subject.objects.get(id = subjects[0]['id'])
                 user.save()
         render_objects['user'] = user
         render_objects['subjects'] = subjects
         render_objects['grade'] = user.grade
+        render_objects['administrator'] = user.administrator
         render_objects['next'] = request.path
         render_objects['user_type'] = 'teacher'
         options = render_objects

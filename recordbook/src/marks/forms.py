@@ -4,7 +4,8 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render_to_response
 from django.forms.util import ErrorList
-from src.marks.models import Lesson, Mark
+
+from models import Lesson, Mark
 from src.curatorship.models import Connection
 
 class LessonForm(forms.ModelForm):

@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 from django.contrib import admin
-from src.userextended.models import Grade, Subject, Teacher, Pupil, School
+from models import Grade, Subject, Teacher, Pupil, School
 
 class SchoolAdmin(admin.ModelAdmin):
     list_display = ('name',)
@@ -24,7 +24,7 @@ class TeacherAdmin(admin.ModelAdmin):
     #Если не вызывать функцию grade, а писать 'grade', то выводится не все записи.
     list_display = (fio, grade)
     fieldsets = [
-                 (u'Общая информация', {'fields': ['last_name', 'first_name', 'middle_name', 'grade']}),
+                 (u'Общая информация', {'fields': ['last_name', 'first_name', 'middle_name', 'grade', 'school']}),
                  (u'Преподавание', {'fields': ['grades', 'subjects']}),
                  (u'Другое', {'fields': ['administrator']})
                 ]
@@ -36,7 +36,7 @@ class PupilAdmin(admin.ModelAdmin):
         return obj.last_name+' '+obj.first_name+' '+obj.middle_name
     fio.short_description = u'Фамилия, имя, отчество'
     list_display = (fio,)
-    fieldsets = [(u'Общая информация', {'fields': ['last_name', 'first_name', 'middle_name', 'sex']}),
+    fieldsets = [(u'Общая информация', {'fields': ['last_name', 'first_name', 'middle_name', 'sex', 'school']}),
                  (u'Учёба', {'fields': ['grade', 'group', 'special']})]
     search_fields = ['first_name', 'last_name']
     ordering = ('last_name',)

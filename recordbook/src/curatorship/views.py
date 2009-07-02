@@ -9,9 +9,9 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from src.views import render_options
 from src.userextended.models import Teacher, Subject, Grade
-from src.curatorship.models import Connection
+from models import Connection
+from forms import ConnectionStep1Wizard, ConnectionStep2Wizard, ConnectionStep3Wizard
 from src.marks.models import Lesson, Mark
-from src.curatorship.forms import ConnectionStep1Wizard, ConnectionStep2Wizard, ConnectionStep3Wizard
 
 def index(request):
     return render_to_response('curatorship/page.html', render_options(request))

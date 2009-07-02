@@ -1,0 +1,10 @@
+{% extends 'page.html' %}
+
+{% block administrator_menu %}
+<ul>
+	<li{% ifequal path "teacher" %} class="active" {% endifequal %}><a href="/administrator/teacher/">Учителя</a></li>
+	<li{% ifequal path "pupil" %} class="active" {% endifequal %}><a href="/administrator/pupil/">Учащиеся</a></li>
+	<li{% ifequal path "subject" %} class="active" {% endifequal %}><a href="/administrator/subject/">Дисциплины</a></li>
+	<li{% ifequal path "grade" %} class="active" {% endifequal %}><a href="/administrator/grade/">Классы</a></li>
+</ul>
+{% endblock %}

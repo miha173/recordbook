@@ -10,8 +10,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from src.views import render_options
 from src.userextended.models import Pupil, Teacher, Subject, Grade
 from src.curatorship.models import Connection
-from src.marks.models import Lesson, Mark
-from src.marks.forms import LessonForm, MarkForm
+from models import Lesson, Mark
+from forms import LessonForm, MarkForm
 
 @login_required
 def index(request):
@@ -33,7 +33,7 @@ def set_current_subject(request, subject_id):
     teacher.save()
     return HttpResponseRedirect(request.GET['next'])
 
-def lessonsList(request):
+def lessonList(request):
     render = render_options(request)
     teacher = Teacher.objects.get(id = request.user.id)
     try:
@@ -41,7 +41,7 @@ def lessonsList(request):
                                                                     subject = teacher.current_subject)
     except ObjectDoesNotExist:
         render['lessons'] = {}
-    return render_to_response('marks/teacher/lessons.html', render) 
+    return render_to_response('marks/teacher/lessonList.html', render) 
 
 #Нужно проверять возможность учителя добавления записи к данному классу
 def lessonEdit(request, mode, id = 0):
@@ -58,7 +58,7 @@ def lessonEdit(request, mode, id = 0):
         elif mode == 'delete': 
              lesson = get_object_or_404(Lesson, id = id)
              lesson.delete()
-             return HttpResponseRedirect('/marks/lessons/')
+             return HttpResponseRedirect('/marks/lesson/')
         else:
             render['form'] = LessonForm()
             grades_id = []
@@ -72,7 +72,7 @@ def lessonEdit(request, mode, id = 0):
             if form.is_valid():
                 form = LessonForm(request.POST, instance = get_object_or_404(Lesson, id = id))
                 form.save()
-                return HttpResponseRedirect('/marks/lessons/')
+                return HttpResponseRedirect('/marks/lesson/')
             else:
                 render['form'] = form
                 return render_to_response('marks/teacher/lesson.html', render)
@@ -87,27 +87,27 @@ def lessonEdit(request, mode, id = 0):
                                                grade = form.cleaned_data['grade']
                                                )
                 lesson.save()
-                return HttpResponseRedirect('/marks/lessons/')
+                return HttpResponseRedirect('/marks/lesson/')
             else:
                 render['form'] = form
                 return render_to_response('marks/teacher/lesson.html', render)
 
-def gradesList(request):
+def gradeList(request):
     render = render_options(request)
     teacher = Teacher.objects.get(id = request.user.id)
     render['grades'] = teacher.grades.all()
-    return render_to_response('marks/teacher/gradesList.html', render)
+    return render_to_response('marks/teacher/gradeList.html', render)
 
-def gradeLessonsList(request, grade_id):
+def gradeLessonList(request, grade_id):
     render = render_options(request)
     teacher = Teacher.objects.get(id = request.user.id)
     render['grade_id'] = grade_id
     render['lessons'] = Lesson.objects.filter(grade = Grade.objects.get(id = grade_id),
                                                                 teacher = teacher,
                                                                 subject = teacher.current_subject)
-    return render_to_response('marks/teacher/gradeLessonsList.html', render)
+    return render_to_response('marks/teacher/gradeLessonList.html', render)
 
-def marksList(request, grade_id, lesson_id):
+def markList(request, grade_id, lesson_id):
     render = render_options(request)
     pupils = Pupil.objects.filter(grade = Grade.objects.get(id = grade_id))
     connection = Connection.objects.get(grade = Grade.objects.get(id = grade_id), teacher = request.user)
@@ -133,42 +133,9 @@ def marksList(request, grade_id, lesson_id):
             absent = False
         pupils_list.append({'id': pupil.id, 'name': pupil.fi(), 'mark': mark, 'absent': absent})
     render['pupils'] = pupils_list
-    return render_to_response('marks/teacher/marksList.html', render)
+    return render_to_response('marks/teacher/markList.html', render)
 
 def giveMark(request, grade_id, lesson_id):
-    #Очень сомнительное место, наверное самое сомнительное в коде
-    #Каждая строчка полна отборного бреда
-    #При выводе убрать списки! Это же полный ахтунг выводить всех учеников
-#    render = render_options(request)
-#    grade_id = int(grade_id)
-    #Если мы ещё не отправляли форму
-#    if not request.POST.get('max_num'):
-#        max_num = 0
-#        pupils = Pupil.objects.filter(grade = grade_id)
-#        marks = []
-#        for pupil in pupils:
-#            if request.POST.get('pupil-%d' % pupil.id):
-#                max_num += 1
-#                #Полный ахтунг
-#                mark = Mark.objects.get_or_create(pupil = pupil, lesson = Lesson.objects.get(id = request.POST.get('lesson')), mark = 0, absent = False)
-#                marks.append(int(mark[0].id))
-#        request.session['marks'] = marks
-#    else:
-#        max_num = int(request.POST.get('max_num'))
-#    MarksFormSet = modelformset_factory(Mark, fields = ('mark', 'absent', 'comment', 'pupil'), max_num = max_num)
-#    if not request.POST.get('send'):
-#        render['marks'] = MarksFormSet(queryset = Mark.objects.filter(id__in = request.session['marks']))
-#        render['max_num'] = max_num
-#        return render_to_response('marks/teacher/giveMark.html', render)
-#    else:
-#        marks = MarksFormSet(request.POST, queryset = Mark.objects.filter(id__in = request.session['marks']))
-#        if marks.is_valid():
-#            marks.save()
-#            return HttpResponseRedirect('/marks/grades/%d/' % grade_id)
-#        else:
-#            render['marks'] = marks
-#            return render_to_response('marks/teacher/giveMark.html', render)
-    
     #Здесь есть скользкий момент, заключающийся в способе определения кому нужно выставлять отметки
     render = render_options(request)
     grade_id = int(grade_id)
@@ -211,7 +178,7 @@ def giveMark(request, grade_id, lesson_id):
                     error = 1
         if error == 0:
             #del request.session['marks']
-            return HttpResponseRedirect('/marks/grades/%d/' % grade_id)
+            return HttpResponseRedirect('/marks/grade/%d/' % grade_id)
         else: 
             marks = []
             for pupil in Pupil.objects.filter(grade = Grade.objects.get(id = grade_id)):

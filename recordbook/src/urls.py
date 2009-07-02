@@ -11,5 +11,6 @@ urlpatterns = patterns('',
                        (r'^admin/(.*)', admin.site.root),
                        (r'^accounts/', include('src.userextended.urls')),
                        (r'^marks/', include('src.marks.urls')),
-                       (r'^curatorship/', include('src.curatorship.urls'))
+                       (r'^curatorship/', include('src.curatorship.urls')),
+                       (r'^administrator/', include('src.userextended.urls')),
 )

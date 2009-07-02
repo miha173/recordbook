@@ -5,7 +5,7 @@
 	{% for lesson in lessons %}
 	<tr>
 		<td>{{ lesson.date|date:"d.m.Y" }}</td>
-		<td><a href="/marks/grades/{{ grade_id }}/{{ lesson.id }}/">{{ lesson.topic }}</a></td>
+		<td><a href="/marks/grade/{{ grade_id }}/{{ lesson.id }}/">{{ lesson.topic }}</a></td>
 	</tr>
 	{% endfor %}
 </table>

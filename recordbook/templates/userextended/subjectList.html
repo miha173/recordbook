@@ -1,0 +1,27 @@
+{% extends 'userextended/page.html' %}
+
+{% block content %}
+<a href="/administrator/subject/add/">Добавить предмет</a>
+<table>
+	{% for subject in subjects.object_list %}
+		<tr>
+			<td>{{ subject.name }}</td>
+			<td><a href="/administrator/subject/edit/{{ subject.id }}/">Редактировать</a>, <a href="/administrator/subject/delete/{{ subject.id }}">Удалить</a>.</td>
+	{% endfor %}
+</table>
+<div class="pagination">
+    <span class="step-links">
+        {% if subjects.has_previous %}
+            <a href="?page={{ subjects.previous_page_number }}">Назад</a>
+        {% endif %}
+
+        <span class="current">
+            Страница {{ subjects.number }} из {{ subjects.paginator.num_pages }}.
+        </span>
+
+        {% if subjects.has_next %}
+            <a href="?page={{ subjects.next_page_number }}">Вперёд</a>
+        {% endif %}
+    </span>
+</div>
+{% endblock %}

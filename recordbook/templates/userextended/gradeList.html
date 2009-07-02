@@ -1,0 +1,13 @@
+{% extends 'userextended/page.html' %}
+
+{% block content %}
+<a href="/administrator/grade/add/">Добавить класс</a>
+<table>
+	{% for grade in grades %}
+		<tr>
+			<td>{{ grade.long_name }}</td>
+			<td>{{ grade.small_name }}</td>
+			<td><a href="/administrator/grade/edit/{{ grade.id }}/">Редактировать</a>, <a href="/administrator/subject/delete/{{ grade.id }}">Удалить</a>.</td>
+	{% endfor %}
+</table>
+{% endblock %}

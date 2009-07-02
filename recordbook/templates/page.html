@@ -45,9 +45,11 @@
     <div id="navigation">
         <div id="sidebar">
             <div id="menu"> 
+				{{ user.username }}
 				<ul>
-					<li><a href="/marks/">Выставление отметок</a>{% block marks_menu %}{% endblock %}</li>
+					{% if subjects %}<li><a href="/marks/">Выставление отметок</a>{% block marks_menu %}{% endblock %}</li>{% endif %}
 					{% if grade %}<li><a href="/curatorship/">Классное руководство</a>{% block curatorship_menu %}{% endblock %}</li>{% endif %}
+					{% if administrator %}<li><a href="/administrator/">Администрирование</a>{% block administrator_menu %}{% endblock %}</li>{% endif %}
 				</ul>
 				<ul style="padding-top: 15px;">
 					<li><a href="/accounts/password_change">Сменить пароль</a></li>

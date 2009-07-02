@@ -5,28 +5,47 @@ from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 import pytils
 
+from src.curatorship.models import Connection
+
 class School(models.Model):
+    u'Модель для школ'
     name = models.CharField(u"Имя учебного заведения", max_length = 100)
-
-class Grade(models.Model):
-    long_name = models.CharField(u"Длинное имя", max_length = 100)
-    small_name = models.CharField(u"Короткое имя", max_length = 10)
-    school = models.ForeignKey(School, verbose_name = "Школа", blank = True)
-    def __unicode__(self):
-        return self.long_name
-
-class Subject(models.Model):
-    name = models.CharField(u"Предмет", max_length = 100)
-    school = models.ForeignKey(School, verbose_name = "Школа", blank = True)
     def __unicode__(self):
         return self.name
 
+class Grade(models.Model):
+    u'Классы в школах'
+    long_name = models.CharField(u"Длинное имя", max_length = 100)
+    small_name = models.CharField(u"Короткое имя", max_length = 10, blank = True)
+    school = models.ForeignKey(School, verbose_name = "Школа")
+    def __unicode__(self):
+        return self.long_name
+    def delete(self, force_insert = False, force_update = False):
+        super(Grade, self).delete(force_insert, force_update)
+    class Meta:
+        ordering = ['long_name']
+
+class Subject(models.Model):
+    u'Учебные дисциплины'
+    name = models.CharField(u"Предмет", max_length = 100)
+    school = models.ForeignKey(School, verbose_name = "Школа")
+    def __unicode__(self):
+        return self.name
+    def delete(self, force_insert=False, force_update=False):
+        Connection.objects.filter(subject = self).remove()
+        Mark.objects.filter(subject = self).remove()
+        Teacher.objects.filter(subject = self).subjects.remove(self)
+        super(Subject, self).delete(force_insert, force_update)
+    class Meta:
+        ordering = ['name']
+
 class Clerk(User):
+    u'Базовый класс расширенного пользователя. Потомки - учителя, ученики.'
     last_name = models.CharField(u"Фамилия", max_length = 30)
     first_name = models.CharField(u"Имя", max_length = 30)
     middle_name = models.CharField(u"Отчество", max_length = 30, blank = True)
     password_journal = models.CharField(u"Пароль доступа к дневнику", max_length = 255)
-    school = models.ForeignKey(School, verbose_name = "Школа", blank = True)
+    school = models.ForeignKey(School, verbose_name = "Школа")
     def __unicode__(self):
         result = self.last_name + ' ' + self.first_name + ' ' + self.middle_name
         if self.grade:
@@ -34,17 +53,20 @@ class Clerk(User):
         return result
     def fio(self):
         return self.last_name + ' ' + self.first_name + ' ' + self.middle_name
+    #Не всегда нужны полные ФИО
     def fi(self):
         return self.last_name + ' ' + self.first_name
     def save(self, force_insert=False, force_update=False):
         #Генерация имени пользователя
         username = self.prefix + "."
+        #Удаление нехороших символов из траслитерации
         last_name = pytils.translit.translify(self.last_name.lower())
         last_name = last_name.replace("'","")
         last_name = last_name.replace("`","")
         first_name = pytils.translit.translify(self.first_name.lower())
         first_name = first_name.replace("'","")
         first_name = first_name.replace("`","")
+        #Проверки на допустимость
         if len(last_name)+len(first_name)>28:
             if len(last_name)>25:
                 last_name = last_name[:25]
@@ -56,25 +78,31 @@ class Clerk(User):
                     first_name = first_name[:28-len(first_name)]
         self.username = username + last_name + '.' + first_name
         #Пароль по умолчанию
-        self.set_password("1")
-        if self.administrator:
-            self.is_                        
+        self.set_password("1")             
         super(Clerk, self).save(force_insert, force_update)
     class Meta:
         abstract = True
+        ordering = ['last_name', 'first_name', 'middle_name']
 
 class Teacher(Clerk):
+    #Для доступа к администраторским функциям (неадмин-панель)
     administrator = models.BooleanField(u"Администратор")
+    #Какие предметы ведёт
     subjects = models.ManyToManyField(Subject, verbose_name = u"Предметы", related_name = 'subjects', blank = True, null = True)
+    #В каких классах ведёт
     grades = models.ManyToManyField(Grade, blank = True, verbose_name = u"Классы", related_name = "grades", null = True)
+    #Есть ли классное руководство
     grade = models.ForeignKey(Grade, verbose_name="Класс", blank = True, related_name = 'grade', null = True)
+    #Выбранный предмет в инструменте выставления отметок
     current_subject = models.ForeignKey(Subject, blank = True, related_name = 'current_subject', null = True)
+    #Для генерации имени пользователя
     prefix = "t"
 
 class Pupil(Clerk):
     grade = models.ForeignKey(Grade, verbose_name = u"Класс")
     sex = models.CharField(max_length = 1, choices = (('1', u'Юноша'), ('2', u'Девушка')), verbose_name = u'Пол')
     group = models.CharField(max_length = 1, choices = (('1', u'1 группа'), ('2', u'2 группа')), verbose_name = u'Группа')
+    #Специальная учебная группа
     special = models.BooleanField(verbose_name = u'Специальная группа')
     prefix = "p"
 
