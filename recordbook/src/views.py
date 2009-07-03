@@ -32,6 +32,7 @@ def render_options(request):
     else:
         user = Pupil.objects.get(id = request.user.id)
         options['usertype'] = 'pupil'
+    options['school'] = user.school
     return options
 
 def index(request):

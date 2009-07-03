@@ -12,18 +12,15 @@ class LessonForm(forms.ModelForm):
     class Meta:
         model = Lesson
         fields = ('date', 'topic', 'task', 'grade')
-    date = forms.DateField(('%d.%m.%Y',), label=u'Дата')
-#    def clean_date(self):
-#        date = self.cleaned_data['date']
-#        try:
-#            date = time.strftime('%Y-%m-%d', time.strptime(date, '%d.%m.%Y'))
-#        except:
-#            self._errros['date'] = u'Дата в неправильном формате. Вводите дату в формате дд.мм.гггг'
-#            del self['date']
-#        return data
+    date = forms.DateField(('%d.%m.%Y',), label=u'Дата', widget=forms.DateTimeInput(format='%d.%m.%Y'))
 
 class MarkForm(forms.ModelForm):
     class Meta:
         model = Mark
         fields = ('mark', 'absent', 'comment')
+
+class ResultForm(forms.ModelForm):
+    class Meta:
+        model = Mark
+        fields = ('mark')
 

@@ -6,13 +6,13 @@ from django.shortcuts import render_to_response
 from django.forms.util import ErrorList
 
 from models import Subject, Teacher, Pupil, Grade
-from src.marks.models import Lesson
+from src.marks.models import Lesson, ResultDate
 
 class SubjectForm(forms.ModelForm):
     class Meta:
         model = Subject
         fields = ('name',)
-        
+
 class GradeForm(forms.ModelForm):
     class Meta:
         model = Grade
@@ -27,3 +27,10 @@ class TeacherForm(forms.ModelForm):
     class Meta:
         model = Teacher
         fields = ('last_name', 'first_name', 'middle_name', 'grade', 'grades', 'subjects', 'administrator')
+
+class ResultDateForm(forms.ModelForm):
+    class Meta:
+        model = ResultDate
+        fields = ('period', 'date', 'grades')
+    date = forms.DateField(('%d.%m.%Y',), label=u'Дата', widget=forms.DateTimeInput(format='%d.%m.%Y'))
+

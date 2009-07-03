@@ -1,12 +1,13 @@
 {% extends 'userextended/page.html' %}
 
 {% block content %}
-<a href="add/">Добавить ученика</a>
+<a href="add/">Добавить итоговый период</a>
 <table>
 	{% for object in objects.object_list %}
 		<tr>
-			<td>{{ object.fio }}</td>
-			<td>{{ object.grade }}</td>
+			<td>{{ object.get_period_display }}</td>
+			<td>{{ object.date|date:"d.n.Y" }}</td>
+			<td>{% for grade in object.grades.all %}{{ grade.small_name }}; {% endfor %}</td>
 			<td><a href="edit/{{ object.id }}/">Редактировать</a>, <a href="delete/{{ object.id }}">Удалить</a>.</td>
 	{% endfor %}
 </table>

@@ -5,6 +5,7 @@
 	{% if subjects %}
 		<li{% ifequal path "lessons" %} class="active"{% endifequal %}><a href="/marks/lesson/">Уроки</a></li>
 		<li{% ifequal path "grades" %} class="active"{% endifequal %}><a href="/marks/grade/">Выставить отметки</li>
+		<li{% ifequal path "result" %} class="active"{% endifequal %}><a href="/marks/result/">Выставить итоговые отметки</li>
 	{% endif %}
 	</ul>
 {% endblock %}

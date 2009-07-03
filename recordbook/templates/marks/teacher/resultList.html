@@ -1,0 +1,19 @@
+{% extends 'marks/teacher/page.html' %}
+
+{% block content %}
+<form method="post" action".">
+<table>
+	<tr><td colspan="3">
+		<input type="submit" name="send" value="Выставить отметки" />
+	</td></tr>
+	{% for pupil in pupils %}
+	<tr>
+		<td>{{ pupil.form.mark }}</td>
+		<td>{{ pupil.name }}</td>
+	</tr>
+	{% endfor %}
+</table>
+<input type="hidden" value="{{ grade_id }}" name="grade_id" />
+<input type="hidden" value="{{ resultdate_id }}" name="resultdate_id" />
+</form>	
+{% endblock %}

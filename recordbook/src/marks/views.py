@@ -10,8 +10,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from src.views import render_options
 from src.userextended.models import Pupil, Teacher, Subject, Grade
 from src.curatorship.models import Connection
-from models import Lesson, Mark
-from forms import LessonForm, MarkForm
+from models import Lesson, Mark, ResultDate, Result
+from forms import LessonForm, MarkForm, ResultForm
 
 @login_required
 def index(request):
@@ -94,8 +94,10 @@ def lessonEdit(request, mode, id = 0):
 
 def gradeList(request):
     render = render_options(request)
-    teacher = Teacher.objects.get(id = request.user.id)
-    render['grades'] = teacher.grades.all()
+    connections = Connection.objects.filter(teacher = request.user, subject = render['current_subject'])
+    render['grades'] = []
+    for connection in connections:
+        render['grades'].append(connection.grade)
     return render_to_response('marks/teacher/gradeList.html', render)
 
 def gradeLessonList(request, grade_id):
@@ -186,3 +188,60 @@ def giveMark(request, grade_id, lesson_id):
                     marks.append({'name': pupil.fi(), 'form': MarkForm(request.POST, prefix = pupil.id)})
             render['marks'] = marks
             return render_to_response('marks/teacher/giveMark.html', render)
+
+def gradeResultList(request):
+    render = render_options(request)
+    connections = Connection.objects.filter(teacher = request.user, subject = render['current_subject'])
+    render['grades'] = []
+    for connection in connections:
+        render['grades'].append(connection.grade)
+    render['resultdates'] = ResultDate.objects.filter(school = render['school'])
+    return render_to_response('marks/teacher/gradeResultList.html', render)
+
+def resultList(request):
+    render = render_options(request)
+    #Проверка доступа!!!
+    #Здесь, как и раньше, есть скользкий момент, заключающийся в способе определения кому нужно выставлять отметки
+    if not request.POST.get('send'):
+        pupils = Pupil.objects.filter(grade = get_object_or_404(Grade, id = request.POST.get('grade')))
+        resultdate_id = request.POST.get('resultdate')
+        results = []
+        for pupil in pupils:
+            try:
+                result = Result.objects.get(result = resultdate_id, pupil = pupil)
+                form = ResultForm(prefix = pupil.id, instance = result)
+            except ObjectDoesNotExist:
+                form = ResultForm(prefix = pupil.id)
+            results.append({'name': pupil.fi(), 'form': form})
+        render['pupils'] = results
+        render['grade_id'] = request.POST.get('grade')
+        render['resultdate_id'] = resultdate_id
+        return render_to_response('marks/teacher/resultList.html', render)
+    else:
+        error = 0
+        for pupil in Pupil.objects.filter(grade = Grade.objects.get(id = request.POST.get('grade_id'))):
+            if request.POST.get('%d-mark' % pupil.id):
+                form = ResultForm(request.POST, prefix = pupil.id)
+                if form.is_valid():
+                    try:
+                        result = Result.objects.get(pupil = Pupil.objects.get(id = pupil.id),
+                                                    result = ResultDate.objects.get(id = request.POST.get('resultdate_id')))
+                    except ObjectDoesNotExist:
+                        result = Result()
+                    result.pupil = Pupil.objects.get(id = pupil.id)
+                    result.result = ResultDate.objects.get(id = request.POST.get('resultdate_id'))
+                    result.mark = form.cleaned_data['mark']
+                    result.subject = render['current_subject']
+                    result.save()
+                else:
+                    error = 1
+        if error == 0:
+            #del request.session['marks']
+            return HttpResponseRedirect('/marks/result/')
+        else: 
+            results = []
+            pupils = Pupil.objects.filter(grade = get_object_or_404(Grade, id = request.POST.get('grade')))
+            for pupil in pupils:
+                results.append({'name': pupil.fi(), 'form': resultsForm(request.POST, prefix = pupil.id)})
+            render['results'] = results
+            return render_to_response('marks/teacher/resultList.html', render)

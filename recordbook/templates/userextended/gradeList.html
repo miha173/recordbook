@@ -4,13 +4,13 @@
 {% if error %}
 <script>alert('{{error}}')</script>
 {% endif %}
-<a href="/administrator/{{ object_name }}/add/">Добавить класс</a>
+<a href="add/">Добавить класс</a>
 <table>
 	{% for object in objects.object_list %}
 		<tr>
 			<td>{{ object.long_name }}</td>
 			<td>{{ object.small_name }}</td>
-			<td><a href="/administrator/{{ object_name }}/edit/{{ object.id }}/">Редактировать</a>, <a href="/administrator/{{ object_name }}/delete/{{ object.id }}">Удалить</a>.</td>
+			<td><a href="edit/{{ object.id }}/">Редактировать</a>, <a href="delete/{{ object.id }}">Удалить</a>.</td>
 	{% endfor %}
 </table>
 {% include "helpers/paginator.html" %}

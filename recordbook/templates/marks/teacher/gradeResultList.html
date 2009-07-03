@@ -1,0 +1,24 @@
+{% extends 'marks/teacher/page.html' %}
+
+{% block content %}
+<form method="post" action="give/">
+<table>
+	<tr>
+		<td colspan="2">
+			<select name="resultdate">
+				{% for resultdate in resultdates %}
+				<option value="{{ resultdate.id }}">{{ resultdate.get_period_display }}</option>
+				{% endfor %}
+			</select>
+			<input type="submit" />
+		</td>
+	</tr>
+	{% for grade in grades %}
+	<tr>
+		<td><input type="radio" name="grade" value="{{ grade.id }}" /></td>
+		<td>{{ grade.long_name }}</td>
+	</tr>
+	{% endfor %}
+</table>
+</form>	
+{% endblock %}
