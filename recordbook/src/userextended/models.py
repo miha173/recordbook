@@ -5,7 +5,6 @@ from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 import pytils
 
-from src.curatorship.models import Connection
 
 class School(models.Model):
     u'Модель для школ'
@@ -20,8 +19,21 @@ class Grade(models.Model):
     school = models.ForeignKey(School, verbose_name = "Школа")
     def __unicode__(self):
         return self.long_name
-    def delete(self, force_insert = False, force_update = False):
-        super(Grade, self).delete(force_insert, force_update)
+    def delete(self):
+        if Pupil.objects.filter(grade = self).count() == 0:
+            from src.marks.models import Mark, Lesson
+            lessons =  Lesson.objects.filter(grade = self)
+            Mark.objects.filter(lesson__in = lessons).delete()
+            lessons.delete()
+            for teacher in Teacher.objects.filter(grade = self):
+                teacher.grade = None
+                teacher.save()
+            for teacher in Teacher.objects.filter(grades = self):
+                teacher.grades.remove(self)
+                teacher.save()
+            super(Grade, self).delete()
+        else:
+            raise Exception(u"В классе числятся ученики")
     class Meta:
         ordering = ['long_name']
 
@@ -31,11 +43,14 @@ class Subject(models.Model):
     school = models.ForeignKey(School, verbose_name = "Школа")
     def __unicode__(self):
         return self.name
-    def delete(self, force_insert=False, force_update=False):
-        Connection.objects.filter(subject = self).remove()
-        Mark.objects.filter(subject = self).remove()
-        Teacher.objects.filter(subject = self).subjects.remove(self)
-        super(Subject, self).delete(force_insert, force_update)
+    def delete(self):
+        from src.curatorship.models import Connection
+        from src.marks.models import Mark, Lesson
+        Connection.objects.filter(subject = self).delete()
+        Mark.objects.filter(lesson = Lesson.objects.filter(subject = self)).delete()
+        if Teacher.objects.filter(subjects = self).count()!=0:
+            teacher.subjects.remove(self)
+        super(Subject, self).delete()
     class Meta:
         ordering = ['name']
 

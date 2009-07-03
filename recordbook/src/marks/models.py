@@ -18,3 +18,21 @@ class Mark(models.Model):
     absent = models.BooleanField(u'Отсутствовал')
     date = models.DateField(u'Дата выставления', auto_now_add = True)
     comment = models.TextField(u'Комментарий к отметке', blank = True)
+    
+class ResultDate(models.Model):
+    school = models.ForeignKey(School)
+    period = CharFileld(u'Итоговый период', max_length = 1, choices = (('1', u'1 четверть'),
+                                                                       ('2', u'2 четверть'),
+                                                                       ('3', u'3 четверть'),
+                                                                       ('4', u'4 четверть'),
+                                                                       ('5', u'1 полугодие'),
+                                                                       ('6', u'2 полугодие'),
+                                                                       ))
+    date = models.DateField(u'Дата подведения итога')
+    grades = models.ManyToManyField(Grade, verbose_name = u'Классы')
+
+class Result(models.Model):
+    result = models.ForeignKey(ResultDate, verbose_name = u'Период')
+    subject = models.ForeignKey(Subject, verbose_name = u'Предмет')
+    pupil = models.ForeignKey(Pupil, verbose_name = u'Ученик')
+    mark = models.IntegerField(u'Отметка')

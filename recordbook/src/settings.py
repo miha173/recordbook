@@ -83,6 +83,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.admindocs',
+    'pytils',
     'src',
     'src.pages',
     'src.userextended',

@@ -17,4 +17,13 @@ class GradeForm(forms.ModelForm):
     class Meta:
         model = Grade
         fields = ('long_name', 'small_name')
-        
+
+class PupilForm(forms.ModelForm):
+    class Meta:
+        model = Pupil
+        fields = ('last_name', 'first_name', 'middle_name', 'sex', 'grade', 'group', 'special')
+
+class TeacherForm(forms.ModelForm):
+    class Meta:
+        model = Teacher
+        fields = ('last_name', 'first_name', 'middle_name', 'grade', 'grades', 'subjects', 'administrator')

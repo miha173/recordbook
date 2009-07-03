@@ -1,0 +1,16 @@
+{% if paginator %}
+<div class="paginator" id="paginator_example"></div>
+<script type="text/javascript">
+	paginator_example = new Paginator(
+		"paginator_example", // id контейнера, куда ляжет пагинатор
+		{{ objects.paginator.num_pages }}., // общее число страниц
+		3, // число страниц, видимых одновременно
+		{{ objects.number }}, // номер текущей страницы
+		"?page" // url страниц
+	);
+</script>
+{% load pytils_numeral %}
+{% comment %}
+Всего {{ objects.paginator.num_pages }} {{ objects.paginator.num_pages|choose_plural:"страница,страницы,страниц" }} страниц.
+{% endcomment %}
+{% endif %}
