@@ -5,15 +5,26 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.template.loader import render_to_string
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.paginator import Paginator
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 from models import Teacher, Pupil, Grade, Subject, School
 from forms import SubjectForm, GradeForm, PupilForm, TeacherForm, ResultDateForm
-from src.views import render_options
+from src.views import render_options, is_administrator
 from src.curatorship.models import Connection
 from src.marks.models import ResultDate
 
 def index(request):
     return render_to_response('userextended/page.html', render_options(request))
+
+@login_required
+@user_passes_test(is_administrator)
+def objectList4Administrator(request, object):
+    return objectList(request, object)
+
+@login_required
+@user_passes_test(is_administrator)
+def objectEdit4Administrator(request, object, mode, id = 0):
+    return objectEdit(request, object, mode, id)
 
 def objectList(request, object):
     render = render_options(request)
@@ -32,7 +43,7 @@ def objectList(request, object):
     if object == 'resultdate':
         Object = ResultDate
         templ = render['object_name'] = 'resultdate'
-    paginator = Paginator(Object.objects.filter(school = Teacher.objects.get(id = request.user.id).school), 20)
+    paginator = Paginator(Object.objects.filter(school = Teacher.objects.get(id = request.user.id).school), 40)
     try:
         page = int(request.GET.get('page', '1'))
     except ValueError:
@@ -44,6 +55,7 @@ def objectList(request, object):
     render['paginator'] = paginator.num_pages - 1
     return render_to_response('userextended/%sList.html' % templ, render)
 
+@login_required
 def objectEdit(request, object, mode, id = 0):
     if object == 'grade':
         Object = Grade

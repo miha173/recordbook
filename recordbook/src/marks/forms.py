@@ -12,7 +12,7 @@ class LessonForm(forms.ModelForm):
     class Meta:
         model = Lesson
         fields = ('date', 'topic', 'task', 'grade')
-    date = forms.DateField(('%d.%m.%Y',), label=u'Дата', widget=forms.DateTimeInput(format='%d.%m.%Y'))
+    date = forms.DateField(('%d.%m.%y',), label=u'Дата', widget=forms.DateTimeInput(format='%d.%m.%y'))
 
 class MarkForm(forms.ModelForm):
     class Meta:

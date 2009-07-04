@@ -31,6 +31,6 @@ class TeacherForm(forms.ModelForm):
 class ResultDateForm(forms.ModelForm):
     class Meta:
         model = ResultDate
-        fields = ('period', 'date', 'grades')
-    date = forms.DateField(('%d.%m.%Y',), label=u'Дата', widget=forms.DateTimeInput(format='%d.%m.%Y'))
-
+        fields = ('period', 'startdate', 'enddate', 'grades')
+    startdate = forms.DateField(('%d.%m.%y',), label = u'Дата начала периода', widget=forms.DateTimeInput(format='%d.%m.%Y'))
+    enddate = forms.DateField(('%d.%m.%y',), label = u'Дата подведения итога', widget=forms.DateTimeInput(format='%d.%m.%Y'))

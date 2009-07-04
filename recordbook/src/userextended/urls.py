@@ -9,8 +9,8 @@ urlpatterns = patterns("src.userextended.views",
                        (r'logout', logout, {'next_page': '/'}),
                        (r'password_change', password_change, {'template_name': 'userextended/change_password.html', 'post_change_redirect': '/'}),
 
-                       (r'^uni/(?P<object>\w+)/$', 'objectList'),
-                       (r'^uni/(?P<object>\w+)/add/$', 'objectEdit', {'mode': 'add'}),
-                       (r'^uni/(?P<object>\w+)/edit/(?P<id>\d+)/$', 'objectEdit', {'mode': 'edit'}),
-                       (r'^uni/(?P<object>\w+)/delete/(?P<id>\d+)/$', 'objectEdit', {'mode': 'delete'}),
+                       (r'^uni/(?P<object>\w+)/$', 'objectList4Administrator'),
+                       (r'^uni/(?P<object>\w+)/add/$', 'objectEdit4Administrator', {'mode': 'add'}),
+                       (r'^uni/(?P<object>\w+)/edit/(?P<id>\d+)/$', 'objectEdit4Administrator', {'mode': 'edit'}),
+                       (r'^uni/(?P<object>\w+)/delete/(?P<id>\d+)/$', 'objectEdit4Administrator', {'mode': 'delete'}),
                        )

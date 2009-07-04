@@ -7,9 +7,9 @@ class Lesson(models.Model):
     teacher = models.ForeignKey(Teacher, verbose_name = u'Учитель')
     date = models.DateField(u'Дата')
     topic = models.CharField(u'Тема урока', max_length = 200)
-    task = models.CharField(u'Домашнее задание', max_length = 200)
+    task = models.CharField(u'Домашнее задание', max_length = 200, blank = True, null = True)
     subject = models.ForeignKey(Subject, verbose_name = u'Предмет')
-    grade = models.ForeignKey(Grade, verbose_name = u'Класс')
+    grade = models.ManyToManyField(Grade, verbose_name = u'Класс')
     class Meta:
         ordering = ['-date']
 
@@ -32,13 +32,17 @@ class ResultDate(models.Model):
                                                                        ('4', u'4 четверть'),
                                                                        ('6', u'2 полугодие'),
                                                                        ))
-    date = models.DateField(u'Дата подведения итога')
+    startdate = models.DateField(verbose_name = u'Дата начала периода')
+    enddate = models.DateField(verbose_name = u'Дата подведения итога')
     grades = models.ManyToManyField(Grade, verbose_name = u'Классы')
     class Meta:
-        ordering = ['date']
+        ordering = ['enddate']
+    def delete(self):
+        Result.objects.filter(result = self).delete()
+        super(ResultDate, self).delete()
 
 class Result(models.Model):
-    result = models.ForeignKey(ResultDate, verbose_name = u'Период')
+    resultdate = models.ForeignKey(ResultDate, verbose_name = u'Период')
     subject = models.ForeignKey(Subject, verbose_name = u'Предмет')
     pupil = models.ForeignKey(Pupil, verbose_name = u'Ученик')
     mark = models.IntegerField(u'Отметка')

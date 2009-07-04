@@ -5,6 +5,25 @@ from django.template import RequestContext
 from src.userextended.models import Pupil, Teacher, Subject
 from src.curatorship.models import Connection
 
+def is_teacher(user):
+    if user.username[0] == 't':
+        return True
+    else:
+        return False
+
+def is_administrator(user):
+    error = 0
+    if user.username[0] == 't':
+        teacher = Teacher.objects.get(id = user.id)
+        if not teacher.administrator:
+            error = 1
+    else:
+        error = 1
+    if error == 0:
+        return True
+    else:
+        return False
+
 def render_options(request):
     options = render_objects = options['render_objects'] = {}
     pathes = request.path.split('/')
