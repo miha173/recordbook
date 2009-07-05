@@ -18,9 +18,27 @@ class MarkForm(forms.ModelForm):
     class Meta:
         model = Mark
         fields = ('mark', 'absent', 'comment')
+    def clean_mark(self):
+        data = self.cleaned_data['mark']
+        data = int(data)
+        if data > 5:
+            raise forms.ValidationError(u"Не слишком высокая отметка?")
+        elif data < 1:
+            raise forms.ValidationError(u"Не слишком низкая отметка?")
+        else:
+            return data
 
 class ResultForm(forms.ModelForm):
     class Meta:
         model = Mark
         fields = ('mark')
+    def clean_mark(self):
+        data = self.cleaned_data['mark']
+        data = int(data)
+        if data > 5:
+            raise forms.ValidationError(u"Не слишком высокая отметка?")
+        elif data < 1:
+            raise forms.ValidationError(u"Не слишком низкая отметка?")
+        else:
+            return data
 
