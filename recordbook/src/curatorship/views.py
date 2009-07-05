@@ -5,10 +5,10 @@ from django.template import RequestContext
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import ObjectDoesNotExist
 
-from src.views import render_options
+from src.views import render_options, is_teacher
 from src.userextended.models import Teacher, Subject, Grade, Pupil
 from models import Connection
 from forms import ConnectionStep1Wizard, ConnectionStep2Wizard, ConnectionStep3Wizard
@@ -17,21 +17,23 @@ from src.marks.models import Lesson, Mark
 def index(request):
     return render_to_response('curatorship/page.html', render_options(request))
 
-#FIXME: Декоратор!!!
+@login_required
+@user_passes_test(is_teacher)
 def connectionsList(request):
     render = render_options(request)
     teacher = Teacher.objects.get(id = request.user.id)
     render['connections'] = Connection.objects.filter(grade = teacher.grade)
     return render_to_response('curatorship/connectionsList.html', render)
 
+@login_required
+@user_passes_test(is_teacher)
 def connectionWizard(request, step):
     render = render_options(request)
     step = int(step)
     if step == 1:
         if request.method == 'GET':
-            user = Teacher.objects.get(id = request.user.id)
             render['form'] = ConnectionStep1Wizard()
-            render['form'].fields['teacher'].queryset = Teacher.objects.filter(grades = user.grade)
+            render['form'].fields['teacher'].queryset = Teacher.objects.filter(grades = render['user'].grade)
             return render_to_response('curatorship/connectionWizard.html', render)
         else:
             render['form'] = ConnectionStep1Wizard(request.POST)
@@ -39,8 +41,7 @@ def connectionWizard(request, step):
                 request.session['teacher'] = render['form'].cleaned_data['teacher']
                 return HttpResponseRedirect('/curatorship/connections/wizard/2/')
             else:
-                user = Teacher.objects.get(id = request.user.id)
-                render['form'].fields['teacher'].queryset = Teacher.objects.filter(grades = user.grade)
+                render['form'].fields['teacher'].queryset = Teacher.objects.filter(grades = render['user'].grade)
                 return render_to_response('curatorship/connectionWizard.html', render)
     if step == 2:
         if request.method == 'GET':
@@ -62,10 +63,9 @@ def connectionWizard(request, step):
         else:
             render['form'] = ConnectionStep3Wizard(request.POST)
             if render['form'].is_valid():
-                user = Teacher.objects.get(id = request.user.id)
                 connection = Connection(teacher = request.session['teacher'],
                                         subject = request.session['subject'],
-                                        grade = user.grade,
+                                        grade = render['user'].grade,
                                         connection = render['form'].cleaned_data['connection'])
                 connection.save()
                 del request.session['teacher']
@@ -74,12 +74,18 @@ def connectionWizard(request, step):
             else:
                 return render_to_response('curatorship/connectionWizard.html', render)
             
+@login_required
+@user_passes_test(is_teacher)
 def connectionEdit(request, connection_id, mode):
     if mode == 'delete':
         connection = get_object_or_404(Connection, id = connection_id)
-        connection.delete()
+        teacher = Teacher.objects.get(id = request.user.id)
+        if connection.grade == teacher.grade:
+            connection.delete()
         return HttpResponseRedirect('/curatorship/connections/')
 
+@login_required
+@user_passes_test(is_teacher)
 def pupilPasswords(request):
     render = render_options(request)
     if request.method == 'GET':

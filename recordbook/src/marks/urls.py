@@ -17,7 +17,7 @@ urlpatterns = patterns("src.marks.views",
                        (r'^grade/(?P<grade_id>\d+)/(?P<lesson_id>\d+)/give/$', 'giveMark'),
                        
                        (r'^result/$', 'gradeResultList'),
-                       (r'^result/give/$', 'resultList'),
+                       (r'^result/give/$', 'gradeResult'),
                        
                        (r'^subject/(?P<subject_id>\d+)/', 'marksView'),
                        )
