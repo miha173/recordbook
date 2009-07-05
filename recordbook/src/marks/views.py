@@ -19,7 +19,7 @@ def index(request):
     render = render_options(request)
     if render['user_type'] == 'pupil':
         marks = Mark.objects.filter(pupil = render['user']).order_by('-lesson__date')
-        render_objects['marks'] = marks
+        render['marks'] = marks
     return render_to_response('marks/%s/index.html' % render['user_type'], render)
 
 @login_required
