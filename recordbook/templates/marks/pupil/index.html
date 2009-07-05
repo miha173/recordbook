@@ -2,6 +2,6 @@
 
 {% block content %}
 	{% for mark in marks %}
-		{{ mark.lesson.date|date:"d.n.Y" }} {{ mark.lesson.subject }} {% if mark.absent %}<b>Отстутствовал</b>{% else %}{{ mark.mark|default:"" }}{% endif %}<br />
+			{{ mark.lesson.date|date:"d.m" }} {{ mark.lesson.subject }} {% if mark.absent %}<b>Отстутствовал</b>{% else %}{{ mark.mark|default:"" }}{% endif %}<br />
 	{% endfor %}
 {% endblock %}

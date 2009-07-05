@@ -18,8 +18,8 @@ from forms import LessonForm, MarkForm, ResultForm
 def index(request):
     render = render_options(request)
     if render['user_type'] == 'pupil':
-        marks = Mark.objects.filter(pupil = Pupil.objects.get(id = request.user.id)).order_by('lesson__date')
-        render['marks'] = marks
+        marks = Mark.objects.filter(pupil = render['user']).order_by('-lesson__date')
+        render_objects['marks'] = marks
     return render_to_response('marks/%s/index.html' % render['user_type'], render)
 
 @login_required
@@ -89,9 +89,11 @@ def lessonEdit(request, mode, id = 0):
                 return render_to_response('marks/teacher/lesson.html', render)
         else:
             if form.is_valid():
-                form.teacher = Teacher.objects.get(id = request.user.id)
-                form.subject = render['current_subject']
-                form.save()
+                lesson = form.save(commit = False)
+                lesson.teacher = render['user']
+                lesson.subject = render['current_subject']
+                lesson.save()
+                form.save_m2m()
                 return HttpResponseRedirect('/marks/lesson/')
             else:
                 render['form'] = form
@@ -235,7 +237,8 @@ def resultList(request):
                 form = ResultForm(prefix = pupil.id)
             sum = 0
             marks = Mark.objects.filter(lesson__date__range = (resultdate.startdate, resultdate.enddate), 
-                                        pupil = pupil)
+                                        pupil = pupil,
+                                        lesson__subject = render['current_subject'])
             for mark in marks:
                 if mark.mark:
                     sum += mark.mark
@@ -275,3 +278,19 @@ def resultList(request):
                 results.append({'name': pupil.fi(), 'form': resultsForm(request.POST, prefix = pupil.id)})
             render['results'] = results
             return render_to_response('marks/teacher/resultList.html', render)
+
+@login_required
+def marksView(request, subject_id):
+    render = render_options(request)
+    paginator = Paginator(Mark.objects.filter(pupil = render['user'], lesson__subject = get_object_or_404(Subject, id = subject_id)).order_by('-lesson__date'), 40)
+    try:
+        page = int(request.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+    try:
+        render['objects'] = paginator.page(page)
+    except:
+        render['objects'] = paginator.page(paginator.num_pages)
+    render['paginator'] = paginator.num_pages - 1
+    render['current_subject'] = int(subject_id)
+    return render_to_response('marks/pupil/marks.html', render)

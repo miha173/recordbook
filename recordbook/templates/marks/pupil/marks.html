@@ -1,0 +1,20 @@
+{% extends 'marks/pupil/page.html' %}
+
+{% block content %}
+	{% if not objects.object_list %}
+	Отметок по этому ещё предмету нет.
+	{% endif %}
+	<ul>
+	{% for object in objects.object_list %}
+		<li>
+			{% if object.absent %}
+				Отсутствовал 
+			{% else %}
+				Получил {{ object.mark }} 
+			{% endif %}
+			на уроке {{ object.lesson.date|date:"d.m.y" }}. {% if object.comment %}(<i>{{ object.comment }}</i>){% endif %}
+		</li>
+	{% endfor %}
+	</ul>
+	{% include 'helpers/paginator.html' %}
+{% endblock %}

@@ -4,11 +4,12 @@ from datetime import date
 from django.template import RequestContext
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 
 from src.views import render_options
-from src.userextended.models import Teacher, Subject, Grade
+from src.userextended.models import Teacher, Subject, Grade, Pupil
 from models import Connection
 from forms import ConnectionStep1Wizard, ConnectionStep2Wizard, ConnectionStep3Wizard
 from src.marks.models import Lesson, Mark
@@ -16,6 +17,7 @@ from src.marks.models import Lesson, Mark
 def index(request):
     return render_to_response('curatorship/page.html', render_options(request))
 
+#FIXME: Декоратор!!!
 def connectionsList(request):
     render = render_options(request)
     teacher = Teacher.objects.get(id = request.user.id)
@@ -77,3 +79,20 @@ def connectionEdit(request, connection_id, mode):
         connection = get_object_or_404(Connection, id = connection_id)
         connection.delete()
         return HttpResponseRedirect('/curatorship/connections/')
+
+def pupilPasswords(request):
+    render = render_options(request)
+    if request.method == 'GET':
+        render['pupils'] = Pupil.objects.filter(grade = render['user'].grade)
+        return render_to_response('curatorship/pupilPasswordsList.html', render)
+    elif request.method == 'POST':
+        pupils = Pupil.objects.filter(grade = render['user'].grade)
+        render['pupils'] = []
+        for pupil in pupils:
+            if request.POST.get('pupil-%s' % pupil.id):
+                password = User.objects.make_random_password()
+                user = User.objects.get(id = pupil.id)
+                user.set_password(password)
+                user.save()
+                render['pupils'].append({'fi': pupil.fi(), 'username': pupil.username, 'password': password})
+        return render_to_response('curatorship/pupilPasswords.html', render)

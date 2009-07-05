@@ -6,6 +6,7 @@
 	{% for object in objects.object_list %}
 		<tr>
 			<td>{{ object.fio }}</td>
+			<td>{{ object.username }}</td>
 			<td><a href="edit/{{ object.id }}/">Редактировать</a>, <a href="delete/{{ object.id }}">Удалить</a>.</td>
 	{% endfor %}
 </table>

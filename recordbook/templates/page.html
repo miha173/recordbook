@@ -3,6 +3,8 @@
 <head>
 	<title>{% block title %}Отметки{% endblock %}</title>
 	<link rel="stylesheet" type="text/css" href="/css/paginator3000.css" />
+	<link rel="stylesheet" type="text/css" href="/css/print.css" media="print" />
+	<link rel="stylesheet" type="text/css" href="/css/default.css" />
 	<script type="text/javascript" src="/js/paginator3000.js"></script>
 	<style>
 /*
@@ -40,19 +42,25 @@
 		}
 
 */	</style>
-	<link rel="stylesheet" type="text/css" href="/css/default.css" />
 </head>
 <body>
 {% block topmenu %}{% endblock %}
     <div id="navigation">
         <div id="sidebar">
-            <div id="menu"> 
+            <div id="menu">
 				{{ user.username }}
+            	{% if teacher %} 
 				<ul>
 					{% if subjects %}<li><a href="/marks/">Выставление отметок</a>{% block marks_menu %}{% endblock %}</li>{% endif %}
 					{% if grade %}<li><a href="/curatorship/">Классное руководство</a>{% block curatorship_menu %}{% endblock %}</li>{% endif %}
 					{% if administrator %}<li><a href="/administrator/">Администрирование</a>{% block administrator_menu %}{% endblock %}</li>{% endif %}
 				</ul>
+				{% endif %}
+				{% if pupil %}
+				<ul>
+					<li><a href="/marks/">Отметки</a>{% block marks_p_menu %}{% endblock %}</li>
+				</ul>
+				{% endif %}
 				<ul style="padding-top: 15px;">
 					<li><a href="/accounts/password_change">Сменить пароль</a></li>
 					<li><a href="/accounts/logout">Выйти</a></li>

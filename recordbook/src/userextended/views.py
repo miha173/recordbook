@@ -105,6 +105,7 @@ def objectEdit(request, object, mode, id = 0):
                 obj = form.save(commit = False)
                 obj.school = Teacher.objects.get(id = request.user.id).school
                 obj.save()
+                form.save_m2m()
                 return HttpResponseRedirect('/administrator/uni/%s/' % templ)
             else:
                 render['form'] = form

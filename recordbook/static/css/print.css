@@ -1,0 +1,14 @@
+body{
+	color: #000;
+}
+#navigation{
+	display: none;
+}
+table.print{
+	border-collapse: collapse;
+	border: solid 1px #000;
+}
+table.print td{
+	border: solid 1px #000;
+	padding: 15px 5px;
+}

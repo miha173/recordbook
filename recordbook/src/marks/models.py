@@ -12,6 +12,9 @@ class Lesson(models.Model):
     grade = models.ManyToManyField(Grade, verbose_name = u'Класс')
     class Meta:
         ordering = ['-date']
+    def delete(self):
+        Mark.objects.filter(lesson = self).delete()
+        super(Lesson, self).delete()
 
 class Mark(models.Model):
     pupil = models.ForeignKey(Pupil, verbose_name = u'Ученик')

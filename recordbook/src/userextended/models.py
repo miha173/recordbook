@@ -93,7 +93,7 @@ class Clerk(User):
                     first_name = first_name[:28-len(first_name)]
         self.username = username + last_name + '.' + first_name
         #Пароль по умолчанию
-        self.set_password("1")             
+        self.set_password("1")
         super(Clerk, self).save(force_insert, force_update)
     class Meta:
         abstract = True
