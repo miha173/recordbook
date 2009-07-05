@@ -1,11 +1,42 @@
 {% extends 'userextended/page.html' %}
 
 {% block content %}
-<h1>Преподаватель</h1>
+<h2>Учитель</h2>
 <form method="post" action=".">
-	<table>
-	{{ form }}
-	<tr><td colspan="2"><input type="submit"></td></tr>
-	</table>
+	{{ form.errors }}
+	<fieldset>
+		<legend>Личная информация</legend>
+		<div class="field">
+			<label for="id_last_name">Фамилия:</label>{{ form.last_name }}
+		</div>
+		<div class="field">
+			<label for="id_first_name">Имя:</label>{{ form.first_name }}
+		</div>
+		<div class="field">
+			<label for="id_middle_name">Отчество: </label>{{ form.middle_name }}
+		</div>
+	</fieldset>
+
+	<fieldset>
+		<legend>Преподавание</legend>
+		<div class="field">
+			<label for="id_subjects">Предметы:</label>{{ form.subjects }}
+		</div>
+		<div class="field">
+			<label for="id_grades">Классы:</label>{{ form.grades }}
+		</div>
+	</fieldset>
+
+	<fieldset>
+		<legend>Другое</legend>
+		<div class="field">
+			<label for="id_grade">Классное руководство:</label>{{ form.grade }}
+		</div>
+		<div class="field">
+			<label for="id_administrator">Администратор: </label>{{ form.administrator }}
+		</div>
+	</fieldset>
+	
+	<input type="submit" value="Сохранить" />
 </form>
 {% endblock %}

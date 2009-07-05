@@ -39,7 +39,7 @@ class Grade(models.Model):
 
 class Subject(models.Model):
     u'Учебные дисциплины'
-    name = models.CharField(u"Предмет", max_length = 100)
+    name = models.CharField(u"Наименование", max_length = 100)
     school = models.ForeignKey(School, verbose_name = "Школа")
     def __unicode__(self):
         return self.name

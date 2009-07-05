@@ -1,11 +1,17 @@
 {% extends 'userextended/page.html' %}
 
 {% block content %}
-<h1>Класс</h1>
+<h2>Класс</h2>
 <form method="post" action=".">
-	<table>
-	{{ form }}
-	<tr><td colspan="2"><input type="submit"></td></tr>
-	</table>
+	{{ form.errors }}
+	<div class="field">
+		<label for="id_long_name">Полное имя:</label>
+		{{ form.long_name }}
+	</div>
+	<div class="field">
+		<label for="id_small_name">Короткое имя:</label>
+		{{ form.small_name }}
+	</div>
+	<input type="submit" value="Сохранить">
 </form>
 {% endblock %}

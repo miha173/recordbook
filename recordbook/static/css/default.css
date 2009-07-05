@@ -116,3 +116,19 @@ table.list thead{
 table.list td {
 	padding: 0px 5px;
 }
+
+	div.field{
+		display: block;
+		clear: right;
+		padding: 5px 0px;
+	}
+	div.field label{
+		width: 11em;
+		display: block;
+		float: left;
+		padding: 3px 10px 0px 0px;
+	}
+	fieldset{
+		margin: 20px 0;
+		padding: 15px;
+	}

@@ -1,10 +1,24 @@
 {% extends 'marks/teacher/page.html' %}
 {% block content %}
 <form method="post" action=".">
-	<table class="form">
-	{{ form }}
-	<tr><td colspan="2"><input type="submit" value="Сохранить" /></td></tr>
-	</table>
-	<input type="hidden" name="current_subject" value="{{ user.current_subject.id }}" />
+	<h2>Урок</h2>
+	{{ form.errors }}
+	<div class="field">
+		<label for="id_date">Дата:</label>
+		{{ form.date }}
+	</div>
+	<div class="field">
+		<label for="id_topic">Тема урока:</label>
+		{{ form.topic }}
+	</div>
+	<div class="field">
+		<label for="id_task">Домашнее задание:</label>
+		{{ form.task }}
+	</div>
+	<div class="field">
+		<label for="id_small_name">Класс:</label>
+		{{ form.grade }}
+	</div>
+	<input type="submit" value="Сохранить">
 </form>
 {% endblock %}
