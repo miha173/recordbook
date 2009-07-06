@@ -51,14 +51,14 @@
 				{{ user.username }}
             	{% if teacher %} 
 				<ul>
-					{% if subjects %}<li><a href="/marks/">Выставление отметок</a>{% block marks_menu %}{% endblock %}</li>{% endif %}
-					{% if grade %}<li><a href="/curatorship/">Классное руководство</a>{% block curatorship_menu %}{% endblock %}</li>{% endif %}
-					{% if administrator %}<li><a href="/administrator/">Администрирование</a>{% block administrator_menu %}{% endblock %}</li>{% endif %}
+					{% if subjects %}<li{% ifequal path "marks" %} class="active"{% endifequal %}><a href="/marks/">Выставление отметок</a>{% block marks_menu %}{% endblock %}</li>{% endif %}
+					{% if grade %}<li{% ifequal path "curatorship" %} class="active"{% endifequal %}><a href="/curatorship/">Классное руководство</a>{% block curatorship_menu %}{% endblock %}</li>{% endif %}
+					{% if administrator %}<li{% ifequal path "administrator" %} class="active"{% endifequal %}><a href="/administrator/">Администрирование</a>{% block administrator_menu %}{% endblock %}</li>{% endif %}
 				</ul>
 				{% endif %}
 				{% if pupil %}
 				<ul>
-					<li><a href="/marks/">Отметки</a>{% block marks_p_menu %}{% endblock %}</li>
+					<li{% ifequal path "marks" %} class="active"{% endifequal %}><a href="/marks/">Отметки</a>{% block marks_p_menu %}{% endblock %}</li>
 				</ul>
 				{% endif %}
 				<ul style="padding-top: 15px;">

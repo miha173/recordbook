@@ -28,7 +28,10 @@ def is_administrator(user):
 def render_options(request):
     options = render_objects = options['render_objects'] = {}
     pathes = request.path.split('/')
-    render_objects['path'] = pathes[pathes.__len__()-2]
+    if pathes.__len__()==3:
+        render_objects['path'] = pathes[1]
+    if pathes.__len__()>3:
+        render_objects['path'] = pathes[2]
     if request.user.username[0] == 't':
         user = Teacher.objects.get(id = request.user.id)
         subjects = []

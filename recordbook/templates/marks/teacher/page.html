@@ -3,9 +3,9 @@
 {% block marks_menu %}
 	<ul>
 	{% if subjects %}
-		<li{% ifequal path "lessons" %} class="active"{% endifequal %}><a href="/marks/lesson/">Уроки</a></li>
-		<li{% ifequal path "grades" %} class="active"{% endifequal %}><a href="/marks/grade/">Отметки</li>
-		<li{% ifequal path "result" %} class="active"{% endifequal %}><a href="/marks/result/">Итоговые отметки</li>
+		<li{% ifequal path "lesson" %} class="active"{% endifequal %}><a href="/marks/lesson/">Уроки</a></li>
+		<li{% ifequal path "grade" %} class="active"{% endifequal %}><a href="/marks/grade/">Отметки</a></li>
+		<li{% ifequal path "result" %} class="active"{% endifequal %}><a href="/marks/result/">Итоговые отметки</a></li>
 	{% endif %}
 	</ul>
 {% endblock %}
