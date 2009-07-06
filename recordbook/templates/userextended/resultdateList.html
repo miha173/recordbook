@@ -8,7 +8,7 @@
 			<td>{{ object.get_period_display }}</td>
 			<td>{{ object.date|date:"d.n.Y" }}</td>
 			<td>{% for grade in object.grades.all %}{{ grade.small_name }}; {% endfor %}</td>
-			<td><a href="edit/{{ object.id }}/">Редактировать</a>, <a href="delete/{{ object.id }}">Удалить</a>.</td>
+			<td><a href="edit/{{ object.id }}/">Редактировать</a>, <a href="delete/{{ object.id }}" class="delete">Удалить</a>.</td>
 	{% endfor %}
 </table>
 {% include "helpers/paginator.html" %}

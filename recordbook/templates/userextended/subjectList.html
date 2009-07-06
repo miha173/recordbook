@@ -6,7 +6,7 @@
 	{% for object in objects.object_list %}
 		<tr>
 			<td>{{ object.name }}</td>
-			<td><a href="edit/{{ object.id }}/">Редактировать</a>, <a href="delete/{{ object.id }}">Удалить</a>.</td>
+			<td><a href="edit/{{ object.id }}/">Редактировать</a>, <a href="delete/{{ object.id }}" class="delete">Удалить</a>.</td>
 	{% endfor %}
 </table>
 {% include "helpers/paginator.html" %}

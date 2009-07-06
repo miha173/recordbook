@@ -8,7 +8,7 @@
 			<td>{{ connection.teacher.fio }}</td>
 			<td>{{ connection.subject }}</td>
 			<td>{{ connection.type }}</td>
-			<td><a href="/curatorship/connections/delete/{{ connection.id }}">Удалить</a></td>
+			<td><a href="/curatorship/connections/delete/{{ connection.id }}" class="delete">Удалить</a></td>
 		</tr>
 	{% endfor %}
 	</table>

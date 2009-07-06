@@ -12,7 +12,7 @@
 		    <tr>
 		        <td>{{ object.topic }}</td>
 		        <td>{% for grade in object.grade.all %}{{ grade.small_name }}; {% endfor %}</td>
-		        <td><a href="/marks/lesson/edit/{{ object.id }}/">Редактировать</a>, <a href="/marks/lesson/delete/{{ object.id }}/">удалить</a>.</td>
+		        <td><a href="/marks/lesson/edit/{{ object.id }}/">Редактировать</a>, <a href="/marks/lesson/delete/{{ object.id }}/" class="delete">удалить</a>.</td>
 		    </tr>
 		{% endfor %}
 		</table>

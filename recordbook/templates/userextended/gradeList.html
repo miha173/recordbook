@@ -10,7 +10,7 @@
 		<tr>
 			<td>{{ object.long_name }}</td>
 			<td>{{ object.small_name }}</td>
-			<td><a href="edit/{{ object.id }}/">Редактировать</a>, <a href="delete/{{ object.id }}">Удалить</a>.</td>
+			<td><a href="edit/{{ object.id }}/">Редактировать</a>, <a href="delete/{{ object.id }}" class="delete">Удалить</a>.</td>
 	{% endfor %}
 </table>
 {% include "helpers/paginator.html" %}
