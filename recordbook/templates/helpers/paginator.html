@@ -10,7 +10,5 @@
 	);
 </script>
 {% load pytils_numeral %}
-{% comment %}
-Всего {{ objects.paginator.num_pages }} {{ objects.paginator.num_pages|choose_plural:"страница,страницы,страниц" }} страниц.
-{% endcomment %}
+Всего {{ objects.paginator.num_pages }} {{ objects.paginator.num_pages|choose_plural:page_variants }}.
 {% endif %}
