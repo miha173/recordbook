@@ -7,7 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
-from django.conf.settings import settings
+from django.conf import settings
 
 from src.views import render_options, is_teacher
 from src.userextended.models import Pupil, Teacher, Subject, Grade
