@@ -7,6 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
+from django.conf.settings import settings
 
 from src.views import render_options, is_teacher
 from src.userextended.models import Pupil, Teacher, Subject, Grade
@@ -34,7 +35,7 @@ def set_current_subject(request, subject_id):
 @user_passes_test(is_teacher)
 def lessonList(request):
     render = render_options(request)
-    paginator = Paginator(Lesson.objects.filter(teacher = render['user'], subject = render['user'].current_subject), 40)
+    paginator = Paginator(Lesson.objects.filter(teacher = render['user'], subject = render['user'].current_subject), settings.PAGINATOR_OBJECTS)
     try:
         page = int(request.GET.get('page', '1'))
     except ValueError:
@@ -287,7 +288,7 @@ def gradeResult(request):
 @login_required
 def marksView(request, subject_id):
     render = render_options(request)
-    paginator = Paginator(Mark.objects.filter(pupil = render['user'], lesson__subject = get_object_or_404(Subject, id = subject_id)).order_by('-lesson__date'), 40)
+    paginator = Paginator(Mark.objects.filter(pupil = render['user'], lesson__subject = get_object_or_404(Subject, id = subject_id)).order_by('-lesson__date'), settings.PAGINATOR_OBJECTS)
     try:
         page = int(request.GET.get('page', '1'))
     except ValueError:

@@ -1,5 +1,4 @@
-# Django settings for src project.
-
+# -*- coding: UTF-8 -*-
 import os
 
 DEBUG = True
@@ -32,6 +31,9 @@ TIME_ZONE = 'Europe/Moscow'
 LANGUAGE_CODE = 'ru-ru'
 
 SITE_ID = 1
+
+#Количество объектов на странице с пагинатором
+PAGINATOR_OBJECTS = 40
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.

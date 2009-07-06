@@ -6,6 +6,7 @@ from django.template.loader import render_to_string
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.conf import settings
 
 from models import Teacher, Pupil, Grade, Subject, School
 from forms import SubjectForm, GradeForm, PupilForm, TeacherForm, ResultDateForm
@@ -43,7 +44,7 @@ def objectList(request, object):
     if object == 'resultdate':
         Object = ResultDate
         templ = render['object_name'] = 'resultdate'
-    paginator = Paginator(Object.objects.filter(school = Teacher.objects.get(id = request.user.id).school), 40)
+    paginator = Paginator(Object.objects.filter(school = Teacher.objects.get(id = request.user.id).school), settings.PAGINATOR_OBJECTS)
     try:
         page = int(request.GET.get('page', '1'))
     except ValueError:
