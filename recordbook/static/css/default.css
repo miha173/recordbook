@@ -117,15 +117,11 @@ table.list td {
 	padding: 0px 5px;
 }
 
-	div.field{
-		display: block;
-		clear: right;
-		padding: 5px 0px;
+	fieldset table tr, table.fieldset tr{
+		margin: 5px 0px;
 	}
-	div.field label{
-		width: 11em;
-		display: block;
-		float: left;
+	fieldset table td.label, table.fieldset td.label{
+		width: 11em;	
 		padding: 3px 10px 0px 0px;
 	}
 	fieldset{

@@ -3,22 +3,28 @@
 <form method="post" action=".">
 	<h2>Урок</h2>
 	{{ form.errors }}
-	<div class="field">
-		<label for="id_date">Дата:</label>
-		{{ form.date }}
-	</div>
-	<div class="field">
-		<label for="id_topic">Тема урока:</label>
-		{{ form.topic }}
-	</div>
-	<div class="field">
-		<label for="id_task">Домашнее задание:</label>
-		{{ form.task }}
-	</div>
-	<div class="field">
-		<label for="id_small_name">Класс:</label>
-		{{ form.grade }}
-	</div>
+	<table class="fieldset">
+		<tr>
+			<td class="label"><label for="id_date">Дата:</label></td>
+			<td>{{ form.date }}</td>
+			<td>{% if form.date.help_text %}<div style="width: 200px; margin-left: 10px; font-size: 12px; padding-left: 10px; border: 1px dashed #4F4F4F; color: #4F4F4F; background: #EFEFEF; border-left: solid 3px">{{ form.date.help_text }}</div>{% endif %}</td>
+		</tr>
+		<tr>
+			<td class="label"><label for="id_topic">Тема урока:</label></td>
+			<td>{{ form.topic }}</td>
+			<td>{% if form.topic.help_text %}<div style="width: 200px; margin-left: 10px; font-size: 12px; padding-left: 10px; border: 1px dashed #4F4F4F; color: #4F4F4F; background: #EFEFEF; border-left: solid 3px">{{ form.topic.help_text }}</div>{% endif %}</td>
+		</tr>
+		<tr>
+			<td class="label"><label for="id_task">Домашнее задание:</label></td>
+			<td>{{ form.task }}</td>
+			<td>{% if form.task.help_text %}<div style="width: 200px; margin-left: 10px; font-size: 12px; padding-left: 10px; border: 1px dashed #4F4F4F; color: #4F4F4F; background: #EFEFEF; border-left: solid 3px">{{ form.task.help_text }}</div>{% endif %}</td>
+		</tr>
+		<tr>
+			<td class="label"><label for="id_small_name">Класс:</label></td>
+			<td>{{ form.grade }}</td>
+			<td>{% if form.grade.help_text %}<div style="width: 200px; margin-left: 10px; font-size: 12px; padding-left: 10px; border: 1px dashed #4F4F4F; color: #4F4F4F; background: #EFEFEF; border-left: solid 3px">{{ form.grade.help_text }}</div>{% endif %}</td>
+		</tr>
+	</table>
 	<input type="submit" value="Сохранить">
 </form>
 {% endblock %}

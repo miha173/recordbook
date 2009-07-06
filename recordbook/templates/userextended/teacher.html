@@ -6,35 +6,55 @@
 	{{ form.errors }}
 	<fieldset>
 		<legend>Личная информация</legend>
-		<div class="field">
-			<label for="id_last_name">Фамилия:</label>{{ form.last_name }}
-		</div>
-		<div class="field">
-			<label for="id_first_name">Имя:</label>{{ form.first_name }}
-		</div>
-		<div class="field">
-			<label for="id_middle_name">Отчество: </label>{{ form.middle_name }}
-		</div>
+		<table>
+			<tr>
+				<td class="label"><label for="id_last_name">Фамилия:</label></td>
+				<td>{{ form.last_name }}</td>
+				<td>{% if form.last_name.help_text %}<div style="width: 200px; margin-left: 10px; font-size: 12px; padding-left: 10px; border: 1px dashed #4F4F4F; color: #4F4F4F; background: #EFEFEF; border-left: solid 3px">{{ form.last_name.help_text }}</div>{% endif %}</td>
+			</tr>
+			<tr>
+				<td class="label"><label for="id_first_name">Имя:</label></td>
+				<td>{{ form.first_name }}</td>
+				<td>{% if form.first_name.help_text %}<div style="width: 200px; margin-left: 10px; font-size: 12px; padding-left: 10px; border: 1px dashed #4F4F4F; color: #4F4F4F; background: #EFEFEF; border-left: solid 3px">{{ form.first_name.help_text }}</div>{% endif %}</td>
+			</tr>
+			<tr>
+				<td class="label"><label for="id_middle_name">Отчество: </label></td>
+				<td>{{ form.middle_name }}</td>
+				<td>{% if form.middle_name.help_text %}<div style="width: 200px; margin-left: 10px; font-size: 12px; padding-left: 10px; border: 1px dashed #4F4F4F; color: #4F4F4F; background: #EFEFEF; border-left: solid 3px">{{ form.middle_name.help_text }}</div>{% endif %}</td>
+			</tr>
+		</table>
 	</fieldset>
 
 	<fieldset>
 		<legend>Преподавание</legend>
-		<div class="field">
-			<label for="id_subjects">Предметы:</label>{{ form.subjects }}
-		</div>
-		<div class="field">
-			<label for="id_grades">Классы:</label>{{ form.grades }}
-		</div>
+		<table>
+			<tr>
+				<td class="label"><label for="id_subjects">Предметы:</label></td>
+				<td>{{ form.subjects }}</td>
+				<td>{% if form.subjects.help_text %}<div style="width: 200px; margin-left: 10px; font-size: 12px; padding-left: 10px; border: 1px dashed #4F4F4F; color: #4F4F4F; background: #EFEFEF; border-left: solid 3px">{{ form.subjects.help_text }}</div>{% endif %}</td>
+			</tr>
+			<tr>
+				<td class="label"><label for="id_grades">Классы:</label></td>
+				<td>{{ form.grades }}</td>
+				<td><div style="width: 200px; margin-left: 10px; font-size: 12px; padding-left: 10px; border: 1px dashed #4F4F4F; color: #4F4F4F; background: #EFEFEF; border-left: solid 3px">{{ form.grades.help_text }}</div></td>
+			</tr>
+		</table>
 	</fieldset>
 
 	<fieldset>
 		<legend>Другое</legend>
-		<div class="field">
-			<label for="id_grade">Классное руководство:</label>{{ form.grade }}
-		</div>
-		<div class="field">
-			<label for="id_administrator">Администратор: </label>{{ form.administrator }}
-		</div>
+		<table>
+			<tr>
+				<td class="label"><label for="id_grade">Классное руководство:</label></td>
+				<td>{{ form.grade }}</td>
+				<td>{% if form.grade.help_text %}<div style="width: 200px; margin-left: 10px; font-size: 12px; padding-left: 10px; border: 1px dashed #4F4F4F; color: #4F4F4F; background: #EFEFEF; border-left: solid 3px">{{ form.grade.help_text }}</div>{% endif %}</td>
+			</tr>
+			<tr>
+				<td class="label"><label for="id_administrator">Администратор: </label></td>
+				<td>{{ form.administrator }}
+				<td>{% if form.administrator.help_text %}<div style="width: 200px; margin-left: 10px; font-size: 12px; padding-left: 10px; border: 1px dashed #4F4F4F; color: #4F4F4F; background: #EFEFEF; border-left: solid 3px">{{ form.administrator.help_text }}</div>{% endif %}</td>
+			</tr>
+		</table>
 	</fieldset>
 	
 	<input type="submit" value="Сохранить" />
