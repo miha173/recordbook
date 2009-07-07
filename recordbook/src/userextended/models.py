@@ -47,7 +47,10 @@ class Subject(models.Model):
         from src.curatorship.models import Connection
         from src.marks.models import Mark, Lesson
         Connection.objects.filter(subject = self).delete()
-        Mark.objects.filter(lesson = Lesson.objects.filter(subject = self)).delete()
+        lessons = Lesson.objects.filter(subject = self)
+        if lessons.count()<>0:
+            Mark.objects.filter(lesson = lessons).delete()
+            lessons.delete()
         if Teacher.objects.filter(subjects = self).count()!=0:
             teacher.subjects.remove(self)
         super(Subject, self).delete()

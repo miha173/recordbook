@@ -29,6 +29,7 @@ def is_administrator(user):
 def render_options(request):
     options = render_objects = options['render_objects'] = {}
     render_objects['page_variants'] = ("страница","страницы","страниц")
+    render_objects['pupil_variants'] = ("ученик", "ученика", "учеников")
     pathes = request.path.split('/')
     if pathes.__len__()==3:
         render_objects['path'] = pathes[1]
