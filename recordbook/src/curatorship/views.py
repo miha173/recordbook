@@ -39,6 +39,9 @@ def connectionWizard(request, step):
             render['form'] = ConnectionStep1Wizard(request.POST)
             if render['form'].is_valid():
                 request.session['teacher'] = render['form'].cleaned_data['teacher']
+                if request.session['teacher'].subjects.count()==1:
+                    request.session['subject'] = request.session['teacher'].subjects.all()[0]
+                    return HttpResponseRedirect('/curatorship/connections/wizard/3/')
                 return HttpResponseRedirect('/curatorship/connections/wizard/2/')
             else:
                 render['form'].fields['teacher'].queryset = Teacher.objects.filter(grades = render['user'].grade)

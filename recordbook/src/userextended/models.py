@@ -9,6 +9,7 @@ import pytils
 class School(models.Model):
     u'Модель для школ'
     name = models.CharField(u"Имя учебного заведения", max_length = 100)
+    prefix = models.CharField(u"Префикс для пароля", max_length = 5)
     def __unicode__(self):
         return self.name
 
@@ -74,7 +75,7 @@ class Clerk(User):
     #Не всегда нужны полные ФИО
     def fi(self):
         return self.last_name + ' ' + self.first_name
-    def save(self, force_insert=False, force_update=False):
+    def gen_username(self, school = False):
         #Генерация имени пользователя
         username = self.prefix + "."
         #Удаление нехороших символов из траслитерации
@@ -84,17 +85,29 @@ class Clerk(User):
         first_name = pytils.translit.translify(self.first_name.lower())
         first_name = first_name.replace("'","")
         first_name = first_name.replace("`","")
+        if school:
+            prefix = len(self.school.prefix)
+            username +=  self.school.prefix + "."
+        else: 
+            prefix = 0
         #Проверки на допустимость
-        if len(last_name)+len(first_name)>28:
-            if len(last_name)>25:
-                last_name = last_name[:25]
+        if len(last_name)+len(first_name)+prefix>28:
+            if len(last_name)>25-prefix:
+                last_name = last_name[:25-prefix]
                 first_name = first_name[:3]
             else:
                 if len(last_name)>len(first_name):
-                    last_name = last_name[:28-len(first_name)]
+                    last_name = last_name[:28-len(first_name)-prefix]
                 else:
-                    first_name = first_name[:28-len(first_name)]
-        self.username = username + last_name + '.' + first_name
+                    first_name = first_name[:28-len(first_name)-prefix]
+        return username + last_name + '.' + first_name
+    def save(self, force_insert=False, force_update=False):
+        username = self.gen_username()
+        try: 
+            User.objects.get(username = username)
+            self.username = self.gen_username(school = True)
+        except:
+            self.username = username
         #Пароль по умолчанию
         self.set_password("1")
         super(Clerk, self).save(force_insert, force_update)

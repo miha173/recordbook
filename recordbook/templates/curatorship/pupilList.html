@@ -17,5 +17,6 @@
 	{% endfor %}
 </table>
 {% load pytils_numeral %}
+<br />
 Всего {{ pupils|length }} {{ pupils|length|choose_plural:pupil_variants }}.
 {% endblock %}

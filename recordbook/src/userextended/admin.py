@@ -5,7 +5,7 @@ from models import Grade, Subject, Teacher, Pupil, School
 
 class SchoolAdmin(admin.ModelAdmin):
     list_display = ('name',)
-    fields = ('name',)
+    fields = ('name', 'prefix')
 
 class GradeAdmin(admin.ModelAdmin):
     list_display = ('long_name',)

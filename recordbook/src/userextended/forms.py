@@ -28,8 +28,8 @@ class TeacherForm(forms.ModelForm):
         model = Teacher
         fields = ('last_name', 'first_name', 'middle_name', 'grade', 'grades', 'subjects', 'administrator')
     help_text4MultipleChoice = u'Удерживайте «Control» (или «Command» на Mac) для выбора нескольких.'
-    grades = forms.ModelMultipleChoiceField(queryset = Grade.objects.all(), help_text = help_text4MultipleChoice)
-    subjects = forms.ModelMultipleChoiceField(queryset = Subject.objects.all(), help_text = help_text4MultipleChoice)
+    grades = forms.ModelMultipleChoiceField(queryset = Grade.objects.all(), help_text = help_text4MultipleChoice, required = False)
+    subjects = forms.ModelMultipleChoiceField(queryset = Subject.objects.all(), help_text = help_text4MultipleChoice, required = False)
 
 class ResultDateForm(forms.ModelForm):
     class Meta:
