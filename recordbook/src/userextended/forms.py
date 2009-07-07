@@ -11,12 +11,12 @@ from src.marks.models import Lesson, ResultDate
 class SubjectForm(forms.ModelForm):
     class Meta:
         model = Subject
-        fields = ('name',)
+        fields = ['name']
 
 class GradeForm(forms.ModelForm):
     class Meta:
         model = Grade
-        fields = ('long_name', 'small_name')
+        fields = ['long_name', 'small_name']
 
 class PupilForm(forms.ModelForm):
     class Meta:
@@ -34,6 +34,6 @@ class TeacherForm(forms.ModelForm):
 class ResultDateForm(forms.ModelForm):
     class Meta:
         model = ResultDate
-        fields = ('period', 'startdate', 'enddate', 'grades')
-    startdate = forms.DateField(('%d.%m.%y',), label = u'Дата начала периода', widget=forms.DateTimeInput(format='%d.%m.%Y'))
-    enddate = forms.DateField(('%d.%m.%y',), label = u'Дата подведения итога', widget=forms.DateTimeInput(format='%d.%m.%Y'))
+        fields = ['period', 'startdate', 'enddate', 'grades']
+    startdate = forms.DateField(('%d.%m.%y',), label = u'Дата начала периода', widget=forms.DateTimeInput(format='%d.%m.%y'))
+    enddate = forms.DateField(('%d.%m.%y',), label = u'Дата подведения итога', widget=forms.DateTimeInput(format='%d.%m.%y'))

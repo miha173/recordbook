@@ -10,22 +10,34 @@
 			<tr>
 				<td class="label"><label for="id_last_name">Фамилия:</label></td>
 				<td>{{ form.last_name }}</td>
-				<td>{% if form.last_name.help_text %}<div style="width: 200px; margin-left: 10px; font-size: 12px; padding-left: 10px; border: 1px dashed #4F4F4F; color: #4F4F4F; background: #EFEFEF; border-left: solid 3px">{{ form.last_name.help_text }}</div>{% endif %}</td>
+				<td>
+					{% if form.last_name.errors %}<div class="error_text">{{ form.last_name.errors }}</div>{% endif %}
+					{% if form.last_name.help_text %}<div class="help_text">{{ form.last_name.help_text }}</div>{% endif %}
+				</td>
 			</tr>
 			<tr>
 				<td class="label"><label for="id_first_name">Имя:</label></td>
 				<td>{{ form.first_name }}</td>
-				<td>{% if form.first_name.help_text %}<div style="width: 200px; margin-left: 10px; font-size: 12px; padding-left: 10px; border: 1px dashed #4F4F4F; color: #4F4F4F; background: #EFEFEF; border-left: solid 3px">{{ form.first_name.help_text }}</div>{% endif %}</td>
+				<td>
+					{% if form.first_name.errors %}<div class="error_text">{{ form.first_name.errors }}</div>{% endif %}
+					{% if form.first_name.help_text %}<div class="help_text">{{ form.first_name.help_text }}</div>{% endif %}
+				</td>
 			</tr>
 			<tr>
 				<td class="label"><label for="id_middle_name">Отчество:</label></td>
 				<td>{{ form.middle_name }}</td>
-				<td>{% if form.middle_name.help_text %}<div style="width: 200px; margin-left: 10px; font-size: 12px; padding-left: 10px; border: 1px dashed #4F4F4F; color: #4F4F4F; background: #EFEFEF; border-left: solid 3px">{{ form.middle_name.help_text }}</div>{% endif %}</td>
+				<td>
+					{% if form.middle_name.errors %}<div class="error_text">{{ form.middle_name.errors }}</div>{% endif %}
+					{% if form.middle_name.help_text %}<div class="help_text">{{ form.middle_name.help_text }}</div>{% endif %}
+				</td>
 			</tr>
 			<tr>
 				<td class="label"><label for="id_sex">Пол:</label></td>
 				<td>{{ form.sex }}</td>
-				<td>{% if form.sex.help_text %}<div style="width: 200px; margin-left: 10px; font-size: 12px; padding-left: 10px; border: 1px dashed #4F4F4F; color: #4F4F4F; background: #EFEFEF; border-left: solid 3px">{{ form.sex.help_text }}</div>{% endif %}</td>
+				<td>
+					{% if form.sex.errors %}<div class="error_text">{{ form.sex.errors }}</div>{% endif %}
+					{% if form.sex.help_text %}<div class="help_text">{{ form.sex.help_text }}</div>{% endif %}
+				</td>
 			</tr>
 		</table>
 	</fieldset>
@@ -35,22 +47,31 @@
 			<tr>
 				<td class="label"><label for="id_grade">Класс:</label></td>
 				<td>{{ form.grade }}</td>
-				<td>{% if form.grade.help_text %}<div style="width: 200px; margin-left: 10px; font-size: 12px; padding-left: 10px; border: 1px dashed #4F4F4F; color: #4F4F4F; background: #EFEFEF; border-left: solid 3px">{{ form.grade.help_text }}</div>{% endif %}</td>
+				<td>
+					{% if form.grade.errors %}<div class="error_text">{{ form.grade.errors }}</div>{% endif %}
+					{% if form.grade.help_text %}<div class="help_text">{{ form.grade.help_text }}</div>{% endif %}
+				</td>
 			</tr>
 			<tr>
 				<td class="label"><label for="id_group">Группа:</label></td>
 				<td>{{ form.group }}</td>
-				<td>{% if form.group.help_text %}<div style="width: 200px; margin-left: 10px; font-size: 12px; padding-left: 10px; border: 1px dashed #4F4F4F; color: #4F4F4F; background: #EFEFEF; border-left: solid 3px">{{ form.group.help_text }}</div>{% endif %}</td>
+				<td>
+					{% if form.group.errors %}<div class="error_text">{{ form.group.errors }}</div>{% endif %}
+					{% if form.group.help_text %}<div class="help_text">{{ form.group.help_text }}</div>{% endif %}
+				</td>
 			</tr>
 		</table>
 	</fieldset>
 	<fieldset>
-		<legend>Другое</legend>
+		<legend>Другая информация</legend>
 		<table>
 			<tr>
 				<td class="label"><label for="id_special">Спец. группа:</label></td>
 				<td>{{ form.special }}</td>
-				<td>{% if form.special.help_text %}<div style="width: 200px; margin-left: 10px; font-size: 12px; padding-left: 10px; border: 1px dashed #4F4F4F; color: #4F4F4F; background: #EFEFEF; border-left: solid 3px">{{ form.cpecial.help_text }}</div>{% endif %}</td>
+				<td>
+					{% if form.grades.errors %}<div class="error_text">{{ form.grades.errors }}</div>{% endif %}
+					{% if form.special.help_text %}<div class="help_text">{{ form.cpecial.help_text }}</div>{% endif %}
+			</td>
 			</tr>
 		</table>
 	</fieldset>

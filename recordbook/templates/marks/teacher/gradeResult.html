@@ -9,8 +9,9 @@
 	{% for pupil in pupils %}
 	<tr>
 		<td>({{ pupil.sa|default:"н\а" }})</td>
-		<td>{{ pupil.form.mark }}</td>
 		<td>{{ pupil.name }}</td>
+		<td>{{ pupil.form.mark }}</td>
+		<td>{% if pupil.form.mark.errors %}<div class="erorr_text">{{ pupil.form.mark.errors }}</div>{% endif %}</td>
 	</tr>
 	{% endfor %}
 </table>

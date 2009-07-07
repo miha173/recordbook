@@ -10,13 +10,13 @@
 				<option value="{{ resultdate.id }}">{{ resultdate.get_period_display }}</option>
 				{% endfor %}
 			</select>
-			<input type="submit" />
+			<input type="submit" value="Выставить отметки" />
 		</td>
 	</tr>
 	{% for grade in grades %}
 	<tr>
-		<td><input type="radio" name="grade" value="{{ grade.id }}" /></td>
-		<td>{{ grade.long_name }}</td>
+		<td><input type="radio" name="grade" id="grade-{{ grade.id }}" value="{{ grade.id }}" /></td>
+		<td><label for="grade-{{ grade.id }}">{{ grade.long_name }}</label></td>
 	</tr>
 	{% endfor %}
 </table>

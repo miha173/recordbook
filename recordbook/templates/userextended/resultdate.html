@@ -3,23 +3,18 @@
 {% block content %}
 <h2>Итоговый период</h2>
 <form method="post" action=".">
-	{{ form.errors }}
-	<div class="field">
-		<label for="id_period">Учебный период:</label>
-		{{ form.period }}
-	</div>
-	<div class="field">
-		<label for="id_startdate">Дата начала периода:</label>
-		{{ form.startdate }}
-	</div>
-	<div class="field">
-		<label for="id_enddate">Дата подведения итога:</label>
-		{{ form.enddate }}
-	</div><br />
-	<div class="field">
-		<label for="id_grades">Классы:</label>
-		{{ form.grades }}
-	</div>
+	<table>
+		{% for field in form %}
+		<tr>
+			<td class="label"><label for="{{ field.label }}">{{ field.label_tag }}:</label></td>
+			<td>{{ field }}</td>
+			<td>
+				{% if field.errors %}<div class="error_text">{{ field.errors }}</div>{% endif %}
+				{% if field.help_text %}<div class="help_text">{{ field.help_text}}</div>{% endif %}
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
 	<input type="submit" value="Сохранить">
 </form>
 {% endblock %}
