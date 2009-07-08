@@ -3,7 +3,19 @@
 from django.db import models
 from src.userextended.models import Pupil, Teacher, Subject, Grade, School
 
+class LessonManager(models.Manager):
+    def search(self, str):
+        values = []
+        a = super(LessonManager, self).get_query_set().filter(grade__long_name__contains = str)
+        for obj in a: values.append(obj.id)
+        a = super(LessonManager, self).get_query_set().filter(grade__small_name__contains = str)
+        for obj in a: values.append(obj.id)
+        a = super(LessonManager, self).get_query_set().filter(topic__contains = str)
+        for obj in a: values.append(obj.id)
+        return super(LessonManager, self).get_query_set().filter(id__in = values)
+
 class Lesson(models.Model):
+    objects = LessonManager()
     teacher = models.ForeignKey(Teacher, verbose_name = u'Учитель')
     date = models.DateField(u'Дата')
     topic = models.CharField(u'Тема урока', max_length = 200)

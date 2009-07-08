@@ -35,7 +35,11 @@ def set_current_subject(request, subject_id):
 @user_passes_test(is_teacher)
 def lessonList(request):
     render = render_options(request)
-    paginator = Paginator(Lesson.objects.filter(teacher = render['user'], subject = render['user'].current_subject), settings.PAGINATOR_OBJECTS)
+    if request.GET.get('search_str'): 
+        objects = Lesson.objects.search(request.GET.get('search_str'))
+        render['search_str'] = request.GET.get('search_str')
+    else: objects = Lesson.objects
+    paginator = Paginator(objects.filter(teacher = render['user'], subject = render['user'].current_subject), settings.PAGINATOR_OBJECTS)
     try:
         page = int(request.GET.get('page', '1'))
     except ValueError:

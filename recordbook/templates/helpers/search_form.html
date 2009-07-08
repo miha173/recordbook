@@ -1,0 +1,10 @@
+<div style="padding: 5px 0px;">
+	<form method="get" action=".">
+		<input type="text" name="search_str" value="{{ search_str }}" />
+		<input type="submit" value="Искать" />
+	</form>
+</div>	
+	{% if not objects.object_list and search_str %}
+	<br />
+	Ничего не найдено. Попробуйте переформулировать запрос.
+	{% endif %}

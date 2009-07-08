@@ -12,6 +12,14 @@ class School(models.Model):
     prefix = models.CharField(u"Префикс для пароля", max_length = 5)
     def __unicode__(self):
         return self.name
+    def delete(self):
+        from src.marks.models import ResultDate
+        Grade.objects.filter(school = self).delete()
+        Subject.objects.filter(school = self).delete()
+        Teacher.objects.filter(school = self).delete()
+        Pupil.objects.filter(school = self).delete()
+        ResultDate.objects.filter(school = self).delete()
+        super(School, self).delete()
 
 class Grade(models.Model):
     u'Классы в школах'
@@ -58,8 +66,25 @@ class Subject(models.Model):
     class Meta:
         ordering = ['name']
 
+class ClerkManager(models.Manager):
+    #Очень тормозно будет
+    def search(self, str):
+        values = []
+        a = super(ClerkManager, self).get_query_set().filter(last_name__contains = str)
+        for obj in a: values.append(obj.id)
+        a = super(ClerkManager, self).get_query_set().filter(first_name__contains = str)
+        for obj in a: values.append(obj.id)
+        a = super(ClerkManager, self).get_query_set().filter(middle_name__contains = str)
+        for obj in a: values.append(obj.id)
+        a = super(ClerkManager, self).get_query_set().filter(grade__long_name__contains = str)
+        for obj in a: values.append(obj.id)
+        a = super(ClerkManager, self).get_query_set().filter(grade__small_name__contains = str)
+        for obj in a: values.append(obj.id)
+        return super(ClerkManager, self).get_query_set().filter(id__in = values)
+
 class Clerk(User):
     u'Базовый класс расширенного пользователя. Потомки - учителя, ученики.'
+    objects = ClerkManager()
     last_name = models.CharField(u"Фамилия", max_length = 30)
     first_name = models.CharField(u"Имя", max_length = 30)
     middle_name = models.CharField(u"Отчество", max_length = 30, blank = True)
@@ -111,6 +136,11 @@ class Clerk(User):
         #Пароль по умолчанию
         self.set_password("1")
         super(Clerk, self).save(force_insert, force_update)
+    def search(self, search_str):
+        values = []
+        a = self.objects.filter(last_name__contains = search_str)
+        for obj in a: values.append(obj)
+        return values
     class Meta:
         abstract = True
         ordering = ['last_name', 'first_name', 'middle_name']
@@ -128,6 +158,10 @@ class Teacher(Clerk):
     current_subject = models.ForeignKey(Subject, blank = True, related_name = 'current_subject', null = True)
     #Для генерации имени пользователя
     prefix = "t"
+    def delete(self):
+        from src.marks.models import Lesson, Mark
+        Lesson.objects.filter(teacher = self).delete()
+        super(Teacher, self).delete()
 
 class Pupil(Clerk):
     grade = models.ForeignKey(Grade, verbose_name = u"Класс")

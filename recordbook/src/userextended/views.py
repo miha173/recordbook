@@ -44,7 +44,11 @@ def objectList(request, object):
     if object == 'resultdate':
         Object = ResultDate
         templ = render['object_name'] = 'resultdate'
-    paginator = Paginator(Object.objects.filter(school = Teacher.objects.get(id = request.user.id).school), settings.PAGINATOR_OBJECTS)
+    if request.GET.get('search_str'): 
+        objects = Object.objects.search(request.GET.get('search_str'))
+        render['search_str'] = request.GET.get('search_str')
+    else: objects = Object.objects
+    paginator = Paginator(objects.filter(school = Teacher.objects.get(id = request.user.id).school), settings.PAGINATOR_OBJECTS)
     try:
         page = int(request.GET.get('page', '1'))
     except ValueError:

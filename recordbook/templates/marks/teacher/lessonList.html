@@ -2,6 +2,12 @@
 
 {% block content %}
 	<a href="/marks/lesson/add/">Добавить урок</a><br />
+	{% include 'helpers/search_form.html' %}
+	{% if not objects.object_list and not search_str %}
+	<br />
+	Уроков нет.
+	{% endif %}
+	{% if objects.object_list %}
 		<table class="list">
 		    <thead>
 		        <td>Тема урока</td>
@@ -17,4 +23,5 @@
 		{% endfor %}
 		</table>
 	{% include "helpers/paginator.html" %}
+	{% endif %}
 {% endblock %}

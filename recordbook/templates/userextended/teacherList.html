@@ -1,7 +1,17 @@
 {% extends 'userextended/page.html' %}
 
 {% block content %}
-<a href="add/">Добавить преподавателя</a>
+<a href="add/">Добавить преподавателя</a><br />
+	{% include 'helpers/search_form.html' %}
+	{% if not objects.object_list and search_str %}
+	<br />
+	Ничего не найдено. Попробуйте переформулировать запрос.
+	{% endif %}
+	{% if not objects.object_list and not search_str %}
+	<br />
+	Преподавателей нет.
+	{% endif %}
+	{% if objects.object_list %}
 <table>
 	{% for object in objects.object_list %}
 		<tr>
@@ -11,4 +21,5 @@
 	{% endfor %}
 </table>
 {% include "helpers/paginator.html" %}
+	{% endif %}
 {% endblock %}

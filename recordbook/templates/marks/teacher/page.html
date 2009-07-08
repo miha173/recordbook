@@ -12,7 +12,7 @@
 
 {% block topmenu %} 
 	{% spaceless %}
-	<ul id="topmenu">
+	<ul>
 	{% for subject in subjects %}
 		{% ifequal subject.id user.current_subject.id %}
 			<li class="active">{{ subject.name }}</li>

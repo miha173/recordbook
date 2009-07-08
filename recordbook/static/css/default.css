@@ -95,25 +95,25 @@ h2 {
 	margin-top: 30px;
 }
 
-#topmenu{
+#topmenu ul{
 	list-style: none;
 	float: right;
 }
-#topmenu li{
+#topmenu ul li{
 	display: inline;
 	padding: 5px 20px;
 }
-#topmenu li.active{
+#topmenu ul li.active{
 	background: #F0FF6F;
 }
-table.list{
+#content table{
 	border-spacing: 0;
 }
-table.list thead{
+#content table thead{
 	font-size: 120%;
 	background: #fff;
 }
-table.list td {
+#content table td {
 	padding: 0px 5px;
 }
 
@@ -150,4 +150,7 @@ table.list td {
 	}
 	div.error_text ul{
 		list-style: none;
+	}
+	div#topmenu{
+		float: right;
 	}

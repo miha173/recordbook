@@ -1,8 +1,20 @@
 {% extends 'userextended/page.html' %}
 
 {% block content %}
-<a href="add/">Добавить ученика</a>
+<a href="add/">Добавить ученика</a><br />
+	{% include 'helpers/search_form.html' %}
+	{% if not objects.object_list and not search_str %}
+	<br />
+	Учеников нет.
+	{% endif %}
+	{% if objects.object_list %}
 <table>
+	<thead>
+		<td>Ученик</td>
+		<td>Логин</td>
+		<td>Класс</td>
+		<td>Действия</td>
+	</thead>
 	{% for object in objects.object_list %}
 		<tr>
 			<td>{{ object.fio }}</td>
@@ -12,4 +24,5 @@
 	{% endfor %}
 </table>
 {% include "helpers/paginator.html" %}
+	{% endif %}
 {% endblock %}
