@@ -1,7 +1,7 @@
 {% extends 'marks/pupil/page.html' %}
 
 {% block content %}
-	{% for mark in marks %}
-			{{ mark.lesson.date|date:"d.m" }} {{ mark.lesson.subject }} {% if mark.absent %}<b>Отстутствовал</b>{% else %}{{ mark.mark|default:"" }}{% endif %}<br />
+	{% for result in results %}
+			{{ result.resultdate.enddate|date:"d.m" }} {{ result.subject }} {{ mark.mark }}<br />
 	{% endfor %}
 {% endblock %}

@@ -19,8 +19,8 @@ from forms import LessonForm, MarkForm, ResultForm
 def index(request):
     render = render_options(request)
     if render['user_type'] == 'pupil':
-        marks = Mark.objects.filter(pupil = render['user']).order_by('-lesson__date')
-        render['marks'] = marks
+        results = Result.objects.filter(pupil = render['user']).order_by('resultdate__enddate')
+        render['results'] = results
     return render_to_response('marks/%s/index.html' % render['user_type'], render)
 
 @login_required

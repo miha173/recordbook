@@ -20,7 +20,7 @@
 			<td>{{ object.fio }}</td>
 			<td>{{ object.username }}</td>
 			<td>{{ object.grade.small_name }}</td>
-			<td><a href="edit/{{ object.id }}/">Редактировать</a>, <a href="delete/{{ object.id }}" class="delete">Удалить</a>.</td>
+			<td>{% include "helpers/buttons/edit.html" %}</td>
 	{% endfor %}
 </table>
 {% include "helpers/paginator.html" %}

@@ -61,7 +61,7 @@ def render_options(request):
         marks_list = {}
         render_objects['subjects'] = []
         for connection in Connection.objects.filter(grade = user.grade):
-            if connection.connection == '0' or connection.connection == user.group or (connection.connection-2) == user.sex or (connection.connection-4) == int(user.special):
+            if connection.connection == '0' or connection.connection == user.group or (int(connection.connection)-2) == user.sex or (int(connection.connection)-4) == int(user.special):
                 render_objects['subjects'].append(connection.subject)
     render_objects['user'] = user
     render_objects['school'] = user.school
