@@ -1,6 +1,7 @@
 {% extends 'marks/pupil/page.html' %}
 
 {% block content %}
+<h2>Итоговые отметки</h2>
 	{% for result in results %}
 			{{ result.resultdate.enddate|date:"d.m" }} {{ result.subject }} {{ mark.mark }}<br />
 	{% endfor %}
