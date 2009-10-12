@@ -1,15 +1,5 @@
 {% extends 'marks/page.html' %}
 
-{% block marks_menu %}
-	<ul>
-	{% if subjects %}
-		<li{% ifequal path "lesson" %} class="active"{% endifequal %}><a href="/marks/lesson/">Уроки</a></li>
-		<li{% ifequal path "grade" %} class="active"{% endifequal %}><a href="/marks/grade/">Отметки</a></li>
-		<li{% ifequal path "result" %} class="active"{% endifequal %}><a href="/marks/result/">Итоговые отметки</a></li>
-	{% endif %}
-	</ul>
-{% endblock %}
-
 {% block topmenu %} 
 	{% spaceless %}
 	<ul>

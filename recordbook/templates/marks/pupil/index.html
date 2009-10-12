@@ -3,6 +3,6 @@
 {% block content %}
 <h2>Итоговые отметки</h2>
 	{% for result in results %}
-			{{ result.resultdate.enddate|date:"d.m" }} {{ result.subject }} {{ mark.mark }}<br />
+			{{ result.resultdate }} ({{ result.resultdate.enddate|date:"d.m" }}) &mdash; {{ result.subject }} &mdash; {{ result.mark }}<br />
 	{% endfor %}
 {% endblock %}

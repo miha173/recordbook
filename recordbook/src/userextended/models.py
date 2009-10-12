@@ -85,8 +85,6 @@ class ClerkManager(models.Manager):
 class Clerk(User):
     u'Базовый класс расширенного пользователя. Потомки - учителя, ученики.'
     objects = ClerkManager()
-    last_name = models.CharField(u"Фамилия", max_length = 30)
-    first_name = models.CharField(u"Имя", max_length = 30)
     middle_name = models.CharField(u"Отчество", max_length = 30, blank = True)
     password_journal = models.CharField(u"Пароль доступа к дневнику", max_length = 255)
     school = models.ForeignKey(School, verbose_name = "Школа")

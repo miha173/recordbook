@@ -2,12 +2,12 @@
 <html>
 <head>
 	<title>{% block title %}Система электронных дневников{% endblock %}</title>
-	<link rel="stylesheet" type="text/css" href="/css/paginator3000.css" />
-	<link rel="stylesheet" type="text/css" href="/css/print.css" media="print" />
-	<link rel="stylesheet" type="text/css" href="/css/default.css" media="screen" />
-	<script type="text/javascript" src="/js/paginator3000.js"></script>
+	<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/paginator3000.css" />
+	<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/print.css" media="print" />
+	<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/default.css" media="screen" />
+	<script type="text/javascript" src="{{ MEDIA_URL }}js/paginator3000.js"></script>
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
-	<script type="text/javascript" src="/js/all.js"></script>
+	<script type="text/javascript" src="{{ MEDIA_URL }}js/all.js"></script>
 	<style>
 /*
 		body{
@@ -53,18 +53,60 @@
         <div id="sidebar">
             <div id="menu">
 				{{ user.username }}
-            	{% if teacher %} 
-				<ul>
-					{% if subjects %}<li{% ifequal path "marks" %} class="active"{% endifequal %}><a href="/marks/">Выставление отметок</a>{% block marks_menu %}{% endblock %}</li>{% endif %}
-					{% if grade %}<li{% ifequal path "curatorship" %} class="active"{% endifequal %}><a href="/curatorship/">Классное руководство</a>{% block curatorship_menu %}{% endblock %}</li>{% endif %}
-					{% if administrator %}<li{% ifequal path "administrator" %} class="active"{% endifequal %}><a href="/administrator/">Администрирование</a>{% block administrator_menu %}{% endblock %}</li>{% endif %}
-				</ul>
-				{% endif %}
-				{% if pupil %}
-				<ul>
-					<li{% ifequal path "marks" %} class="active"{% endifequal %}><a href="/marks/">Отметки</a>{% block marks_p_menu %}{% endblock %}</li>
-				</ul>
-				{% endif %}
+            	{% ifequal user.prefix "t" %} 
+					<ul>
+						{% if user.subjects %}
+							<li{% if not DIR %}{% ifequal ACTIVE_URL "marks" %} class="active"{% endifequal %}{% endif %}><a href="/marks/">Выставление отметок</a>
+								{% ifequal ACTIVE_URL 'marks' %}
+									<ul>
+									{% if subjects %}
+										<li{% ifequal DIR "lesson" %} class="active"{% endifequal %}><a href="/marks/lesson/">Уроки</a></li>
+										<li{% ifequal DIR "grade" %} class="active"{% endifequal %}><a href="/marks/grade/">Отметки</a></li>
+										<li{% ifequal DIR "result" %} class="active"{% endifequal %}><a href="/marks/result/">Итоговые отметки</a></li>
+									{% endif %}
+									</ul>
+								{% endifequal %}
+							</li>
+						{% endif %}
+						{% if user.grade %}
+							<li{% if not DIR %}{% ifequal ACTIVE_URL "curatorship" %} class="active"{% endifequal %}{% endif %}><a href="/curatorship/">Классное руководство</a>
+								{% ifequal ACTIVE_URL 'curatorship' %}
+									<ul>
+										<li{% ifequal DIR "connections" %} class="active"{% endifequal %}><a href="/curatorship/connections/">Связки</a></li>
+										<li{% ifequal DIR "pupil" %} class="active"{% endifequal %}><a href="/curatorship/pupil/">Ученики</a></li>
+										<li{% ifequal DIR "pupil_passwords" %} class="active"{% endifequal %}><a href="/curatorship/pupil_passwords/">Пароли учеников</a></li>
+									</ul>
+								{% endifequal %}
+							</li>
+						{% endif %}
+						{% if user.administrator %}
+							<li{% if not DIR %}{% ifequal ACTIVE_URL "administrator" %} class="active"{% endifequal %}{% endif %}><a href="/administrator/">Администрирование</a>
+								{% ifequal ACTIVE_URL 'administrator' %}
+									<ul>
+										<li{% ifequal DIR "teacher" %} class="active" {% endifequal %}><a href="/administrator/uni/teacher/">Учителя</a></li>
+										<li{% ifequal DIR "pupil" %} class="active" {% endifequal %}><a href="/administrator/uni/pupil/">Учащиеся</a></li>
+										<li{% ifequal DIR "subject" %} class="active" {% endifequal %}><a href="/administrator/uni/subject/">Дисциплины</a></li>
+										<li{% ifequal DIR "grade" %} class="active" {% endifequal %}><a href="/administrator/uni/grade/">Классы</a></li>
+										<li{% ifequal DIR "resultdate" %} class="active" {% endifequal %}><a href="/administrator/uni/resultdate/">Итоги</a></li>
+									</ul>
+								{% endifequal %}
+							</li>
+						{% endif %}
+					</ul>
+				{% endifequal %}
+            	{% ifequal user.prefix "p" %} 
+					<ul>
+						<li{% ifequal ACTIVE_URL "marks" %} class="active"{% endifequal %}><a href="/marks/">Отметки</a>
+							{% ifequal ACTIVE_URL 'marks' %}
+								<ul>
+									{% for subject in subjects %}
+										<li{% ifequal DIR subject.id %} class="active"{% endifequal %}><a href="/marks/subject/{{ subject.id }}/">{{ subject.name }}</a></li>
+									{% endfor %}
+								</ul>
+							{% endifequal %}
+						</li>
+					</ul>
+				{% endifequal %}
 				<ul style="padding-top: 15px;">
 					<li><a href="/accounts/password_change">Сменить пароль</a></li>
 					<li><a href="/accounts/logout">Выйти</a></li>

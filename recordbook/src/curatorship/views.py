@@ -8,33 +8,32 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import ObjectDoesNotExist
 
-from src.views import render_options, is_teacher
 from src.userextended.models import Teacher, Subject, Grade, Pupil
 from models import Connection
 from forms import ConnectionStep1Wizard, ConnectionStep2Wizard, ConnectionStep3Wizard, PupilForm
 from src.marks.models import Lesson, Mark
 
 def index(request):
-    return render_to_response('curatorship/page.html', render_options(request))
+    return render_to_response('curatorship/page.html', context_instance = RequestContext(request))
 
 @login_required
-@user_passes_test(is_teacher)
+@user_passes_test(lambda u: u.prefix=='t')
 def connectionsList(request):
-    render = render_options(request)
+    render = {}
     teacher = Teacher.objects.get(id = request.user.id)
     render['connections'] = Connection.objects.filter(grade = teacher.grade)
-    return render_to_response('curatorship/connectionsList.html', render)
+    return render_to_response('curatorship/connectionsList.html', render, context_instance = RequestContext(request))
 
 @login_required
-@user_passes_test(is_teacher)
+@user_passes_test(lambda u: u.prefix=='t')
 def connectionWizard(request, step):
-    render = render_options(request)
+    render = {}
     step = int(step)
     if step == 1:
         if request.method == 'GET':
             render['form'] = ConnectionStep1Wizard()
-            render['form'].fields['teacher'].queryset = Teacher.objects.filter(grades = render['user'].grade)
-            return render_to_response('curatorship/connectionWizard.html', render)
+            render['form'].fields['teacher'].queryset = Teacher.objects.filter(grades = request.user.grade)
+            return render_to_response('curatorship/connectionWizard.html', render, context_instance = RequestContext(request))
         else:
             render['form'] = ConnectionStep1Wizard(request.POST)
             if render['form'].is_valid():
@@ -44,13 +43,13 @@ def connectionWizard(request, step):
                     return HttpResponseRedirect('/curatorship/connections/wizard/3/')
                 return HttpResponseRedirect('/curatorship/connections/wizard/2/')
             else:
-                render['form'].fields['teacher'].queryset = Teacher.objects.filter(grades = render['user'].grade)
-                return render_to_response('curatorship/connectionWizard.html', render)
+                render['form'].fields['teacher'].queryset = Teacher.objects.filter(grades = request.user.grade)
+                return render_to_response('curatorship/connectionWizard.html', render, context_instance = RequestContext(request))
     if step == 2:
         if request.method == 'GET':
             render['form'] = ConnectionStep2Wizard()
             render['form'].fields['subject'].queryset = request.session['teacher'].subjects
-            return render_to_response('curatorship/connectionWizard.html', render)
+            return render_to_response('curatorship/connectionWizard.html', render, context_instance = RequestContext(request))
         else:
             render['form'] = ConnectionStep2Wizard(request.POST)
             if render['form'].is_valid():
@@ -58,27 +57,27 @@ def connectionWizard(request, step):
                 return HttpResponseRedirect('/curatorship/connections/wizard/3')
             else:
                 render['form'].fields['subject'].queryset = Subject.objects.filter(teacher = request.session['teacher'])
-                return render_to_response('curatorship/connectionWizard.html', render)
+                return render_to_response('curatorship/connectionWizard.html', render, context_instance = RequestContext(request))
     if step == 3:
         if request.method == 'GET':
             render['form'] = ConnectionStep3Wizard()
-            return render_to_response('curatorship/connectionWizard.html', render)
+            return render_to_response('curatorship/connectionWizard.html', render, context_instance = RequestContext(request))
         else:
             render['form'] = ConnectionStep3Wizard(request.POST)
             if render['form'].is_valid():
                 connection = Connection(teacher = request.session['teacher'],
                                         subject = request.session['subject'],
-                                        grade = render['user'].grade,
+                                        grade = request.user.grade,
                                         connection = render['form'].cleaned_data['connection'])
                 connection.save()
                 del request.session['teacher']
                 del request.session['subject']
                 return HttpResponseRedirect('/curatorship/connections/')
             else:
-                return render_to_response('curatorship/connectionWizard.html', render)
+                return render_to_response('curatorship/connectionWizard.html', render, context_instance = RequestContext(request))
             
 @login_required
-@user_passes_test(is_teacher)
+@user_passes_test(lambda u: u.prefix=='t')
 def connectionEdit(request, connection_id, mode):
     if mode == 'delete':
         connection = get_object_or_404(Connection, id = connection_id)
@@ -88,14 +87,14 @@ def connectionEdit(request, connection_id, mode):
         return HttpResponseRedirect('/curatorship/connections/')
 
 @login_required
-@user_passes_test(is_teacher)
+@user_passes_test(lambda u: u.prefix=='t')
 def pupilPasswords(request):
-    render = render_options(request)
+    render = {}
     if request.method == 'GET':
-        render['pupils'] = Pupil.objects.filter(grade = render['user'].grade)
-        return render_to_response('curatorship/pupilPasswordsList.html', render)
+        render['pupils'] = Pupil.objects.filter(grade = request.user.grade)
+        return render_to_response('curatorship/pupilPasswordsList.html', render, context_instance = RequestContext(request))
     elif request.method == 'POST':
-        pupils = Pupil.objects.filter(grade = render['user'].grade)
+        pupils = Pupil.objects.filter(grade = request.user.grade)
         render['pupils'] = []
         for pupil in pupils:
             if request.POST.get('pupil-%s' % pupil.id):
@@ -104,19 +103,19 @@ def pupilPasswords(request):
                 user.set_password(password)
                 user.save()
                 render['pupils'].append({'fi': pupil.fi(), 'username': pupil.username, 'password': password})
-        return render_to_response('curatorship/pupilPasswords.html', render)
+        return render_to_response('curatorship/pupilPasswords.html', render, context_instance = RequestContext(request))
 
 @login_required
-@user_passes_test(is_teacher)
+@user_passes_test(lambda u: u.prefix=='t')
 def pupilList(request):
-    render = render_options(request)
-    render['pupils'] = Pupil.objects.filter(grade = render['user'].grade)
-    return render_to_response('curatorship/pupilList.html', render)
+    render = {}
+    render['pupils'] = Pupil.objects.filter(grade = request.user.grade)
+    return render_to_response('curatorship/pupilList.html', render, context_instance = RequestContext(request))
 
 @login_required
-@user_passes_test(is_teacher)
+@user_passes_test(lambda u: u.prefix=='t')
 def pupilEdit(request, mode, id = 0):
-    render = render_options(request)
+    render = {}
     if request.method == 'GET':
         if mode == 'edit':
             render['form'] = PupilForm(instance = get_object_or_404(Pupil, id = id))
@@ -128,7 +127,7 @@ def pupilEdit(request, mode, id = 0):
                 return HttpResponseRedirect('/curatorship/pupil/')
         else:
             render['form'] = PupilForm()
-        return render_to_response('curatorship/pupil.html', render)
+        return render_to_response('curatorship/pupil.html', render, context_instance = RequestContext(request))
     if request.method == 'POST':
         if mode == 'edit':
             form = PupilForm(request.POST, instance = get_object_or_404(Pupil, id = id))
@@ -137,16 +136,15 @@ def pupilEdit(request, mode, id = 0):
                 return HttpResponseRedirect('/curatorship/pupil/')
             else:
                 render['form'] = form
-                return render_to_response('curatorship/pupil.html', render)
+                return render_to_response('curatorship/pupil.html', render, context_instance = RequestContext(request))
         else:
             form = PupilForm(request.POST)
             if form.is_valid():
                 obj = form.save(commit = False)
-                obj.school = Teacher.objects.get(id = request.user.id).school
-                obj.grade = Teacher.objects.get(id = request.user.id).grade
+                obj.school = request.user.school
+                obj.grade = request.user.grade
                 obj.save()
-                form.save_m2m()
                 return HttpResponseRedirect('/curatorship/pupil/')
             else:
                 render['form'] = form
-                return render_to_response('curatorship/pupil.html', render)
+                return render_to_response('curatorship/pupil.html', render, context_instance = RequestContext(request))

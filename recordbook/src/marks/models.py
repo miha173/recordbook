@@ -55,6 +55,8 @@ class ResultDate(models.Model):
     def delete(self):
         Result.objects.filter(result = self).delete()
         super(ResultDate, self).delete()
+    def __unicode__(self):
+        return self.get_period_display()
 
 class Result(models.Model):
     resultdate = models.ForeignKey(ResultDate, verbose_name = u'Период')

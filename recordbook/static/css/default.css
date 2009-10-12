@@ -154,3 +154,7 @@ h2 {
 	div#topmenu{
 		float: right;
 	}
+	
+ul.errorlist ul.errorlist{
+	text-indent: 15px;
+}

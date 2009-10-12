@@ -18,14 +18,20 @@
 	</style>
 </head>
 <body>
-{{form.errors}}<br />
+<center>
+	{{ form.errors }}
+</center>
 <div id="content">
-<form action="?next=/" method="post">
-{{form.username}}<br />
-{{form.password}}<br />
-<input type="submit" style="font-size: 14px;" name="OK" value="Войти">
-</form>
+	<form action="?next=/" method="post">
+		Логин:<br />
+		{{ form.username }}<br /><br />
+		Пароль:<br />
+		{{ form.password }}<br /><br />
+		<input type="submit" style="font-size: 14px;" name="OK" value="Войти">
+	</form>
 </div>
-<script>document.getElementById('id_username').focus()</script>
+<script type="text/javascript">
+	document.getElementById('id_username').focus();
+</script>
 </body>
 </html>

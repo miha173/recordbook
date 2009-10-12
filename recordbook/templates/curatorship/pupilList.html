@@ -12,11 +12,11 @@
 	<tr>
 		<td>{{ pupil.fi }}</td>
 		<td>{{ pupil.username }}</td>
-		<td><a href="edit/{{ pupil.id }}">Редактировать</a>, <a href="delete/{{ pupil.id }}" class="delete">удалить</a>.</td>
+		<td><a href="edit/{{ pupil.id }}/">Редактировать</a>, <a href="delete/{{ pupil.id }}/" class="delete">удалить</a>.</td>
 	</tr>
 	{% endfor %}
 </table>
 {% load pytils_numeral %}
 <br />
-Всего {{ pupils|length }} {{ pupils|length|choose_plural:pupil_variants }}.
+Всего {{ pupils|length }} {{ pupils|length|choose_plural:pupil_plural }}.
 {% endblock %}

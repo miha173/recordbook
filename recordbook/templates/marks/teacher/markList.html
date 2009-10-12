@@ -8,11 +8,14 @@
 		</td></tr>
 		{% for pupil in pupils %}
 		<tr>
-			<td><input type="checkbox" name="pupil-{{ pupil.id }}" /></td>
-			<td>{{ pupil.name }}</td>
+			<td><input type="checkbox" name="pupil-{{ pupil.id }}" id="pupil-{{ pupil.id }}" /></td>
+			<td><label for="pupil-{{ pupil.id }}">{{ pupil.name }}</label></td>
 			<td>{% if pupil.absent %}H{% else %}{{ pupil.mark|default:"" }}{% endif %}</td>
 		</tr>
 		{% endfor %}
+		<tr><td colspan="3">
+			<input type="submit" value="Выставить отметки" />
+		</td></tr>
 	</table>
 </form>
 {% endblock %}

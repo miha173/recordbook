@@ -2,29 +2,11 @@
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
+from django.contrib.auth.decorators import login_required
 
 from src.userextended.models import Pupil, Teacher, Subject
 from src.curatorship.models import Connection
 from src.marks.models import Mark
-
-def is_teacher(user):
-    if user.username[0] == 't':
-        return True
-    else:
-        return False
-
-def is_administrator(user):
-    error = 0
-    if user.username[0] == 't':
-        teacher = Teacher.objects.get(id = user.id)
-        if not teacher.administrator:
-            error = 1
-    else:
-        error = 1
-    if error == 0:
-        return True
-    else:
-        return False
 
 def render_options(request):
     options = render_objects = options['render_objects'] = {}
@@ -67,8 +49,6 @@ def render_options(request):
     render_objects['school'] = user.school
     return render_objects
 
+@login_required()
 def index(request):
-    if not request.user.is_authenticated():
-        return HttpResponseRedirect('/accounts/login')
-    render = render_options(request)
-    return render_to_response('root/index.html', render)
+    return render_to_response('root/index.html', context_instance=RequestContext(request))

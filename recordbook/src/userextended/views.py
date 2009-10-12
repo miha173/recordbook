@@ -10,25 +10,26 @@ from django.conf import settings
 
 from models import Teacher, Pupil, Grade, Subject, School
 from forms import SubjectForm, GradeForm, PupilForm, TeacherForm, ResultDateForm
-from src.views import render_options, is_administrator
 from src.curatorship.models import Connection
 from src.marks.models import ResultDate
 
 def index(request):
-    return render_to_response('userextended/page.html', render_options(request))
+    return render_to_response('userextended/page.html', context_instance = RequestContext(request))
 
 @login_required
-@user_passes_test(is_administrator)
+@user_passes_test(lambda u: u.prefix=='t')
+@user_passes_test(lambda u: u.administrator)
 def objectList4Administrator(request, object):
     return objectList(request, object)
 
 @login_required
-@user_passes_test(is_administrator)
+@user_passes_test(lambda u: u.prefix=='t')
+@user_passes_test(lambda u: u.administrator)
 def objectEdit4Administrator(request, object, mode, id = 0):
     return objectEdit(request, object, mode, id)
 
 def objectList(request, object):
-    render = render_options(request)
+    render = {}
     if object == 'grade':
         Object = Grade
         templ = render['object_name'] = 'grade'
@@ -58,7 +59,7 @@ def objectList(request, object):
     except:
         render['objects'] = paginator.page(paginator.num_pages)
     render['paginator'] = paginator.num_pages - 1
-    return render_to_response('userextended/%sList.html' % templ, render)
+    return render_to_response('userextended/%sList.html' % templ, render, context_instance = RequestContext(request))
 
 @login_required
 def objectEdit(request, object, mode, id = 0):
@@ -82,7 +83,7 @@ def objectEdit(request, object, mode, id = 0):
         Object = ResultDate
         templ = 'resultdate'
         Form = ResultDateForm
-    render = render_options(request)
+    render = {}
     if request.method == 'GET':
         if mode == 'edit':
             render['form'] = Form(instance = get_object_or_404(Object, id = id))
@@ -94,7 +95,7 @@ def objectEdit(request, object, mode, id = 0):
                 return HttpResponseRedirect(u'/administrator/uni/%s?error=%s' % (templ, error))
         else:
             render['form'] = Form()
-        return render_to_response('userextended/%s.html' % templ, render)
+        return render_to_response('userextended/%s.html' % templ, render, context_instance = RequestContext(request))
     if request.method == 'POST':
         if mode == 'edit':
             form = Form(request.POST, instance = get_object_or_404(Object, id = id))
@@ -103,7 +104,7 @@ def objectEdit(request, object, mode, id = 0):
                 return HttpResponseRedirect('/administrator/uni/%s' % templ)
             else:
                 render['form'] = form
-                return render_to_response('userextended/%s.html' % templ, render)
+                return render_to_response('userextended/%s.html' % templ, render, context_instance = RequestContext(request))
         else:
             form = Form(request.POST)
             if form.is_valid():
@@ -114,4 +115,4 @@ def objectEdit(request, object, mode, id = 0):
                 return HttpResponseRedirect('/administrator/uni/%s/' % templ)
             else:
                 render['form'] = form
-                return render_to_response('userextended/%s.html' % templ, render)
+                return render_to_response('userextended/%s.html' % templ, render, context_instance = RequestContext(request))

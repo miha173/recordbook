@@ -9,7 +9,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
 from django.conf import settings
 
-from src.views import render_options, is_teacher
 from src.userextended.models import Pupil, Teacher, Subject, Grade
 from src.curatorship.models import Connection
 from models import Lesson, Mark, ResultDate, Result
@@ -17,29 +16,29 @@ from forms import LessonForm, MarkForm, ResultForm
 
 @login_required
 def index(request):
-    render = render_options(request)
-    if render['user_type'] == 'pupil':
-        results = Result.objects.filter(pupil = render['user']).order_by('resultdate__enddate')
+    render = {}
+    temp = request.user_type
+    if request.user_type == 'pupil':
+        results = Result.objects.filter(pupil = request.user).order_by('resultdate__enddate')
         render['results'] = results
-    return render_to_response('marks/%s/index.html' % render['user_type'], render)
+    return render_to_response('marks/%s/index.html' % request.user_type, render, context_instance = RequestContext(request))
 
 @login_required
-@user_passes_test(is_teacher)
+@user_passes_test(lambda u: u.prefix=='t')
 def set_current_subject(request, subject_id):
-    teacher = Teacher.objects.get(id = request.user.id)
-    teacher.current_subject = Subject.objects.get(id = subject_id)
-    teacher.save()
+    request.user.current_subject = Subject.objects.get(id = subject_id)
+    request.user.save()
     return HttpResponseRedirect(request.GET['next'])
 
 @login_required
-@user_passes_test(is_teacher)
+@user_passes_test(lambda u: u.prefix=='t')
 def lessonList(request):
-    render = render_options(request)
+    render = {}
     if request.GET.get('search_str'): 
         objects = Lesson.objects.search(request.GET.get('search_str'))
         render['search_str'] = request.GET.get('search_str')
     else: objects = Lesson.objects
-    paginator = Paginator(objects.filter(teacher = render['user'], subject = render['user'].current_subject), settings.PAGINATOR_OBJECTS)
+    paginator = Paginator(objects.filter(teacher = request.user, subject = request.user.current_subject), settings.PAGINATOR_OBJECTS)
     try:
         page = int(request.GET.get('page', '1'))
     except ValueError:
@@ -49,30 +48,26 @@ def lessonList(request):
     except:
         render['objects'] = paginator.page(paginator.num_pages)
     render['paginator'] = paginator.num_pages - 1
-    return render_to_response('marks/teacher/lessonList.html', render) 
+    return render_to_response('marks/teacher/lessonList.html', render, context_instance = RequestContext(request)) 
 
 #Нужно проверять возможность учителя добавления записи к данному классу
 @login_required
-@user_passes_test(is_teacher)
+@user_passes_test(lambda u: u.prefix=='t')
 def lessonEdit(request, mode, id = 0):
-    render = render_options(request)
+    render = {}
     if request.method == 'GET':
         if mode == 'edit':
-            lesson = get_object_or_404(Lesson, id = id)
-            if lesson.teacher == render['user']:
-                render['form'] = LessonForm(instance = lesson)
-                grades_id = []
-                for connection in Connection.objects.filter(teacher = request.user):
-                    grades_id.append(connection.grade.id)
-                render['form'].fields['grade'].queryset = Grade.objects.filter(id__in = grades_id)
-                render['lesson_id'] = id
-                return render_to_response('marks/teacher/lesson.html', render)
-            else:
-                return HttpResponseRedirect('/marks/lesson/')
+            lesson = get_object_or_404(Lesson, id = id, teacher = request.user)
+            render['form'] = LessonForm(instance = lesson)
+            grades_id = []
+            for connection in Connection.objects.filter(teacher = request.user):
+                grades_id.append(connection.grade.id)
+            render['form'].fields['grade'].queryset = Grade.objects.filter(id__in = grades_id)
+            render['lesson_id'] = id
+            return render_to_response('marks/teacher/lesson.html', render, context_instance = RequestContext(request))
         elif mode == 'delete': 
-             lesson = get_object_or_404(Lesson, id = id)
-             if lesson.teacher == render['user']:
-                 lesson.delete()
+             lesson = get_object_or_404(Lesson, id = id, teacher = request.user)
+             lesson.delete()
              return HttpResponseRedirect('/marks/lesson/')
         else:
             render['form'] = LessonForm()
@@ -80,7 +75,7 @@ def lessonEdit(request, mode, id = 0):
             for connection in Connection.objects.filter(teacher = request.user):
                 grades_id.append(connection.grade.id)
             render['form'].fields['grade'].queryset = Grade.objects.filter(id__in = grades_id)
-            return render_to_response('marks/teacher/lesson.html', render)
+            return render_to_response('marks/teacher/lesson.html', render, context_instance = RequestContext(request))
     else:
         form = LessonForm(request.POST)
         grades_id = []
@@ -89,56 +84,55 @@ def lessonEdit(request, mode, id = 0):
         form.fields['grade'].queryset = Grade.objects.filter(id__in = grades_id)
         if mode == 'edit':
             if form.is_valid():
-                lesson = get_object_or_404(Lesson, id = id)
-                if lesson.teacher == render['user']:
-                    form = LessonForm(request.POST, instance = lesson)
-                    form.save()
+                lesson = get_object_or_404(Lesson, id = id, teacher = request.user)
+                form = LessonForm(request.POST, instance = lesson)
+                form.save()
                 return HttpResponseRedirect('/marks/lesson/')
             else:
                 render['form'] = form
-                return render_to_response('marks/teacher/lesson.html', render)
+                return render_to_response('marks/teacher/lesson.html', render, context_instance = RequestContext(request))
         else:
             if form.is_valid():
                 lesson = form.save(commit = False)
-                lesson.teacher = render['user']
-                lesson.subject = render['current_subject']
+                lesson.teacher = request.user
+                lesson.subject = request.user.current_subject
                 lesson.save()
                 form.save_m2m()
                 return HttpResponseRedirect('/marks/lesson/')
             else:
                 render['form'] = form
-                return render_to_response('marks/teacher/lesson.html', render)
+                return render_to_response('marks/teacher/lesson.html', render, context_instance = RequestContext(request))
 
 @login_required
-@user_passes_test(is_teacher)
+@user_passes_test(lambda u: u.prefix=='t')
 def gradeList(request):
-    render = render_options(request)
-    connections = Connection.objects.filter(teacher = render['user'], subject = render['current_subject'])
+    render = {}
+    connections = Connection.objects.filter(teacher = request.user, subject = request.user.current_subject)
     render['grades'] = []
     for connection in connections:
         render['grades'].append(connection.grade)
-    return render_to_response('marks/teacher/gradeList.html', render)
+    return render_to_response('marks/teacher/gradeList.html', render, context_instance = RequestContext(request))
 
 @login_required
-@user_passes_test(is_teacher)
+@user_passes_test(lambda u: u.prefix=='t')
 def gradeLessonList(request, grade_id):
-    render = render_options(request)
+    render = {}
     render['grade_id'] = grade_id
-    if Grade.objects.get(id = grade_id) in render['user'].grades.all():
-        render['lessons'] = Lesson.objects.filter(grade__id = grade_id, teacher = render['user'], subject = render['current_subject'])
-        return render_to_response('marks/teacher/gradeLessonList.html', render)
+    if Grade.objects.get(id = grade_id) in request.user.grades.all():
+        render['lessons'] = Lesson.objects.filter(grade__id = grade_id, teacher = request.user, subject = request.user.current_subject)
+        return render_to_response('marks/teacher/gradeLessonList.html', render, context_instance = RequestContext(request))
     else:
         return Http404
 
 @login_required
-@user_passes_test(is_teacher)
+@user_passes_test(lambda u: u.prefix=='t')
 def markList(request, grade_id, lesson_id):
-    render = render_options(request)
+    render = {}
     grade = Grade.objects.get(id = grade_id)
     lesson = get_object_or_404(Lesson, id = lesson_id)
-    if (grade in render['user'].grades.all()) and (lesson.teacher == render['user']):
+    if (grade in request.user.grades.all()) and (lesson.teacher == request.user):
         pupils = Pupil.objects.filter(grade = grade)
-        connection = Connection.objects.get(grade = grade, teacher = request.user, subject = render['current_subject'])
+        connection = Connection.objects.get(grade = grade, teacher = request.user, subject = request.user.current_subject)
         if connection.connection == '1':
             pupils = pupils.filter(group = '1')
         if connection.connection == '2':
@@ -160,17 +154,17 @@ def markList(request, grade_id, lesson_id):
                 absent = False
             pupils_list.append({'id': pupil.id, 'name': pupil.fi(), 'mark': mark, 'absent': absent})
         render['pupils'] = pupils_list
-        return render_to_response('marks/teacher/markList.html', render)
+        return render_to_response('marks/teacher/markList.html', render, context_instance = RequestContext(request))
     else:
         return Http404
 
 @login_required
-@user_passes_test(is_teacher)
+@user_passes_test(lambda u: u.prefix=='t')
 def giveMark(request, grade_id, lesson_id):
-    render = render_options(request)
+    render = {}
     grade = get_object_or_404(Grade, id = grade_id)
     lesson = get_object_or_404(Lesson, id = lesson_id)
-    if (grade in render['user'].grades.all()) and (lesson.teacher == render['user']):
+    if (grade in request.user.grades.all()) and (lesson.teacher == request.user):
         if not request.POST.get('send'):
             marks = []
             pupilsForMarks = []
@@ -184,7 +178,7 @@ def giveMark(request, grade_id, lesson_id):
                     marks.append({'name': pupil.fi(), 'form': markForm})
                     pupilsForMarks.append(pupil.id)
             render['marks'] = marks
-            return render_to_response('marks/teacher/giveMark.html', render)
+            return render_to_response('marks/teacher/giveMark.html', render, context_instance = RequestContext(request))
         else:
             error = 0
             for pupil in Pupil.objects.filter(grade = grade):
@@ -212,29 +206,29 @@ def giveMark(request, grade_id, lesson_id):
                     if request.POST.get('%d-mark' % pupil.id) or request.POST.get('%d-absent' % pupil.id):
                         marks.append({'name': pupil.fi(), 'form': MarkForm(request.POST, prefix = pupil.id)})
                 render['marks'] = marks
-                return render_to_response('marks/teacher/giveMark.html', render)
+                return render_to_response('marks/teacher/giveMark.html', render, context_instance = RequestContext(request))
     return Http404
 
 @login_required
-@user_passes_test(is_teacher)
+@user_passes_test(lambda u: u.prefix=='t')
 def gradeResultList(request):
-    render = render_options(request)
-    connections = Connection.objects.filter(teacher = render['user'], subject = render['current_subject'])
+    render = {}
+    connections = Connection.objects.filter(teacher = request.user, subject = request.user.current_subject)
     render['grades'] = []
     for connection in connections:
         render['grades'].append(connection.grade)
-    render['resultdates'] = ResultDate.objects.filter(school = render['school'])
-    return render_to_response('marks/teacher/gradeResultList.html', render)
+    render['resultdates'] = ResultDate.objects.filter(school = request.user.school)
+    return render_to_response('marks/teacher/gradeResultList.html', render, context_instance = RequestContext(request))
 
 @login_required
-@user_passes_test(is_teacher)
+@user_passes_test(lambda u: u.prefix=='t')
 def gradeResult(request):
-    render = render_options(request)
+    render = {}
     grade = get_object_or_404(Grade, id = request.POST.get('grade'))
     resultdate = get_object_or_404(ResultDate, id = request.POST.get('resultdate'))
     render['grade'] = grade.id
     render['resultdate'] = resultdate.id
-    if grade in render['user'].grades.all():
+    if grade in request.user.grades.all():
         if not request.POST.get('send'):
             pupils = Pupil.objects.filter(grade = grade)
             results = []
@@ -248,7 +242,7 @@ def gradeResult(request):
                 sum = 0
                 marks = Mark.objects.filter(lesson__date__range = (resultdate.startdate, resultdate.enddate), 
                                             pupil = pupil,
-                                            lesson__subject = render['current_subject'])
+                                            lesson__subject = request.user.current_subject)
                 for mark in marks:
                     if mark.mark:
                         sum += mark.mark
@@ -258,7 +252,7 @@ def gradeResult(request):
                     sa = 0
                 results.append({'name': pupil.fi(), 'form': form, 'sa': sa})
             render['pupils'] = results
-            return render_to_response('marks/teacher/gradeResult.html', render)
+            return render_to_response('marks/teacher/gradeResult.html', render, context_instance = RequestContext(request))
         else:
             error = 0
             for pupil in Pupil.objects.filter(grade = grade):
@@ -273,7 +267,7 @@ def gradeResult(request):
                         result.pupil = pupil
                         result.resultdate = resultdate
                         result.mark = form.cleaned_data['mark']
-                        result.subject = render['current_subject']
+                        result.subject = request.user.current_subject
                         result.save()
                     else:
                         error = 1
@@ -285,14 +279,14 @@ def gradeResult(request):
                 for pupil in pupils:
                     results.append({'name': pupil.fi(), 'form': ResultForm(request.POST, prefix = pupil.id)})
                 render['pupils'] = results
-                return render_to_response('marks/teacher/gradeResult.html', render)
+                return render_to_response('marks/teacher/gradeResult.html', render, context_instance = RequestContext(request))
     else:
         return Http404
 
 @login_required
 def marksView(request, subject_id):
-    render = render_options(request)
-    paginator = Paginator(Mark.objects.filter(pupil = render['user'], lesson__subject = get_object_or_404(Subject, id = subject_id)).order_by('-lesson__date'), settings.PAGINATOR_OBJECTS)
+    render = {}
+    paginator = Paginator(Mark.objects.filter(pupil = request.user, lesson__subject = get_object_or_404(Subject, id = subject_id)).order_by('-lesson__date'), settings.PAGINATOR_OBJECTS)
     try:
         page = int(request.GET.get('page', '1'))
     except ValueError:
@@ -302,5 +296,5 @@ def marksView(request, subject_id):
     except:
         render['objects'] = paginator.page(paginator.num_pages)
     render['paginator'] = paginator.num_pages - 1
-    render['current_subject'] = int(subject_id)
-    return render_to_response('marks/pupil/marks.html', render)
+    request.user.current_subject = int(subject_id)
+    return render_to_response('marks/pupil/marks.html', render, context_instance = RequestContext(request))
