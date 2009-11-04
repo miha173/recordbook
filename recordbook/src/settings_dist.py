@@ -93,7 +93,7 @@ APPEND_SLASH = True
 # Настройки для интеграции системы электронных дневников с Google App's (http://www.google.com/apps/intl/ru/group/index.html)
 GAPPS_USE = False
 GAPPS_LOGIN = 'admin@example.com'
-GAPPS_DOMAIN = 'lyc01.ru'
+GAPPS_DOMAIN = 'example.com'
 GAPPS_PASSWORD = 'password'
 
 DATE_FORMAT = "d.m.y"
