@@ -126,15 +126,16 @@ class Clerk(User):
         return username + last_name + '.' + first_name
     def save(self, force_insert = False, force_update = False, init = False):
         if not self.pk or init:
-            import gdata.apps.service
-            from src.settings import GAPPS_DOMAIN, GAPPS_LOGIN, GAPPS_PASSWORD
+            from src.settings import GAPPS_DOMAIN, GAPPS_LOGIN, GAPPS_PASSWORD, GAPPS_USE
             if not init:
                 username = self.gen_username()
                 if User.objects.filter(username = username).count() != 0:
                     self.username = self.gen_username(school = True)
-            service = gdata.apps.service.AppsService(email=GAPPS_LOGIN, domain=GAPPS_DOMAIN, password=GAPPS_PASSWORD)
-            service.ProgrammaticLogin()
-            service.CreateUser(self.username, self.last_name, self.first_name, '123456789', quota_limit=1000)
+            if GAPPS_USE:
+                import gdata.apps.service
+                service = gdata.apps.service.AppsService(email=GAPPS_LOGIN, domain=GAPPS_DOMAIN, password=GAPPS_PASSWORD)
+                service.ProgrammaticLogin()
+                service.CreateUser(self.username, self.last_name, self.first_name, '123456789', quota_limit=1000)
             self.set_password("123456789")
         super(Clerk, self).save(force_insert, force_update)
     def search(self, search_str):
