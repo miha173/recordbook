@@ -10,8 +10,8 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from src.userextended.models import Teacher, Subject, Grade, Pupil
 from models import Connection
-from forms import ConnectionStep1Wizard, ConnectionStep2Wizard, ConnectionStep3Wizard, PupilForm
-from src.marks.models import Lesson, Mark
+from forms import ConnectionStep1Wizard, ConnectionStep2Wizard, ConnectionStep3Wizard, PupilForm, GraphiksForm
+from src.marks.models import Lesson, Mark, Result
 
 def index(request):
     return render_to_response('curatorship/page.html', context_instance = RequestContext(request))
@@ -148,3 +148,35 @@ def pupilEdit(request, mode, id = 0):
             else:
                 render['form'] = form
                 return render_to_response('curatorship/pupil.html', render, context_instance = RequestContext(request))
+
+@login_required
+@user_passes_test(lambda u: u.prefix=='t')
+def graphiks(request):
+    render = {}
+    if request.method == 'GET':
+        render['form'] = GraphiksForm()
+    else:
+        form = GraphiksForm(request.POST)
+        form.is_valid()
+        render['subjects'] = form.cleaned_data['subjects']
+        render['resultdates'] = form.cleaned_data['resultDates']
+        render['pupils'] = Pupil.objects.filter(grade = request.user.grade)
+        for pupil in render['pupils']:
+            pupil.dates = []
+            for rd in render['resultdates']:
+                date = "'" + rd.name + "', "
+                for sbj in render['subjects']:
+                    if Result.objects.filter(pupil = pupil, subject = sbj, resultdate = rd).count()!=0:
+                        date += str(Result.objects.get(pupil = pupil, subject = sbj, resultdate = rd).mark) + ", "
+                    else:
+                        date += "0, "
+                pupil.dates.append(date)
+        render['form'] = form
+    return render_to_response('curatorship/graphiks.html', render, context_instance = RequestContext(request))
+
+
+
+
+
+
+        

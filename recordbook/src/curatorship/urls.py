@@ -15,5 +15,7 @@ urlpatterns = patterns("src.curatorship.views",
                        (r'^pupil/edit/(?P<id>\d+)/$', 'pupilEdit', {'mode': 'edit'}),
                        (r'^pupil/delete/(?P<id>\d+)/$', 'pupilEdit', {'mode': 'delete'}),
                        
-                       (r'pupil_passwords/', 'pupilPasswords')
+                       (r'pupil_passwords/', 'pupilPasswords'),
+                       
+                       (r'^graphiks/$', 'graphiks'),
                        )

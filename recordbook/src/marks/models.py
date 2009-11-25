@@ -40,6 +40,7 @@ class Mark(models.Model):
 
 class ResultDate(models.Model):
     school = models.ForeignKey(School)
+    name = models.CharField(max_length=255, verbose_name = u'Имя периода', null = True, blank = True)
     period = models.CharField(u'Итоговый период', max_length = 1, choices = (('1', u'1 четверть'),
                                                                        ('2', u'2 четверть'),
                                                                        ('5', u'1 полугодие'),
@@ -53,10 +54,10 @@ class ResultDate(models.Model):
     class Meta:
         ordering = ['enddate']
     def delete(self):
-        Result.objects.filter(result = self).delete()
+        Result.objects.filter(resultdate = self).delete()
         super(ResultDate, self).delete()
     def __unicode__(self):
-        return self.get_period_display()
+        return self.name
 
 class Result(models.Model):
     resultdate = models.ForeignKey(ResultDate, verbose_name = u'Период')
