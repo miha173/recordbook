@@ -239,7 +239,7 @@ def gradeResult(request):
             for pupil in pupils:
                 try:
                     result = Result.objects.get(resultdate = resultdate, pupil = pupil)
-                    form = ResultForm(prefix = pupil.id, instance = result)
+                    form = ResultForm(prefix = pupil.id, instance = result, subject = request.user.current_subject)
                 except ObjectDoesNotExist:
                     form = ResultForm(prefix = pupil.id)
                 sum = 0
