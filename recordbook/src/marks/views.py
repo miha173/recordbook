@@ -28,7 +28,10 @@ def index(request):
 def set_current_subject(request, subject_id):
     request.user.current_subject = Subject.objects.get(id = subject_id)
     request.user.save()
-    return HttpResponseRedirect(request.GET['next'])
+    next = request.GET.get('next', '').strip()
+    if len(next) == 0:
+        next = '/marks/'
+    return HttpResponseRedirect(next)
 
 @login_required
 @user_passes_test(lambda u: u.prefix=='t')
@@ -261,7 +264,7 @@ def gradeResult(request):
                     if form.is_valid():
                         try:
                             result = Result.objects.get(pupil = Pupil.objects.get(id = pupil.id),
-                                                        resultdate = resultdate)
+                                                        resultdate = resultdate, subject = request.user.current_subject)
                         except ObjectDoesNotExist:
                             result = Result()
                         result.pupil = pupil
