@@ -238,8 +238,8 @@ def gradeResult(request):
             from math import pow
             for pupil in pupils:
                 try:
-                    result = Result.objects.get(resultdate = resultdate, pupil = pupil)
-                    form = ResultForm(prefix = pupil.id, instance = result, subject = request.user.current_subject)
+                    result = Result.objects.get(resultdate = resultdate, pupil = pupil, subject = request.user.current_subject)
+                    form = ResultForm(prefix = pupil.id, instance = result)
                 except ObjectDoesNotExist:
                     form = ResultForm(prefix = pupil.id)
                 sum = 0
