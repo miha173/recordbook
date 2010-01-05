@@ -7,7 +7,7 @@
       //google.setOnLoadCallback(drawChart);
     </script>
 
-<form method="post" action=".">
+<form method="post" action=".">{% csrf_token %}
 	<table>
 		{% for field in form %}
 		<tr>

@@ -3,7 +3,7 @@
 {% block content %}
 <h2>Ученик</h2>
 {{ form.errors }}
-<form method="post" action=".">
+<form method="post" action=".">{% csrf_token %}
 	<fieldset>
 		<legend>Общая информация</legend>
 		<table>

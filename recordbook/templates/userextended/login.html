@@ -22,7 +22,7 @@
 	{{ form.errors }}
 </center>
 <div id="content">
-	<form action="?next=/" method="post">
+	<form action="?next=/" method="post">{% csrf_token %}
 		Логин:<br />
 		{{ form.username }}<br /><br />
 		Пароль:<br />

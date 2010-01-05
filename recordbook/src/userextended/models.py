@@ -67,24 +67,18 @@ class Subject(models.Model):
         ordering = ['name']
 
 class ClerkManager(models.Manager):
-    #Очень тормозно будет
+    def __init__(self, fields):
+        self.search_fields = fields
+        models.Manager.__init__(self)
     def search(self, str):
-        values = []
-        a = super(ClerkManager, self).get_query_set().filter(last_name__contains = str)
-        for obj in a: values.append(obj.id)
-        a = super(ClerkManager, self).get_query_set().filter(first_name__contains = str)
-        for obj in a: values.append(obj.id)
-        a = super(ClerkManager, self).get_query_set().filter(middle_name__contains = str)
-        for obj in a: values.append(obj.id)
-        a = super(ClerkManager, self).get_query_set().filter(grade__long_name__contains = str)
-        for obj in a: values.append(obj.id)
-        a = super(ClerkManager, self).get_query_set().filter(grade__small_name__contains = str)
-        for obj in a: values.append(obj.id)
-        return super(ClerkManager, self).get_query_set().filter(id__in = values)
+        from django.db.models import Q
+        search_query_list = [Q(**{s + '__icontains': str}) for s in self.search_fields]
+        search_query = reduce(lambda x, y: x | y, search_query_list)
+        return self.filter(search_query)
 
 class Clerk(User):
     u'Базовый класс расширенного пользователя. Потомки - учителя, ученики.'
-    objects = ClerkManager()
+    objects = ClerkManager(['last_name', 'first_name', 'middle_name', 'grade__long_name', 'grade__small_name'])
     middle_name = models.CharField(u"Отчество", max_length = 30, blank = True)
     password_journal = models.CharField(u"Пароль доступа к дневнику", max_length = 255)
     school = models.ForeignKey(School, verbose_name = "Школа")

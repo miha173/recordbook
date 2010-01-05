@@ -1,6 +1,6 @@
 {% extends 'marks/teacher/page.html' %}
 {% block content %}
-<form method="post" action=".">
+<form method="post" action=".">{% csrf_token %}
 	<fieldset>
 	<legend>Урок</legend>
 	<table class="fieldset">

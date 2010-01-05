@@ -1,5 +1,5 @@
 <div style="padding: 5px 0px;">
-	<form method="get" action=".">
+	<form method="get" action=".">{% csrf_token %}
 		<input type="text" name="search_str" value="{{ search_str }}" />
 		<input type="submit" value="Искать" />
 	</form>
