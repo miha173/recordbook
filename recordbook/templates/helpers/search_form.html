@@ -4,7 +4,7 @@
 		<input type="submit" value="Искать" />
 	</form>
 </div>	
-	{% if not objects.object_list and search_str %}
+{% if not objects.object_list and search_str %}
 	<br />
 	Ничего не найдено. Попробуйте переформулировать запрос.
-	{% endif %}
+{% endif %}

@@ -1,0 +1,24 @@
+{% extends 'page_pupil.html' %}
+
+{% block padding %}
+	<h1>{{ teacher.fio }}</h1>
+	<div class="subject">
+		{% for subject in teacher.subjects.all %}
+	    <a href="#">{{ subject }}</a><br />
+		{% endfor %}
+	</div>
+	{#<div class="classroom"><div><div>23</div></div></div>#}
+	<div class="gray">
+		{% if teacher.grade %}
+		    Классный руководитель <a href="#">{{ teacher.grade }} класса</a>
+		{% endif %}
+	</div>
+{% endblock %}
+
+{% block content %}
+<div id="about-teacher">
+	{% for achievement in teacher.achievement.all %}
+		<p>{{ achievement.description }}</p>
+	{% endfor %}
+</div>
+{% endblock %}

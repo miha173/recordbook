@@ -10,12 +10,18 @@ class LazyUser(object):
     def __get__(self, request, obj_type=None):
         if not hasattr(request, '_cached_user'):
             user = get_user(request);
+            userprofile = user
             if user.is_authenticated():
                 try:
-                    if user.username[0] == 'p':
+                    if Pupil.objects.filter(user_ptr=user).count()>0: 
                         userprofile = Pupil.objects.get(user_ptr=user)
-                    elif user.username[0] == 't':
+                        userprofile.prefix = 'p'
+                    elif Teacher.objects.filter(user_ptr=user).count()>0: 
                         userprofile = Teacher.objects.get(user_ptr=user)
+                        userprofile.prefix = 't'
+                    elif user.is_superuser: 
+                        userprofile = user
+                        userprofile.prefix = 'a'
                 except:
                     userprofile = user
             else:
@@ -27,7 +33,7 @@ class AuthenticationMiddleware(object):
     def process_request(self, request):
         request.__class__.user = LazyUser()
         if request.user.is_authenticated():
-            if request.user.username[0] == 't':
+            if request.user.prefix == 't':
                 request.__class__.user_type = 'teacher'
                 request.__class__.is_teacher = True
                 request.__class__.is_pupil = False

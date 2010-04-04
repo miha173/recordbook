@@ -79,7 +79,7 @@
 	margin-left:-10px;
 	width:20px; height:20px;
 	overflow:hidden;
-	background:url("/images/slider_knob.gif") no-repeat 50% 50%;
+	background:url("/media/images/slider_knob.gif") no-repeat 50% 50%;
 	cursor:pointer; cursor:hand;
 }
 .paginator .current_page_mark {

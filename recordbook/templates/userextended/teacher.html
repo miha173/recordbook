@@ -1,8 +1,16 @@
-{% extends 'userextended/page.html' %}
+{% extends BASE_TEMPLATE %}
+
+{% block padding %}
+    <a href="/administrator/uni/school/#sch{{ school.id }}">{{ school }}</a>
+    <span>&rarr;</span>
+    <a href="/administrator/uni/teacher/{{ school.id }}/">Учителя</a>
+    <span>&rarr;</span>
+    <h1>Редактирование</h1>
+{% endblock %}
 
 {% block content %}
-<h2>Учитель</h2>
 <form method="post" action=".">{% csrf_token %}
+<table class="table"><tr><td>
 	<fieldset>
 		<legend>Личная информация</legend>
 		<table>
@@ -32,7 +40,7 @@
 			</tr>
 		</table>
 	</fieldset>
-
+	</td></tr><tr><td>
 	<fieldset>
 		<legend>Преподавание</legend>
 		<table>
@@ -54,7 +62,7 @@
 			</tr>
 		</table>
 	</fieldset>
-
+	</td></tr><tr><td>
 	<fieldset>
 		<legend>Другое</legend>
 		<table>
@@ -67,16 +75,18 @@
 				</td>
 			</tr>
 			<tr>
-				<td class="label"><label for="id_administrator">Администратор: </label></td>
-				<td>{{ form.administrator }}
+				<td class="label"><label for="id_cart">Номер карты: </label></td>
+				<td>{{ form.cart }}
 				<td>
-					{% if form..errors %}<div class="error_text">{{ form..errors }}</div>{% endif %}
-					{% if form.administrator.help_text %}<div class="help_text">{{ form.administrator.help_text }}</div>{% endif %}
+					{% if form.cart.errors %}<div class="error_text">{{ form.cart.errors }}</div>{% endif %}
+					{% if form.cart.help_text %}<div class="help_text">{{ form.cart.help_text }}</div>{% endif %}
 				</td>
 			</tr>
 		</table>
 	</fieldset>
-	
-	<input type="submit" value="Сохранить" />
+	</td></tr><tr><td>
+		<input type="submit" value="Сохранить" />
+	</td></tr>
+</table>
 </form>
 {% endblock %}

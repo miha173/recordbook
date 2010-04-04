@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 from django.contrib import admin
-from models import Grade, Subject, Teacher, Pupil, School
+from models import Grade, Subject, Teacher, Pupil, School, Staff, Achievement
 
 class SchoolAdmin(admin.ModelAdmin):
     list_display = ('name',)
@@ -31,6 +31,9 @@ class TeacherAdmin(admin.ModelAdmin):
     search_fields = ['first_name', 'last_name']
     ordering = ('last_name',)
 
+class AchievementInline(admin.TabularInline):
+    model = Achievement
+    
 class PupilAdmin(admin.ModelAdmin):
     def fio(obj):
         return obj.last_name+' '+obj.first_name+' '+obj.middle_name
@@ -40,9 +43,21 @@ class PupilAdmin(admin.ModelAdmin):
                  (u'Учёба', {'fields': ['grade', 'group', 'special']})]
     search_fields = ['first_name', 'last_name']
     ordering = ('last_name',)
+#    inlines = [AchievementInline, ]
+
+class StaffAdmin(admin.ModelAdmin):
+    def fio(obj):
+        return obj.last_name+' '+obj.first_name+' '+obj.middle_name
+    fio.short_description = u'Фамилия, имя, отчество'
+    list_display = (fio,)
+    fieldsets = [(u'Общая информация', {'fields': ['last_name', 'first_name', 'middle_name', 'school']}),]
+    search_fields = ['first_name', 'last_name']
+    ordering = ('last_name',)
     
 admin.site.register(School, SchoolAdmin)
 admin.site.register(Grade, GradeAdmin)
 admin.site.register(Subject, SubjectAdmin)
 admin.site.register(Pupil, PupilAdmin)
 admin.site.register(Teacher, TeacherAdmin)
+admin.site.register(Staff, StaffAdmin)
+

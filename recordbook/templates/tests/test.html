@@ -1,0 +1,20 @@
+{% extends 'tests/page.html' %}
+
+{% block content %}
+<h2>Тест</h2>
+<form method="post" action=".">{% csrf_token %}
+	<table>
+		{% for field in form %}
+		<tr>
+			<td class="label"><label for="{{ field.label }}">{{ field.label_tag }}:</label></td>
+			<td>{{ field }}</td>
+			<td>
+				{% if field.errors %}<div class="error_text">{{ field.errors }}</div>{% endif %}
+				{% if field.help_text %}<div class="help_text">{{ field.help_text}}</div>{% endif %}
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+	<input type="submit" value="Сохранить">
+</form>
+{% endblock %}

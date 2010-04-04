@@ -1,26 +1,31 @@
-{% extends 'userextended/page.html' %}
+{% extends BASE_TEMPLATE %}
+
+{% block padding %}
+    <a href="/administrator/uni/school/#sch{{ school.id }}">{{ school }}</a>
+    <span>&rarr;</span>
+    <h1>Ученики</h1>
+    <table><tr style="vertical-align: baseline;"><td>
+		<a href="add/">Добавить ученика</a>
+	</td><td style="padding-left: 20px;">
+		{% include 'helpers/search_form.html' %}
+	</td></tr></table>
+{% endblock %}
 
 {% block content %}
-<a href="add/">Добавить ученика</a><br />
-	{% include 'helpers/search_form.html' %}
-	{% if not objects.object_list and not search_str %}
-	<br />
-	Учеников нет.
-	{% endif %}
-	{% if objects.object_list %}
-<table>
+{% if objects.object_list %}
+<table class="table">
 	<thead>
-		<td>Ученик</td>
-		<td>Логин</td>
-		<td>Класс</td>
-		<td>Действия</td>
+		<th>Ученик</th>
+		<th>Логин</th>
+		<th>Класс</th>
+		<th>Действия</th>
 	</thead>
 	{% for object in objects.object_list %}
-		<tr>
+		<tr class="{% cycle 'gray' '' %}">
 			<td>{{ object.fio }}</td>
 			<td>{{ object.username }}</td>
-			<td>{{ object.grade.small_name }}</td>
-			<td>{% include "helpers/buttons/edit.html" %}</td>
+			<td>{{ object.grade.long_name }}</td>
+			<td>{% include "helpers/buttons/edit.html" %} <a href="/administrator/uni/achievement/{{ object.id }}/">Достижения.</a></td>
 	{% endfor %}
 </table>
 {% include "helpers/paginator.html" %}

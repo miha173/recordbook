@@ -1,4 +1,4 @@
-{% extends 'page.html' %}
+{% extends BASE_TEMPLATE %}
 
 {% comment %}
 {% block menu %}
@@ -8,3 +8,112 @@
 </ul>
 {% endblock %}
 {% endcomment %}
+
+{% block padding %}
+	{% if BASE_TEMPLATE == 'administrator.html' %}
+		<a href="/administrator/uni/school/add/"><h1>Добавить школу</h1></a>
+	{% endif %}
+{% endblock %}
+
+{% block content %}
+{% if BASE_TEMPLATE == 'page_pupil.html' %}
+                <table id="index">
+                    <tr>
+                        <td>
+                            {% include 'helpers/classmates.html' %}
+                        </td>
+						
+						{% include 'attendance/day.html' %}
+						
+                        <td>
+                            <div id="class-teacher">
+                                <div class="gray">
+                                    Классный руководитель
+                                </div>
+                                <h1>{{ curator }}</h1>
+                                {#<div class="subject"><a href="#">Литература</a></div>#}
+                                {#<div class="classroom"><div><div>23</div></div></div>#}
+                            </div>
+							{% comment %}
+                            <!-- Объявление -->
+                            <div class="message">
+                                <p>
+                                    Профилактические работы в ночь с 31 декабря на 1 января. 
+                                </p>
+                            </div>
+                            <!-- / Объявление -->
+                            <!-- Объявление -->
+                            <div class="message">
+                                <p>
+                                    Обновление оценок от 20 января 2009.
+                                </p>
+                            </div>
+                            <!-- / Объявление -->
+                            <!-- Объявление -->
+                            <div class="message">
+                                <p>
+                                    Спорный регион В&nbsp;этом году число нападений в&nbsp;Ираке резко сократилось.
+                                </p>
+                                <p>
+                                    Киркук и&nbsp;Мосул остается опасным, указывает корреспондент 
+                                    <nobr>
+                                        Би-би
+                                    </nobr>-си в&nbsp;Багдаде Хамфри Хоксли.
+                                </p>
+                            </div>
+                            <!-- / Объявление -->
+							{% endcomment %}
+                        </td>
+                    </tr>
+                </table>
+{% endif %}
+{% if BASE_TEMPLATE == 'administrator.html' %}
+<table class="table">
+	{% for school in objects.object_list %}
+		<tr>
+			<td colspan="3">
+				<h2>
+					{{ school.name }} 
+					<a href="/administrator/uni/school/edit/{{ school.id }}"><img src="{{ MEDIA_URL}}images/edit.png" /></a> 
+					<a href="/administrator/uni/school/delete/{{ school.id }}" class="delete"><img src="{{ MEDIA_URL}}images/delete.png" /></a>
+				</h2>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<a href="#">Ученики</a>
+			</td>
+			<td>
+				<a href="#">Предметы</a>
+			</td>
+			<td>
+				<a href="#">Расписания</a>
+			</td>
+		</tr><tr>
+			<td>
+				<a href="#">Учителя</a>
+			</td>
+			<td>
+				<a href="#">Классы</a>
+			</td>
+			<td>
+				
+			</td>
+		</tr><tr>
+			<td>
+				<a href="#">Персонал</a>
+			</td>
+			<td>
+				<a href="#">Камеры</a>
+			</td>
+			<td>
+				
+			</td>
+		</tr>
+		<tr>
+			<td colspan="3"><hr /></td>
+		</tr>
+	{% endfor %}
+</table>
+{% endif %}
+{% endblock %}

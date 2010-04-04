@@ -1,0 +1,48 @@
+{% extends 'tests/page.html' %}
+
+{% block content %}
+<h2>Вопросы части A<a href="a/question/add/"><img src="/images/add.png" /></a></h2>
+
+{% for key, questions in variantsA.items %}
+	<h3 id="q{{ key }}"><a href="a/question/edit/{{ key }}/">Вопрос №{{ key }}</a><a href="a/variant/add/{{ key }}/"><img src="/images/add.png" /></a></h3>
+	<div>
+	{% for variant in questions %}
+		<span id="v{{ variant.id }}">
+			{{ variant.task }}
+		</span> 
+		<a href="a/variant/edit/{{ variant.id }}/" style="color: #ff0000">
+			<img src="/images/edit.png" />
+		</a>
+		<a href="a/variant/delete/{{ variant.id }}/" style="color: #ff0000" class="delete">
+			<img src="/images/delete.png" />
+		</a>
+		<br />
+	{% endfor %}
+	</div>
+{% empty %}
+	Вы ещё не создали вопросов.
+{% endfor %}
+
+
+<h2>Вопросы части B<a href="b/question/add/"><img src="/images/add.png" /></a></h2>
+{% for key, questions in variantsB.items %}
+	<h3 id="q{{ key }}"><a href="b/question/edit/{{ key }}/">Вопрос №{{ key }}</a><a href="b/variant/add/{{ key }}/"><img src="/images/add.png" /></a></h3>
+	<div>
+	{% for variant in questions %}
+		<span id="v{{ variant.id }}">
+			{{ variant.task }}
+		</span> 
+		<a href="b/variant/edit/{{ variant.id }}/" style="color: #ff0000">
+			<img src="/images/edit.png" />
+		</a>
+		<a href="b/variant/delete/{{ variant.id }}/" style="color: #ff0000" class="delete">
+			<img src="/images/delete.png" />
+		</a>
+		<br />
+	{% endfor %}
+	</div>
+{% empty %}
+	Вы ещё не создали вопросов.
+{% endfor %}
+
+{% endblock %}

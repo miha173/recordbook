@@ -1,20 +1,14 @@
-{% extends 'userextended/page.html' %}
+{% extends BASE_TEMPLATE %}
+
+{% block padding %}
+    <a href="/administrator/uni/school/#sch{{ school.id }}">{{ school }}</a>
+    <span>&rarr;</span>
+    <a href="/administrator/uni/grade/{{ school.id }}/">Классы</a>
+    <span>&rarr;</span>
+    <h1>Редактирование</h1>
+{% endblock %}
+
 
 {% block content %}
-<h2>Класс</h2>
-<form method="post" action=".">{% csrf_token %}
-	<table>
-		{% for field in form %}
-		<tr>
-			<td class="label"><label for="{{ field.label }}">{{ field.label_tag }}:</label></td>
-			<td>{{ field }}</td>
-			<td>
-				{% if field.errors %}<div class="error_text">{{ field.errors }}</div>{% endif %}
-				{% if field.help_text %}<div class="help_text">{{ field.help_text}}</div>{% endif %}
-			</td>
-		</tr>
-		{% endfor %}
-	</table>
-	<input type="submit" value="Сохранить">
-</form>
+	{% include 'helpers/uniForm.html' %}
 {% endblock %}

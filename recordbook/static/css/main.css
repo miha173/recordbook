@@ -1,0 +1,768 @@
+@charset "utf-8";
+/* Основные */
+* {
+	margin:0;
+	padding:0;
+}
+
+body {
+	width:100%;
+	color:#000;
+	font-family:Arial;
+	font-size:100%;
+	background:#F3F3E3;
+	behavior:url(/media/hover.htc);
+}
+
+table {
+	font-size:100%;
+	border-collapse:collapse;
+}
+
+img {
+	border:0;
+}
+
+.clear {
+	width:100%;
+	clear:both;
+	float:none !important;
+	overflow:hidden;
+	height:0;
+	font-size:0;
+}
+
+a {color:#0E90B8;}
+a:hover {color:#D52023;}
+
+
+
+
+/* Все */
+#all {
+	max-width:1600px;
+	min-width:900px;
+	width:expression((document.documentElement.clientWidth	|| document.body.clientWidth) < 980 ? '980px' : (document.documentElement.clientWidth || document.body.clientWidth) > 1600 ? '1635px' : '99.9%' );
+}
+
+
+
+
+
+/* Верхняя полоса */
+#headline {
+	width:100%;
+	float:left;
+	padding:0.5em 0;
+	border-bottom:2px solid #000;
+	background:#232323;
+}
+
+#headline a {
+	display:block;
+	float:left;
+	padding:0 20px;
+	color:#999;
+	font-size:70%;
+}
+
+#headline a:hover {color:#fff;}
+#headline a#right {float:right; min-height:12px; background:url(/media/images/design/blank.gif) 4px -54px no-repeat;}
+#headline a:hover#right {background:url(/media/images/design/blank.gif) -57px 4px no-repeat;}
+
+
+
+
+
+/* Шапка */
+#header {
+	width:100%;
+	float:left;
+	border-bottom:1px solid #fff;
+	background:#64B8D2 url(/media/images/design/header-bg.png) repeat-x;
+}
+
+body#admin #header {
+	background:#64B8D2 url(/media/images/design/admin/header-bg.png) repeat-x;
+}
+
+body#site #header {
+	background:#1F2F02 url(/media/images/design/site/screen-bg.jpg) repeat-x;
+}
+
+	#header #user {
+		float:left;
+		padding:0.5em 0 1.5em 37px;
+		background:url(/media/images/design/user.gif) 20px 0.9em no-repeat;
+	}
+
+	#header #user big {
+		font-size:130%;
+		color:#fff;
+	}
+
+	body#site #header #logo {
+		float:left;
+		width:25%;
+		padding:1em 0 1.5em 20px;
+	}
+	
+	
+	body#site #site-navigation {
+		float:left;
+		width:45%;
+		padding:1.5em 0 1.5em 20px;
+	}
+	
+	body#site #site-navigation strong {display:block; float:left; margin:0 1em 0 0; color:#E0FF84; font-size:80%; font-weight:bold;}
+	body#site #site-navigation a {display:block; float:left; margin:0 1em 0 0; color:#fff; font-size:80%;}
+	body#site #site-navigation a:hover {color:#E0FF84;}
+	
+
+	#header #exit {
+		float:right;
+		padding:0.5em 20px 1.5em 37px;
+	}
+
+	#header #exit a {
+		display:block;
+		float:left;
+		min-height:20px;
+		padding-left:20px;
+		color:#fff;
+		font-size:80%;
+		background:url(/media/images/design/exit.gif) 4px -52px no-repeat;
+	}
+
+	#header #exit a:hover {
+		color:#D52023;
+		background:url(/media/images/design/exit.gif) -56px 3px no-repeat;
+	}
+	
+
+	body#site #header #login-button {
+		float:right;
+		padding:0.5em 0 1.5em 0;
+	}
+
+	body#site #header #login-button input {
+		display:block;
+		float:left;
+		width:10em;
+		height:1.8em;
+		margin:1em 20px 1em 0;
+		text-align:center;
+		background:#EBEBEB;
+		border:2px solid #fff;
+		border-bottom:2px solid #9C9C9C;
+		border-right:2px solid #9C9C9C;
+		cursor:pointer;
+	}
+	
+
+	#header #navigation {
+		float:left;
+		margin:0 20px -7px 0;
+		padding-left:10px;
+	}
+
+	#header #navigation a,
+	#header #navigation big {
+		position:relative;
+		display:block;
+		float:left;
+		margin:0 10px 0 0;
+		padding:0.4em 10px 0.8em 10px;
+		color:#fff;
+		font-size:100%;
+		font-weight:normal;
+	}
+
+	#header #navigation a:hover {
+		background:url(/media/images/design/hover.png) top left repeat-x;
+	}
+
+	body#admin #header #navigation a:hover {
+		background:url(/media/images/design/admin/hover.png) top left repeat-x;
+	}
+
+	body#site #header #navigation a:hover {
+		background:url(/media/images/design/site/hover.png) top left repeat-x;
+	}
+
+	#header #navigation a#current,
+	#header #navigation big {
+		color:#000;
+	}
+
+	#header #navigation a#current.blue, #header #navigation big.blue {background:url(/media/images/design/current-blue.gif) bottom center no-repeat;}
+	#header #navigation a#current.yellow, #header #navigation big.yellow {background:url(/media/images/design/current-yellow.gif) bottom center no-repeat;}
+	#header #navigation a#current.green, #header #navigation big.green {background:url(/media/images/design/current-green.gif) bottom center no-repeat;}
+	#header #navigation a#current.red, #header #navigation big.red {background:url(/media/images/design/current-red.gif) bottom center no-repeat;}
+	#header #navigation a#current.purple, #header #navigation big.purple {background:url(/media/images/design/current-purple.gif) bottom center no-repeat;}
+	#header #navigation a#current.gay, #header #navigation big.gay {background:url(/media/images/design/current-gay.gif) bottom center no-repeat;}
+	
+
+	body#site #header #navigation2 {
+		float:left;
+		margin:0 20px -7px 0;
+		padding-left:10px;
+	}
+
+	body#site #header #navigation2 a,
+	body#site #header #navigation2 strong {
+		position:relative;
+		display:block;
+		float:left;
+		margin:0 10px 0 0;
+		padding:0.7em 10px 0.8em 10px;
+		color:#fff;
+		font-size:80%;
+		font-weight:normal;
+	}
+
+	body#site #header #navigation2 a:hover {
+		color:#E0FF84;
+		background:none;
+	}
+
+	body#site #header #navigation2 strong {
+		color:#E0FF84;
+		font-weight:bold;
+	}
+
+
+
+
+
+/* Шапка */
+#shadow {
+	clear:both;
+	width:100%;
+	height:19px;
+	background:#fff url(/media/images/design/shadow.png) repeat-x;
+}
+
+
+
+
+
+/* Заголовки, подразделы, кабинеты, названия предметов */
+#sub-navigation {
+	float:left;
+	width:100%;
+	background:#fff;
+}
+
+#sub-navigation.index {
+	float:left;
+	width:auto;
+	background:#ccc;
+}
+
+#sub-navigation #padding {
+	float:left;
+	padding:0 20px;
+}
+
+	#sub-navigation h1,
+	#class-teacher h1 {
+		display:inline;
+		padding:0 1em 0 0;
+		font-size:130%;
+		font-weight:normal;
+	}
+	
+	#sub-navigation a {
+		padding:0 1em 0 0;
+		font-size:80%;
+	}
+	
+	#sub-navigation span {
+		padding:0 1em 0 0;
+		color:#999;
+		font-size:80%;
+	}
+	
+	#sub-navigation div.gray,
+	#class-teacher div.gray {
+			float:left;
+			margin:0.5em 20px 0 0;
+			font-size:80%;
+	}
+	
+	#sub-navigation.index div.gray {
+			clear:both;
+			width:50%;
+	}
+	
+	#sub-navigation div.gray a {font-size:100%;}
+	
+	
+		/* Кабинет */
+		#sub-navigation div.classroom {
+			width:2.5em;
+			padding:0 0.2em;
+			border-top:1px solid #F1F1F1;
+			border-right:1px solid #D1D1D1;
+			border-bottom:1px solid #BEBEBE;
+			border-left:1px solid #ECECEC;
+			background:#F3F3E3 url(/media/images/design/classroom.png) top left no-repeat;
+		}
+		
+		#sub-navigation div.classroom {
+			float:left;
+			margin:0.5em 20px 0 0;
+		}
+	
+		#sub-navigation div.classroom div {
+			background:url(/media/images/design/nail.png) left center no-repeat;
+		}
+	
+		#sub-navigation div.classroom div div {
+			font-size:80%;
+			text-align:center;
+			background:url(/media/images/design/nail.png) right center no-repeat;
+		}
+
+
+		/* Дни недели */
+		#sub-navigation div.calendar {
+			font-size:80%;
+			padding:0 0 0 18px;
+			background:url(/media/images/design/calendar.gif) 0 0.2em no-repeat;
+		}
+		
+		#sub-navigation div.calendar a {
+			color:#000;
+			text-decoration:none;
+			border-bottom:1px solid #000;
+		}
+		
+		#sub-navigation div.calendar a:hover {color:#D52023; border-bottom:1px solid #D52023;}
+		
+		#sub-navigation div.calendar {
+			float:left;
+			margin:0.5em 20px 0 0;
+		}
+
+
+		/* Учителя */
+		#sub-navigation div.teacher {
+			float:left;
+			margin:0.5em 20px 0 0;
+		}
+
+
+		/* Уроки */
+		#sub-navigation div.subject {
+			float:left;
+			margin:0.5em 20px 0 0;
+		}
+
+		#sub-navigation div.subject a {
+			padding:0;
+		}
+
+
+
+
+/* Основное содержание */
+#content {
+	width:100%;
+	clear:both;
+	padding:1.5em 0;
+	background:#fff;
+}
+
+	#content table.table {
+		margin:0 20px;
+	}
+	
+	#content table.table tfoot {border-top:1px solid #E5E5E5;}
+	#content table.table tr.gray {background:#F6F8F9;}
+	#content table.table tr.gray#me {background:url(/media/images/design/today.gif) top;}
+	#content table.table tr:hover {background:#F5F5E5;}
+	#content table.table thead tr:hover {background:#fff;}
+	#content table.table td {padding:0.8em 20px 0.8em 10px;}
+	#content table.table td.padding-right {padding-right:0;}
+
+	#content table.table#index {
+		background:none;
+		border:0;
+	}
+
+		/* Шапка таблицы */
+		#content table.table thead th {
+			padding:0.5em 20px 0.5em 10px;
+			color:#999;
+			font-size:70%;
+			text-align:left;
+			font-weight:normal;
+			border-bottom:1px solid #E5E5E5;
+			white-space:nowrap;
+		}
+		#content table.table thead th.active, #content table.table thead th.active_asc, #content table.table thead th.active_desc {
+			background:#F5F5E5;
+		}
+		#content table.table thead th.active_asc{
+			background: url(/media/images/design/z-a.gif) no-repeat;
+			background-position: 7px left;
+			padding-left: 15px;
+		}
+		#content table.table thead th.active_desc{
+			background: url(/media/images/design/a-z.gif) no-repeat;
+			background-position: 7px left;
+			padding-left: 15px;
+		}
+		#content table.table thead th.ajax_link span{
+			display:block;
+			float:left;
+			color:#999;
+			text-decoration:none;
+			border-bottom:1px dotted #999;
+			cursor: hand;
+		}
+		
+		#content table.table thead th a {
+			display:block;
+			float:left;
+			color:#999;
+			text-decoration:none;
+			border-bottom:1px dotted #999;
+		}
+		
+		#content table.table thead th a:hover {
+			color:#000;
+			border-bottom:1px dotted #000;
+		}
+		
+		#content table.table thead th img {
+			display:block;
+			float:left;
+			margin:3px 0 0 5px;
+		}
+
+		/* Кабинет */
+		#content table.table div.classroom {
+			width:2.5em;
+			padding:0 0.2em;
+			border-top:1px solid #F1F1F1;
+			border-right:1px solid #D1D1D1;
+			border-bottom:1px solid #BEBEBE;
+			border-left:1px solid #ECECEC;
+			background:#F3F3E3 url(/media/images/design/classroom.png) top left no-repeat;
+		}
+	
+		#content table.table div.classroom div {
+			background:url(/media/images/design/nail.png) left center no-repeat;
+		}
+	
+		#content table.table div.classroom div div {
+			font-size:80%;
+			text-align:center;
+			background:url(/media/images/design/nail.png) right center no-repeat;
+		}
+
+
+		/* Дни недели */
+		#content table.table div.calendar {
+			font-size:80%;
+			padding:0 0 0 18px;
+			background:url(/media/images/design/calendar.gif) 0 0.2em no-repeat;
+		}
+		
+		#content table.table div.calendar a {
+			color:#000;
+			text-decoration:none;
+			border-bottom:1px solid #000;
+		}
+		
+		#content table.table div.calendar a:hover {color:#D52023; border-bottom:1px solid #D52023;}
+
+
+		/* Оценки */
+		#content table.table div.mark-good,
+		#content table.table div.mark-normal,
+		#content table.table div.mark-bad {
+			color:#0C5794;
+			font-family:Georgia;
+			font-style:italic;
+			font-size:110%;
+		}
+		
+		#content table.table div.mark-normal, #sub-navigation div.mark-normal {color:#703B5C;}
+		#content table.table div.mark-bad, #sub-navigation div.mark-bad {color:#D52023;}
+
+
+		/* Учителя */
+		#content table.table div.teacher {
+			font-size:80%;
+		}
+
+
+		/* Дата */
+		#content table.table div.date {
+			font-size:80%;
+			color:#999;
+		}
+
+
+		/* Номер */
+		#content table.table div.number {
+			font-size:80%;
+			color:#999;
+		}
+
+
+		/* Уроки */
+		#content table.table div.subject {
+			font-size:80%;
+			color:#999;
+		}
+
+
+		/* Уроки заканчиваются */
+		#content table.table div.end {
+			font-size:80%;
+			color:#999;
+		}
+		
+			#content table.table div.end strong {
+				font-weight:normal;
+				color:#000;
+			}
+		
+
+		/* текстовое поле для ввода оценок */
+		#content table.table input.mark {
+			width:1.5em;
+			height:1.5em;
+			color:#000;
+			font-family:Georgia;
+			font-style:italic;
+			font-size:110%;
+			text-align:center;
+			border:1px solid #B1B1B1;
+			border-right:1px solid #E5E5E5;
+			border-bottom:1px solid #E5E5E5;
+		}
+		
+		#content table.table input:focus.mark {
+			border:1px solid #090;
+		}
+		
+		#content table.table tfoot {
+			color:#999;
+			font-size:80%;
+		}
+
+
+	/* Об учителе */
+	#content div#about-teacher {
+		width:70%;
+		margin:0 20px;
+		background:url(/media/images/design/bg-about-teacher.gif) top repeat-x;
+	}
+	
+	#content div#about-teacher p {
+		padding:0.5em 10px;
+		font-size:80%;
+	}
+
+
+
+	/* Расписание */
+	table#shedule td {
+		padding:0 0 1.5em 0;
+		vertical-align:top;
+	}
+	
+	table#shedule td table.table {
+		margin-top:0.5em;
+		border-top:1px solid #E5E5E5;
+		background:url(/media/images/design/bg-shedule.gif) top repeat-x;
+	}
+	
+	table#shedule small {
+		display:block;
+		margin:0 20px;
+		color:#999;
+		font-size:80%;
+	}
+	
+	table#shedule td#today small {
+		color:#090;
+	}
+	
+	
+	table#shedule td#today table.table {
+		margin-top:0.5em;
+		background:url(/media/images/design/today.gif) top repeat-x;
+	}
+	
+	table#shedule big {
+		display:block;
+		margin:0 20px;
+		font-size:130%;
+	}
+	
+	
+		/* Расписание звонков */
+		table#shedule td div#bells {
+			margin:1em 0 0 20px;
+			padding:0 0 0 45px;
+			background:url(/media/images/design/bell.gif) 0 0 no-repeat;
+		}
+		
+		table#shedule td div#bells big {
+			display:block;
+			margin:0;
+			padding:5px 0 1em 0;
+			font-size:100%;
+		}
+		
+		table#shedule td div#bells p {
+			padding:0.5em 0;
+			font-size:80%;
+		}
+
+
+	/* Таблица на главной */
+	table#index td {
+		padding:0 0 1.5em 0;
+		vertical-align:top;
+	}
+	
+	table#index td table.table {
+		margin-top:0.5em;
+		border-top:1px solid #E5E5E5;
+		background:url(/media/images/design/bg-shedule.gif) top repeat-x;
+	}
+	
+	table#index td table.table td {
+		white-space:nowrap;
+	}
+	
+	table#index td#today small {
+		display:block;
+		margin:0 20px;
+		color:#999;
+		font-size:80%;
+		color:#090;
+	}
+	
+	table#index big {
+		display:block;
+		margin:0 20px;
+		font-size:130%;
+	}
+	
+		
+		/* Классный руководитель */
+		#class-teacher {
+			padding:0 0 4em 20px;
+		}
+	
+		
+			/* Заголовок */
+			#class-teacher h1 {
+				display:block;
+					clear:both;
+				padding:0 1em 0 0;
+				font-size:130%;
+				font-weight:normal;
+			}
+			
+			#class-teacher div.gray {
+					clear:both;
+					margin:0.5em 20px 0 0;
+					font-size:80%;
+			}
+			
+			
+			/* Кабинет */
+			#class-teacher div.classroom {
+				width:2.5em;
+				padding:0 0.2em;
+				border-top:1px solid #F1F1F1;
+				border-right:1px solid #D1D1D1;
+				border-bottom:1px solid #BEBEBE;
+				border-left:1px solid #ECECEC;
+				background:#F3F3E3 url(/media/images/design/classroom.png) top left no-repeat;
+			}
+			
+			#class-teacher div.classroom {
+				float:left;
+				margin:0.5em 20px 0 0;
+			}
+		
+			#class-teacher div.classroom div {
+				background:url(/media/images/design/nail.png) left center no-repeat;
+			}
+		
+			#class-teacher div.classroom div div {
+				font-size:80%;
+				text-align:center;
+				background:url(/media/images/design/nail.png) right center no-repeat;
+			}
+	
+	
+			/* Уроки */
+			#class-teacher div.subject {
+				font-size:80%;
+				color:#999;
+			}
+	
+			#class-teacher div.subject {
+				float:left;
+				margin:0.5em 20px 0 0;
+			}
+			
+			
+		/* Объявление */
+		table#index div.message {
+			clear:both;
+			padding:0 0 0.5em 0;
+			max-width:500px;
+			margin:1em 20px 0 20px;
+			border:1px solid #DFDFCC;
+			background:#ffffe1;
+		}
+		
+		table#index div.message p {
+			padding:0.5em 10px 0 10px;
+			font-size:80%;
+		}
+
+	
+	
+
+/* © */
+#copyright {
+	float:left;
+	width:100%;
+	border-top:1px solid #DCDCD0;
+	background:#F3F3E3;
+}
+
+#copyright div.column {
+	float:left;
+	width:33%;
+	padding:1.5em 0;
+}
+
+#copyright div.column p {
+	padding:0 20px;
+	color:#999;
+	font-size:70%;
+}
+
+table fieldset li, table.form li{
+	list-style: none;
+}
+
+
+legend{
+	margin: 0 5px;
+}

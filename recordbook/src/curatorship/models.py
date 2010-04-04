@@ -1,8 +1,9 @@
 # -*- coding: UTF-8 -*-
 from django.db import models
 from src.userextended.models import Teacher, Subject, Grade
+from src.rest.models import RestModel
 
-class Connection(models.Model):
+class Connection(RestModel):
     teacher = models.ForeignKey(Teacher, verbose_name = u'Учитель')
     subject = models.ForeignKey(Subject, verbose_name = u'Предмет')
     grade = models.ForeignKey(Grade, verbose_name = u'Класс')

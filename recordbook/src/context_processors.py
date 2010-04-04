@@ -1,5 +1,7 @@
 # -*- coding: UTF-8 -*-
 
+from datetime import date
+
 from django.core.context_processors import request
 from django.core.signals import request_started
 
@@ -10,13 +12,15 @@ from src import settings
 
 def plural(request):
     plural = {}
-    plural['page_plural'] = ("страница","страницы","страниц")
+    plural['page_plural'] = (u"страница", u"страницы", u"страниц")
     plural['pupil_plural'] = ("ученик", "ученика", "учеников")
     return plural
 
 def menu(request):
     dirs = request.path.split('/')
     url = dirs[1]
+    if len(dirs) == 1:
+        url = ''
     path = ''
     if len(dirs)>3:
         path = dirs[2]
@@ -29,7 +33,9 @@ def environment(request):
     render = {}
     user = request.user
     if request.user.is_authenticated():
-        if request.user.username[0] == 't':
+        temp = request.user.prefix
+        if request.user.prefix == 't':
+            render['BASE_TEMPLATE'] = 'page.html'
             subjects = []
             last_subject = None
             for connection in Connection.objects.filter(teacher = user).order_by('subject'):
@@ -37,12 +43,20 @@ def environment(request):
                     last_subject = connection.subject
                     subjects.append({'id': connection.subject.id, 'name': connection.subject.name})
             if not user.current_subject:
-                if subjects.__len__() != 0:
+                if len(subjects) != 0:
                     user.current_subject = Subject.objects.get(id = subjects[0]['id'])
                     user.save()
             render['subjects'] = subjects
-        else:
-            render['subjects'] = [connection.subject for connection in Connection.objects.filter(grade = user.grade) if connection.connection == '0' or connection.connection == user.group or (int(connection.connection)-2) == user.sex or (int(connection.connection)-4) == int(user.special)]
+            if settings.ROOT_CAN_ALL:
+                if user.is_administrator():
+                    render['subjects'] = Subject.objects.filter(school = user.school)
+        elif request.user.prefix == 'p':
+            render['BASE_TEMPLATE'] = 'page_pupil.html'
+            render['subjects'] = user.get_subjects()
+        elif request.user.prefix == 'a':
+            render['BASE_TEMPLATE'] = 'administrator.html'
+    render['ROOT_CAN_ALL'] = settings.ROOT_CAN_ALL
+    render['current_year'] = date.today().year
     return render
 
 

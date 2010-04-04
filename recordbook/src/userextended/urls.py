@@ -13,4 +13,10 @@ urlpatterns = patterns("src.userextended.views",
                        (r'^uni/(?P<object>\w+)/add/$', 'objectEdit4Administrator', {'mode': 'add'}),
                        (r'^uni/(?P<object>\w+)/edit/(?P<id>\d+)/$', 'objectEdit4Administrator', {'mode': 'edit'}),
                        (r'^uni/(?P<object>\w+)/delete/(?P<id>\d+)/$', 'objectEdit4Administrator', {'mode': 'delete'}),
+                       
+                       (r'^uni/(?P<object>\w+)/(?P<school_id>\d+)/$', 'objectList4Administrator'),
+                       (r'^uni/(?P<object>\w+)/(?P<school_id>\d+)/add/$', 'objectEdit4Administrator', {'mode': 'add'}),
+                       (r'^uni/(?P<object>\w+)/(?P<school_id>\d+)/edit/(?P<id>\d+)/$', 'objectEdit4Administrator', {'mode': 'edit'}),
+                       (r'^uni/(?P<object>\w+)/(?P<school_id>\d+)/delete/(?P<id>\d+)/$', 'objectEdit4Administrator', {'mode': 'delete'}),
+                       
                        )

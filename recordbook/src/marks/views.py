@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-from datetime import date
+from datetime import date, timedelta, datetime
 
 from django.template import RequestContext
 from django.shortcuts import render_to_response, get_object_or_404
@@ -8,9 +8,12 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
 from django.conf import settings
+from django.db.models import Q
+from django.db.models.aggregates import Avg
 
 from src.userextended.models import Pupil, Teacher, Subject, Grade
 from src.curatorship.models import Connection
+from src.attendance.models import UsalTimetable
 from models import Lesson, Mark, ResultDate, Result
 from forms import LessonForm, MarkForm, ResultForm
 
@@ -18,10 +21,75 @@ from forms import LessonForm, MarkForm, ResultForm
 def index(request):
     render = {}
     temp = request.user_type
-    if request.user_type == 'pupil':
+    if request.user.prefix == 'p':
+        dates = []
+        temp = date.today() - timedelta(days = 7)
+        while temp != date.today() + timedelta(days = 1) :
+            dates.append(temp)
+            temp += timedelta(days = 1)
+        marks = []
+        for subject in request.user.get_subjects():
+            subj = []
+            subj.append(subject)
+            m = []
+            sum = 0
+            sum_n = 0
+            for day in dates:
+                if Mark.objects.filter(pupil = request.user, lesson__date = day, lesson__subject = subject).count()==1:
+                    mark = Mark.objects.get(pupil = request.user, lesson__date = day, lesson__subject = subject)
+                    m.append(mark)
+                    if not mark.absent:
+                        sum += mark.mark
+                        sum_n += 1
+                else:
+                    m.append('')
+            subj.append(m)
+            if sum_n != 0:
+                subj.append(float(sum)/sum_n)
+            else:
+                subj.append(0)
+            subj.append(Connection.objects.get(Q(connection = 0) | Q(connection = request.user.group) | Q(connection = int(request.user.sex)+2), subject = subject, grade = request.user.grade).teacher)
+            if subj[2]<3:
+                type = "bad"
+            elif subj[2]>=4:
+                type = "good"
+            else:
+                type = "normal"
+            subj.append(type)
+            marks.append(subj)
+        render['marks'] = marks
+        render['dates'] = dates
         results = Result.objects.filter(pupil = request.user).order_by('resultdate__enddate')
         render['results'] = results
     return render_to_response('marks/%s/index.html' % request.user_type, render, context_instance = RequestContext(request))
+
+@login_required
+def viewMarks(request, id):
+    render = {}
+    pupil = request.user
+    subject = get_object_or_404(Subject, id = id, school = request.user.school)
+    subject.teacher = Connection.objects.get(Q(connection = 0) | Q(connection = pupil.group) | Q(connection = int(pupil.sex)+2), subject = subject, grade = pupil.grade).teacher
+    subject.avg = Mark.objects.filter(pupil = pupil, absent = False, date__gte = datetime.now() - timedelta(weeks = 4), lesson__subject = subject).aggregate(Avg('mark'))['mark__avg']
+    if subject.avg<3:
+        subject.avg_type = "bad"
+    elif subject.avg>=4:
+        subject.avg_type = "good"
+    else:
+        subject.avg_type = "normal"
+    days = {1: u'Пн',
+            2: u'Вт',
+            3: u'Ср',
+            4: u'Чт',
+            5: u'Пт',
+            6: u'Вс',
+            }
+    subject.days = []
+    [subject.days.append(int(lesson.workday)) for lesson in UsalTimetable.objects.filter(grade = pupil.grade, subject = subject, group = pupil.group).order_by('workday') if int(lesson.workday) not in subject.days]
+    subject.days = [days[day] for day in subject.days]
+    render['marks'] = Mark.objects.filter(pupil = pupil, lesson__date__gte = datetime.now() - timedelta(weeks = 4), lesson__subject = subject)
+
+    render['subject'] = subject
+    return render_to_response('marks/%s/marks.html' % request.user_type, render, context_instance = RequestContext(request))
 
 @login_required
 @user_passes_test(lambda u: u.prefix=='t')

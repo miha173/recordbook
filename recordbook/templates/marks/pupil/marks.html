@@ -1,20 +1,41 @@
-{% extends 'marks/pupil/page.html' %}
+{% extends 'page_pupil.html' %}
+
+{% block sort_headers %}{1: {sorter: false}}{% endblock %}
+
+{% block padding %}
+	<h1>{{ subject }}</h1> 
+	{#<div class="classroom"><div><div>23</div></div></div>#}
+	<div class="calendar">{{ subject.days|join:", " }}</div>
+	<div class="teacher"><a href="/teachers/{{ subject.teacher.id }}">{{ subject.teacher.fio }}</a></div>
+{% endblock %}
 
 {% block content %}
-	{% if not objects.object_list %}
-	Отметок по этому ещё предмету нет.
-	{% endif %}
-	<ul>
-	{% for object in objects.object_list %}
-		<li>
-			{% if object.absent %}
-				Отсутствовал 
-			{% else %}
-				Получил {{ object.mark }} 
-			{% endif %}
-			на уроке {{ object.lesson.date|date:"d.m.y" }}. {% if object.comment %}(<i>{{ object.comment }}</i>){% endif %}
-		</li>
-	{% endfor %}
-	</ul>
-	{% include 'helpers/paginator.html' %}
+	<table class="table sort">
+	  <thead>
+	  <tr>
+	    <th class="ajax_link"><span>Дата</span></th>
+	    {#<th>Название работы</th>#}
+	    <th class="ajax_link"><span>Оценка</span></th>
+	  </tr>
+	  </thead>
+	  
+	  <tbody>
+	  	{% for mark in marks %}
+		  <tr class="{% cycle 'gray' '' %}">
+		    <td><div class="date">{{ mark.lesson.date|date:"d.m" }}</div></td>
+		    {#<td><a href="#">{{ mark.lesson.topic }}</a></td>#}
+		    <td><div class="mark-{{ mark.get_type }}">{{ mark }}</div></td>
+		  </tr>
+		{% endfor %}
+	  
+	  </tbody>
+	  
+	  <tfoot>
+	  <tr>
+	    <td></td>
+	    <td><div class="date">Средний балл</div></td>
+	    <td><div class="mark-{{ subject.avg_type }}">{{ subject.avg|default:0 }}</div></td>
+	  </tr>
+	  </tfoot>
+	</table>
 {% endblock %}

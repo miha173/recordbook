@@ -44,6 +44,7 @@
 		}
 
 */	</style>
+
 </head>
 <body>
 	<div id="topmenu">
@@ -55,7 +56,7 @@
 				{{ user.username }}
             	{% ifequal user.prefix "t" %} 
 					<ul>
-						{% if user.subjects %}
+						{% if user.subjects and not ROOT_CAN_ALL or user.is_administrator %}
 							<li{% if not DIR %}{% ifequal ACTIVE_URL "marks" %} class="active"{% endifequal %}{% endif %}><a href="/marks/">Выставление отметок</a>
 								{% ifequal ACTIVE_URL 'marks' %}
 									<ul>
@@ -80,7 +81,7 @@
 								{% endifequal %}
 							</li>
 						{% endif %}
-						{% if user.administrator %}
+						{% if user.is_administrator %}
 							<li{% if not DIR %}{% ifequal ACTIVE_URL "administrator" %} class="active"{% endifequal %}{% endif %}><a href="/administrator/">Администрирование</a>
 								{% ifequal ACTIVE_URL 'administrator' %}
 									<ul>
@@ -92,6 +93,7 @@
 									</ul>
 								{% endifequal %}
 							</li>
+							<li{% ifequal path "attendace" %} class="active"{% endifequal %}><a href="/attendance/">Расписания</a>{% block attendance_menu %}{% endblock %}</li>
 						{% endif %}
 					</ul>
 				{% endifequal %}
@@ -114,7 +116,7 @@
 				</ul>
             </div>
             <div class="copyright">
-                 2009 &copy;
+                 &copy;&nbsp;2008&nbsp;&mdash;&nbsp;{{ current_year }}
             </div>
         </div>
 	</div>
