@@ -14,46 +14,6 @@ from src.utils import PlaningError
 
 
 
-def Hex2Bin(ch):
-    ch = ch.upper()
-    if ch == '0': return '0000'
-    elif ch == '1': return '0001'
-    elif ch == '2': return '0010'
-    elif ch == '3': return '0011'
-    elif ch == '4': return '0100'
-    elif ch == '5': return '0101'
-    elif ch == '6': return '0110'
-    elif ch == '7': return '0111'
-    elif ch == '8': return '1000'
-    elif ch == '9': return '1001'
-    elif ch == 'A': return '1010'
-    elif ch == 'B': return '1011'
-    elif ch == 'C': return '1100'
-    elif ch == 'D': return '1101'
-    elif ch == 'E': return '1110'
-    elif ch == 'F': return '1111'
-
-def Bin2Hex(ch):
-    ch = ch.upper()
-#    print ch
-    if ch == '0000': return '0'
-    elif ch == '0001': return '1'
-    elif ch == '0010': return '2'
-    elif ch == '0011': return '3'
-    elif ch == '0100': return '4'
-    elif ch == '0101': return '5'
-    elif ch == '0110': return '6'
-    elif ch == '0111': return '7'
-    elif ch == '1000': return '8'
-    elif ch == '1001': return '9'
-    elif ch == '1010': return 'A'
-    elif ch == '1011': return 'B'
-    elif ch == '1100': return 'C'
-    elif ch == '1101': return 'D'
-    elif ch == '1110': return 'E'
-    elif ch == '1111': return 'F'
-
-
 
 
 class School(RestModel):
@@ -64,9 +24,32 @@ class School(RestModel):
     url = models.URLField(null = True, blank = True)
     address = models.CharField(verbose_name = u'Адрес школы', max_length = 255)
     phone = models.CharField(verbose_name = u'Телефон школы', max_length = 255)
+    gate_use = models.BooleanField(verbose_name = u'Использовать шлюз', default = False)
+    gate_id = models.CharField(verbose_name = u'ID для смс-шлюза', max_length = 255, blank = True, null = True)
+    gate_password  = models.CharField(verbose_name = u'Пароль для смс-шлюза', max_length = 255, blank = True, null = True)
+    gate_url = models.URLField(verbose_name = u'URL смс-шлюза', blank = True, null = True)
 
     serialize_fields = ['id', 'name', 'saturday']
     serialize_name = 'school'
+    
+    def __init__(self, *args, **kwargs):
+        from src.marks.models import Mark
+        super(School, self).__init__(*args, **kwargs)
+        grades = Grade.objects.filter(school = self).count() > 0
+        subjects = Subject.objects.filter(school = self).count() > 0
+        pupils = Pupil.objects.filter(school = self).count() > 0
+        teachers = Teacher.objects.filter(school = self).count() > 0
+        marks = Mark.objects.filter(pupil__school = self).count() > 0
+        show = {}
+        show['staff'] = show['subjects'] = show['grades'] = show['options'] = True
+        show['pupils'] = grades
+        show['teachers'] = subjects and grades
+        show['resultdates'] = grades
+        show['connections'] = teachers
+        show['deliveryes'] = marks
+        show['timetables'] = teachers
+        show['marks'] = marks
+        self.show = show
     
     def __unicode__(self):
         return self.name
@@ -83,17 +66,7 @@ class School(RestModel):
         Teacher.objects.filter(school = self).delete()
         Pupil.objects.filter(school = self).delete()
         ResultDate.objects.filter(school = self).delete()
-        Cam.objects.filter(school = school).delete()
         super(School, self).delete()
-
-class Cam(models.Model):
-    name = models.CharField(max_length = 255, verbose_name = u'Название камеры')
-    ip = models.IPAddressField(verbose_name = u'IP камеры')
-    device1 = models.CharField(max_length = 255, verbose_name = u'Устройство 1', null = True, blank = True)
-    device1_name = models.CharField(max_length = 255, verbose_name = u'Устройство 1 - имя', null = True, blank = True)
-    device2 = models.CharField(max_length = 255, verbose_name = u'Устройство 2', null = True, blank = True)
-    device2_name = models.CharField(max_length = 255, verbose_name = u'Устройство 2 - имя', null = True, blank = True)
-    school = models.ForeignKey(School, verbose_name = u'Школа')
 
 class Option(models.Model):
     key = models.CharField(max_length = 255, verbose_name = u'Настройка')
@@ -103,6 +76,7 @@ class Option(models.Model):
 
 class Grade(RestModel):
     u'Классы в школах'
+    number = models.IntegerField(verbose_name = u'Порядковый номер', null = True, blank = True)
     long_name = models.CharField(u"Длинное имя", max_length = 100)
     small_name = models.CharField(u"Короткое имя", max_length = 10, blank = True)
     school = models.ForeignKey(School, verbose_name = "Школа")
@@ -112,7 +86,10 @@ class Grade(RestModel):
     serialize_name = 'grade'
     
     def __unicode__(self):
-        return self.long_name
+        if self.number:
+            return "%d%s" % (self.number, self.long_name)
+        else:
+            return self.long_name
     def get_subjects(self):
         from src.curatorship.models import Connection
         subjects = []
@@ -136,8 +113,12 @@ class Grade(RestModel):
             super(Grade, self).delete()
         else:
             raise PlaningError(u"В классе числятся ученики")
+    def save(self, *args, **kwargs):
+        self.long_name = self.long_name.lower()
+        self.small_name = self.small_name.lower()
+        super(Grade, self).save(*args, **kwargs)
     class Meta:
-        ordering = ['long_name']
+        ordering = ['number']
 
 class Subject(RestModel):
     u'Учебные дисциплины'
@@ -181,6 +162,8 @@ class Clerk(User, RestModel):
     school = models.ForeignKey(School, verbose_name = "Школа")
     cart = models.CharField(u'Карта', max_length = 10, null = True, blank = True)
     cart_ext = models.CharField(u'Карта (рат.)', max_length = 10, null = True, blank = True)
+    gate_id = models.IntegerField(null = True, blank = True)
+    phone = models.CharField(max_length = 20, verbose_name = u'Номер телефона', null = True, blank = True)
     def __unicode__(self):
         result = self.last_name + ' ' + self.first_name + ' ' + self.middle_name
 #        if self.grade:
@@ -222,30 +205,28 @@ class Clerk(User, RestModel):
                 else:
                     first_name = first_name[:28-len(first_name)-prefix]
         return username + last_name + '.' + first_name
-    def save(self, force_insert = False, force_update = False, init = False):
-        from src.settings import GAPPS_DOMAIN, GAPPS_LOGIN, GAPPS_PASSWORD, GAPPS_USE, USE_SHELNI
-        if not self.cart: self.cart = ''
-        if self.cart[len(self.cart)-4:len(self.cart)] == '001A':
-            cart = self.cart[:len(self.cart)-4]
-            cart = "".join([Hex2Bin(i) for i in cart])
-            new_cart = "".join([cart[i] for i in xrange(len(cart)-1, -1, -1)])
-            new_cart = "".join([Bin2Hex(new_cart[i-4:i]) for i in xrange(4, len(new_cart)+1, 4)])
-            new_cart = "".join([new_cart[i-2:i] for i in xrange(len(new_cart), 0, -2)])
-            self.cart_ext = new_cart + '001A'
-        if USE_SHELNI:
-            from shelni import ShelniConfig
-            tc_ip = Option.objects.get(key = 'TC_IP')
-            cams = []
-            for cam in Cam.objects.filter(school = self.school):
-                cams.append([cam.device1, 1])
-                cams.append([cam.device2, 1])
-            c = ShelniConfig(host = tc_ip.value, devices = cams)
-            c.login('Serega', '1')
+    def save(self, force_insert = False, force_update = False, init = False, safe = False):
+        from src.settings import GAPPS_DOMAIN, GAPPS_LOGIN, GAPPS_PASSWORD, GAPPS_USE
+        if self.school.gate_use:
+            from gate import Gate
+            gate = Gate(self.school.gate_url, self.school.gate_id, self.school.gate_password)
+            if not self.gate_id:
+                self.gate_id = gate.addUser(self.phone_mother)
+                self.gate_id = gate.addUser(self.phone_father)
+            else:
+                if self.prefix == 'p':
+                    if old.phone_mother != self.phone_mother:
+                        gate.changePhone(self.gate_id, self.phone_mother)
+                        gate.changePhone(self.gate_id, self.phone_father)
+        if self.pk:
+            if self.prefix == 'p':
+                old = Pupil.objects.get(id = self.id)
+            if self.prefix == 't':
+                old = Teacher.objects.get(id = self.id)
+            if self.prefix == 's':
+                old = Staff.objects.get(id = self.id)
+            if old.cart == self.cart: make_card = False
         if not self.pk or init:
-#            if not init:
-#                username = self.gen_username()
-#                if User.objects.filter(username = username).count() != 0:
-#                    self.username = self.gen_username(school = True)
             if GAPPS_USE:
                 import gdata.apps.service
                 service = gdata.apps.service.AppsService(email=GAPPS_LOGIN, domain=GAPPS_DOMAIN, password=GAPPS_PASSWORD)
@@ -259,12 +240,6 @@ class Clerk(User, RestModel):
                 self.username = username
             self.set_password("123456789")
             super(Clerk, self).save(force_insert, force_update)
-            if USE_SHELNI:
-                c.add_user(self.cart_ext, cell = self.id)
-        else:
-            if USE_SHELNI:
-                c.add_user(self.cart_ext, cell = self.id)
-            super(Clerk, self).save(force_insert, force_update)
     def search(self, search_str):
         values = []
         a = self.objects.filter(last_name__contains = search_str)
@@ -275,17 +250,17 @@ class Clerk(User, RestModel):
         ordering = ['last_name', 'first_name', 'middle_name']
 
 class Teacher(Clerk):
-    #Для доступа к администраторским функциям (неадмин-панель)
+    # Для доступа к администраторским функциям (неадмин-панель)
     administrator = models.BooleanField(u"Администратор")
-    #Какие предметы ведёт
+    # Какие предметы ведёт
     subjects = models.ManyToManyField(Subject, verbose_name = u"Предметы", related_name = 'subjects', blank = True, null = True)
-    #В каких классах ведёт
+    # В каких классах ведёт
     grades = models.ManyToManyField(Grade, blank = True, verbose_name = u"Классы", related_name = "grades", null = True)
-    #Есть ли классное руководство
+    # Есть ли классное руководство
     grade = models.ForeignKey(Grade, verbose_name="Класс", blank = True, related_name = 'grade', null = True)
-    #Выбранный предмет в инструменте выставления отметок
+    # Выбранный предмет в инструменте выставления отметок
     current_subject = models.ForeignKey(Subject, blank = True, related_name = 'current_subject', null = True)
-    #Для генерации имени пользователя
+    # Для генерации имени пользователя и других костылей
     prefix = "t"
 
     serialize_fields = ['id', 'last_name', 'first_name', 'middle_name', 'grade_id', 'school_id', 'grades', 'subjects']
@@ -305,19 +280,21 @@ class Pupil(Clerk):
     group = models.CharField(max_length = 1, choices = (('1', u'1 группа'), ('2', u'2 группа')), verbose_name = u'Группа')
     #Специальная учебная группа
     special = models.BooleanField(verbose_name = u'Специальная группа')
-    account = models.FloatField(verbose_name = u'Баланс', default = 0)
+    account = models.DecimalField(verbose_name = u'Баланс', default = '0', max_digits = 20, decimal_places = 2)
     parent_mother = models.CharField(max_length = 255, verbose_name = u'Мать', blank = True, null = True)
     parent_father = models.CharField(max_length = 255, verbose_name = u'Отец', blank = True, null = True)
     phone_mother = models.CharField(max_length = 255, verbose_name = u'Телефон матери', blank = True, null = True)
     phone_father = models.CharField(max_length = 255, verbose_name = u'Телефон отца', blank = True, null = True)
     delivery = models.BooleanField(default = True, verbose_name = u'Отправлять смс')
+    insurance_policy = models.TextField(verbose_name = u'Страховой полис', null = True, blank = True)
     
     prefix = "p"
-    serialize_fields = ['id', 'last_name', 'first_name', 'middle_name', 'grade_id', 'group', 'school_id']
+    serialize_fields = ['id', 'account', 'last_name', 'first_name', 'middle_name', 'grade_id', 'group', 'school_id']
     serialize_name = 'pupil'
     
     def curator(self):
-        return Teacher.objects.get(grade = self.grade)
+        # FIXME
+        return Teacher.objects.filter(grade = self.grade)[0]
     
     def get_marks_avg(self, delta = timedelta(weeks = 4)):
         from decimal import *
@@ -325,9 +302,9 @@ class Pupil(Clerk):
         temp = Mark.objects.filter(pupil = self, absent = False, lesson__date__gte = datetime.now()-delta).aggregate(Avg('mark'))['mark__avg']
         if not temp:
             temp = 0
-        getcontext().prec = 4
-        temp = Decimal(str(temp))
-        return temp    
+        getcontext().prec = 2
+#        temp = Decimal(str(temp))
+        return "%.2f" % temp
     def get_marks_avg_type(self, delta = timedelta(weeks = 4)):
         mark = self.get_marks_avg(delta)
         if mark<3:
@@ -337,25 +314,12 @@ class Pupil(Clerk):
         else:
             return "normal"
     def get_teachers(self):
-#        from src.curatorship.models import Connection
-#        teachers = [connection.teacher for connection in Connection.objects.filter(grade = self.grade) if connection.connection == '0' or connection.connection == self.group or (int(connection.connection)-2) == self.sex or (int(connection.connection)-4) == int(self.special)]
-#        for teacher in teachers:
-#            ok = False
-#            for i in xrange(len(teachers)-1):
-#                if teachers[i].id == teacher.id:
-#                    if ok:
-#                        del teachers[i]
-#                    else: ok = True
-        teachers = Teacher.objects.filter(grades = self.grade)
+        from src.curatorship.models import Connection
+        teachers = set([connection.teacher for connection in Connection.objects.filter(grade = self.grade) if connection.connection == '0' or connection.connection == self.group or (int(connection.connection)-2) == self.sex or (int(connection.connection)-4) == int(self.special)])
         return teachers
     def get_subjects(self):
-        subjects = set()
-        for teacher in self.get_teachers():
-            for sbj in teacher.subjects.all():
-                subjects.add(sbj)
-        return subjects
-#        from src.curatorship.models import Connection
-#        return [connection.subject for connection in Connection.objects.filter(grade = self.grade) if connection.connection == '0' or connection.connection == self.group or (int(connection.connection)-2) == self.sex or (int(connection.connection)-4) == int(self.special)]
+        from src.curatorship.models import Connection
+        return [connection.subject for connection in Connection.objects.filter(grade = self.grade) if connection.connection == '0' or connection.connection == self.group or (int(connection.connection)-2) == self.sex or (int(connection.connection)-4) == int(self.special)]
 
 class Achievement(models.Model):
     title = models.CharField(verbose_name = u'Достижение', max_length = 255)
@@ -368,3 +332,17 @@ class Staff(Clerk):
     Модель персонала
     '''
     prefix = 's'
+
+class Permission(models.Model):
+    user_id = models.IntegerField()
+    user_type = models.CharField(max_length = 1, choices = (('p', 'p'), ('t', 't'), ('s', 's')))
+    permission = models.CharField(max_length = 255)
+
+    def user(self):
+        if self.user_type == 'p': Model = Pupil
+        elif self.user_type == 't': Model = Teacher
+        elif self.user_type == 's': Model = Staff
+        return Model.objects.get(id = self.user_id)
+
+
+

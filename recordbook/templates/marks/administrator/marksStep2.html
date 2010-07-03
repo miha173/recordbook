@@ -1,0 +1,24 @@
+{% extends BASE_TEMPLATE %}
+
+{% block padding %}
+    <a href="/administrator/uni/school/#sch{{ school.id }}">{{ school }}</a>
+    <span>&rarr;</span>
+    <h1>{{ grade }}</h1>
+{% endblock %}
+
+{% block content %}
+{% if grade.get_subjects %}
+	<p style="margin: 30px 30px;">Выберите предмет</p>
+	<table class="table">
+		{% for subject in grade.get_subjects %}
+			{% cycle '<tr>' '' %}
+				<td>
+					<a href="{% url src.marks.views.marksStep3 school.id, grade.id, subject.id %}">{{ subject }}</a>
+				</td>
+			{% cycle '' '</tr>' %}
+		{% endfor %}
+	</table>
+{% else %}
+	<p style="margin: 30px 30px;">В этом классе ещё не ведут уроки</p>
+{% endif %}
+{% endblock %}

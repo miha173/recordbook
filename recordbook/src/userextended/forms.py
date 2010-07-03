@@ -5,7 +5,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render_to_response
 from django.forms.util import ErrorList
 
-from models import Subject, Teacher, Pupil, Grade, School, Staff, Cam, Option, Achievement
+from models import Subject, Teacher, Pupil, Grade, School, Staff, Option, Achievement, Permission
 from src.marks.models import Lesson, ResultDate
 
 class SubjectForm(forms.ModelForm):
@@ -18,7 +18,7 @@ class SubjectForm(forms.ModelForm):
 class SchoolForm(forms.ModelForm):
     class Meta:
         model = School
-        fields = ['name', 'prefix', 'saturday', 'url', 'address', 'phone']
+        fields = ['name', 'prefix', 'saturday', 'url', 'address', 'phone', 'gate_use', 'gate_url', 'gate_id', 'gate_password']
         
 class OptionForm(forms.ModelForm):
     def __init__(self, school = None, *args, **kwargs):
@@ -27,19 +27,12 @@ class OptionForm(forms.ModelForm):
         model = Option
         fields = ['key', 'value']
 
-class CamForm(forms.ModelForm):
-    def __init__(self, school = None, *args, **kwargs):
-        super(CamForm, self).__init__(*args, **kwargs)
-    class Meta:
-        model = Cam
-        fields = ['name', 'ip', 'device1', 'device1_name', 'device2', 'device2_name']
-
 class GradeForm(forms.ModelForm):
     def __init__(self, school = None, *args, **kwargs):
         super(GradeForm, self).__init__(*args, **kwargs)
     class Meta:
         model = Grade
-        fields = ['long_name', 'small_name']
+        fields = ['number', 'long_name', 'small_name']
 
 class PupilForm(forms.ModelForm):
     def __init__(self, school = None, *args, **kwargs):
@@ -48,7 +41,7 @@ class PupilForm(forms.ModelForm):
     photo = forms.FileField(required = False)
     class Meta:
         model = Pupil
-        fields = ('last_name', 'first_name', 'middle_name', 'sex', 'grade', 'group', 'special', 'cart', 'phone_mother', 'phone_father')
+        fields = ('last_name', 'first_name', 'middle_name', 'sex', 'grade', 'group', 'special', 'cart', 'phone_mother', 'phone_father', 'email')
 
 class StaffForm(forms.ModelForm):
     def __init__(self, school = None, *args, **kwargs):
@@ -90,3 +83,6 @@ class AchievementForm(forms.ModelForm):
     class Meta:
         model = Achievement
         fields = ['title', 'description', 'date']
+
+class PermissionForm():
+    pass

@@ -47,6 +47,7 @@
                     {% if ACTIVE_URL == 'marks' %}<big class="red">Оценки</big>{% else %}<a href="/marks/">Оценки</a>{% endif %}
                     {% if ACTIVE_URL == 'grade' %}<big class="purple">Класс</big>{% else %}<a href="/grade/">Класс</a>{% endif %}
                     {% if ACTIVE_URL == 'teachers' %}<big class="blue">Учителя</big>{% else %}<a href="/teachers/">Учителя</a>{% endif %}
+                    {% if ACTIVE_URL == 'sms' %}<big class="blue">СМС-уведомления</big>{% else %}<a href="/sms/">СМС-уведомления</a>{% endif %}
                 </div>
             </div>
             <!-- / Шапка --><!-- Тень -->
@@ -72,12 +73,11 @@
             <div id="copyright">
                 <div class="column">
                     <p>
-                        &copy;&nbsp;2008&nbsp;&mdash;&nbsp;{{ current_year }}&nbsp;Электронная школа
+                        &copy;&nbsp;2009&#150;{{ current_year }}&nbsp;Электронная школа
                     </p>
                 </div>
                 <div class="column">
                     <p>
-                        {#Служба клиентской поддержки:<br>8-800-444-1212#}
                     </p>
                 </div>
             </div>

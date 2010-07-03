@@ -17,9 +17,9 @@ class LessonManager(RestModelManager):
 
 class Lesson(RestModel):
     objects = LessonManager()
-    teacher = models.ForeignKey(Teacher, verbose_name = u'Учитель')
+    teacher = models.ForeignKey(Teacher, verbose_name = u'Учитель', blank = True, null = True)
     date = models.DateField(u'Дата')
-    topic = models.CharField(u'Тема урока', max_length = 200)
+    topic = models.CharField(u'Тема урока', max_length = 200, blank = True, null = True)
     task = models.CharField(u'Домашнее задание', max_length = 200, blank = True, null = True)
     subject = models.ForeignKey(Subject, verbose_name = u'Предмет')
     grade = models.ManyToManyField(Grade, verbose_name = u'Класс')
@@ -59,6 +59,19 @@ class Mark(RestModel):
             return u'Н'
         else:
             return unicode(self.mark)
+    
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            if self.pupil.gate_id:
+                from gate import Gate
+                gate = Gate(self.pupil.school.gate_url, self.pupil.school.gate_id, self.pupil.school.gate_password)
+                message = u'%s. %s. ' % (self.lesson.date.strftime('%d.%m.%Y'), self.lesson.subject.name)
+                if self.absent:
+                    message = message + u'Отсутствовал'
+                else:
+                    message = message + u'Получил %s' % int(self.mark)
+                gate.sendMessage(self.pupil.gate_id, message)
+        super(Mark, self).save(*args, **kwargs)
     
     class Meta:
         ordering = ['-date']

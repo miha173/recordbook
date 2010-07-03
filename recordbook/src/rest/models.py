@@ -26,10 +26,10 @@ class RestModel(models.Model):
             return result
         else:
             return demjson.encode(result)
-    def save(self, force_insert = False, force_update = False):
+    def save(self, *args, **kwargs):
         from datetime import datetime
         self.rest_modified = datetime.now()
-        super(RestModel, self).save(force_insert, force_update)
+        super(RestModel, self).save(*args, **kwargs)
     class Meta:
         abstract = True
 

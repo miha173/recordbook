@@ -1,0 +1,44 @@
+{% extends BASE_TEMPLATE %}
+
+{% block padding %}
+    <a href="/administrator/uni/school/#sch{{ school.id }}">{{ school }}</a>
+    <span>&rarr;</span>
+    <h1>{{ grade }} &mdash; {{ subject }}</h1>
+{% endblock %}
+
+{% block content %}
+{% if forms %}
+<ul>
+	{% for key, item in forms.items %}
+		{{ item.errors }}
+	{% endfor %}
+</ul>
+<form method="post" action=".">
+	<table class="table">
+		<thead>
+			<th>Ученики</th>
+			{% for date in dates %}
+				<th>{{ date|date:"d.m" }}</th>
+			{% endfor %}
+		</thead>
+		<tbody>
+			{% for key, item in forms.items %}
+				<tr class="{% cycle 'gray' '' %}">
+					<td>{{ key }}</td>
+					{% for field in item %}
+						<td>{{ field }}</td>
+					{% endfor %}
+				</tr>
+			{% endfor %}
+		</tbody>
+		<tfoot>
+			<td colspan="15">
+				<input type="submit">
+			</td>
+		</tfoot>
+	</table>
+</form>
+{% else %}
+	<p style="margin: 30px 30px;">В этом классе ещё нет учеников</p>
+{% endif %}
+{% endblock %}

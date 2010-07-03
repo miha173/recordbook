@@ -7,14 +7,13 @@ from datetime import datetime, timedelta, date
 from django.template import RequestContext
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.loader import render_to_string
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models.aggregates import Avg
 
 import src
 from src import settings
-from src.userextended.models import School, Pupil, Teacher, Achievement
-from src.library.models import Arrearage
+from src.userextended.models import School, Pupil, Teacher, Achievement, Permission, Staff
 from src.marks.models import Mark, ResultDate, Result
 from src.attendance.models import UsalTimetable
 
@@ -31,8 +30,7 @@ def REST(request, model, id = 0):
     render = u''
     headers = {}
     
-#    status = 401
-#    headers['WWW-Authenticate'] = 'Basic realm="Secure Area"'
+    # Авторизация
     logined = False
     import base64
     from django.contrib.auth import authenticate, login
@@ -111,5 +109,23 @@ def formatModel(s):
     return s[0].upper() + s[1:].lower()
     
     
-            
+def permissions(request):
+    render = []
+    card = request.REQUEST.get('card', '')
+    query = {'cart': card}
+    type = 0
+    if Pupil.objects.filter(**query).count() == 1:
+        type = 'p'
+        clerk = Pupil.objects.get(**query)
+    if Teacher.objects.filter(**query).count() == 1:
+        type = 't'
+        clerk = Teacher.objects.get(**query)
+    if Staff.objects.filter(**query).count() == 1:
+        type = 's'
+        clerk = Staff.objects.get(**query)
+    if type == 0:
+        raise Http404
+    render = [p.permission for p in Permission.objects.filter(user_id = clerk.id, user_type = type)]
+    render = demjson.encode(render)
+    return HttpResponse(render)
 

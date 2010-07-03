@@ -1,12 +1,16 @@
 # -*- coding: UTF-8 -*-
 
+from datetime import date, timedelta
+
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render_to_response
 from django.forms.util import ErrorList
 
-from models import Lesson, Mark
+from models import Lesson, Mark, Grade
 from src.curatorship.models import Connection
+
+from src import settings
 
 class LessonForm(forms.ModelForm):
     class Meta:
@@ -43,3 +47,41 @@ class ResultForm(forms.ModelForm):
         else:
             return data
 
+class DeliveryForm(forms.Form):
+    def __init__(self, school = None, *args, **kwargs):
+        super(DeliveryForm, self).__init__(*args, **kwargs)
+        if school: self.fields['grades'].queryset = Grade.objects.filter(school = school)
+    grades = forms.ModelMultipleChoiceField(queryset = Grade.objects.all(), label = u'Классы', widget = forms.CheckboxSelectMultiple())
+    start = forms.DateField(label = u'Дата начала периода')
+    end = forms.DateField(label = u'Дата окончания периода')
+
+class StatForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super(StatForm, self).__init__(*args, **kwargs)
+        self.fields['start'].widget.format = '%d.%m.%Y'
+        self.fields['end'].widget.format = '%d.%m.%Y'
+    start = forms.DateField(('%d.%m.%Y',), label = u'Дата начала периода', initial = date.today() - timedelta(weeks = 2))
+    end = forms.DateField(('%d.%m.%Y',), label = u'Дата окончания периода', initial = date.today())
+
+def MarkValidator(mark):
+    if int(mark) in range(1, settings.MAX_MARK + 1):
+        return int(mark)
+    else:
+        raise forms.ValidationError(u'Неверная оценка')
+
+class MarksAdminForm(forms.Form):
+    def __init__(self, dates, pupil, init, *args, **kwargs):
+        super(MarksAdminForm, self).__init__(*args, **kwargs)
+        self.pupil = pupil
+        for date in dates:
+            field = 'mark-%d%d%d' % (date.day, date.month, date.year)
+            t = None
+            if field in init: t = str(init[field])
+            self.fields[field] = forms.CharField(initial = t, validators = [MarkValidator], required = False, widget = forms.TextInput(attrs = {'size': 1, 'class': 'mark'}))
+#            if field in init:
+#                a = dir(self[field].field)
+#                ss
+#                self[field].field.initial = 'sasaas'
+#                self[field].field.initial = init[field]
+    
+    

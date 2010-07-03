@@ -1,0 +1,11 @@
+{% extends BASE_TEMPLATE %}
+
+{% load formater %}
+
+{% block content %}
+	<div style="padding: 0 30px;">
+		<h2>Инструкции для смс-уведомлений</h2>
+		<h3>Ваш баланс {{ sms }} смс и {{ account|number_format }} р. в остатке</h3>
+		{{ text }}
+	</div>
+{% endblock %}

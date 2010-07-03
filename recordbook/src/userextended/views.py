@@ -8,12 +8,11 @@ from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.conf import settings
 
-from models import Teacher, Pupil, Grade, Subject, School, Staff, Cam, Option, Achievement
+from models import Teacher, Pupil, Grade, Subject, School, Staff, Option, Achievement
 from forms import SubjectForm, GradeForm, PupilForm, TeacherForm, ResultDateForm, StaffForm, \
-                  SchoolForm, CamForm, OptionForm, AchievementForm
-from src.library.forms import BookForm, ArrearageForm
+                  SchoolForm, OptionForm, AchievementForm
 from src.curatorship.models import Connection
-from src.library.models import Book, Arrearage
+from src.curatorship.forms import ConnectionGlobalForm
 from src.marks.models import ResultDate
 from src.utils import PlaningError
 
@@ -25,6 +24,7 @@ def index(request):
 def objectList4Administrator(request, object, school_id = 0):
     ext = {}
     if object == 'achievement': ext['pupil'] = get_object_or_404(Pupil, id = school_id)
+    elif object == 'connection': ext['grade__school'] = get_object_or_404(School, id = school_id)
     else:
         if school_id: ext['school'] = get_object_or_404(School, id = school_id)
     return objectList(request, object, ext)
@@ -35,6 +35,7 @@ def objectList4Administrator(request, object, school_id = 0):
 def objectEdit4Administrator(request, object, mode, id = 0, school_id = 0):
     ext = {}
     if object == 'achievement': ext['pupil'] = get_object_or_404(Pupil, id = school_id)
+    elif object == 'connection': ext['grade__school'] = get_object_or_404(School, id = school_id)
     else:
         if school_id: ext['school'] = get_object_or_404(School, id = school_id)
     return objectEdit(request, object, mode, id, ext)
@@ -57,12 +58,12 @@ def objectList(request, object, ext = {}):
         Object = ResultDate
     if object == 'school':
         Object = School
-    if object == 'cam':
-        Object = Cam
     if object == 'option':
         Object = Option
     if object == 'achievement':
         Object = Achievement
+    if object == 'connection':
+        Object = Connection
     if request.GET.get('search_str'): 
         objects = Object.objects.search(request.GET.get('search_str'))
         render['search_str'] = request.GET.get('search_str')
@@ -105,18 +106,19 @@ def objectEdit(request, object, mode, id = 0, ext = {}):
     if object == 'school':
         Object = School
         Form = SchoolForm
-    if object == 'cam':
-        Object = Cam
-        Form = CamForm
     if object == 'option':
         Object = Option
         Form = OptionForm
     if object == 'achievement':
         Object = Achievement
         Form = AchievementForm
+    if object == 'connection':
+        Object = Connection
+        Form = ConnectionGlobalForm
     
     url = '/administrator/uni/%s/' % templ
     if 'school' in ext.keys(): url += str(ext['school'].id) + '/'
+    if 'grade__school' in ext.keys(): url += str(ext['grade__school'].id) + '/'
     elif 'pupil' in ext.keys(): url += str(ext['pupil'].id) + '/'
     
     render = {}

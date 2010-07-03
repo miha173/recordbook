@@ -90,6 +90,14 @@
 					{% if form.phone_mother.help_text %}<div class="help_text">{{ form.phone_mother.help_text }}</div>{% endif %}
 				</td>
 			</tr>
+			<tr>
+				<td class="label"><label for="id_cart">Электропочта: </label></td>
+				<td>{{ form.email }}
+				<td>
+					{% if form.email.errors %}<div class="error_text">{{ form.email.errors }}</div>{% endif %}
+					{% if form.email.help_text %}<div class="help_text">{{ form.email.help_text }}</div>{% endif %}
+				</td>
+			</tr>
 		</table>
 	</fieldset>
 </td></tr><tr><td>

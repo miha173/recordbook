@@ -15,7 +15,7 @@ class SchoolRestForm(forms.ModelForm):
 class GradeRestForm(forms.ModelForm):
     class Meta:
         model = Grade
-        fields = ['long_name', 'small_name', 'school']
+        fields = ['number', 'long_name', 'small_name', 'school']
 
 class TeacherRestForm(forms.ModelForm):
     class Meta:
@@ -45,7 +45,7 @@ class LessonRestForm(forms.ModelForm):
 class MarkRestForm(forms.ModelForm):
     class Meta:
         model = Mark
-        fields = ['pupil', 'lesson', 'mark', 'absent', 'date']
+        fields = ['pupil', 'lesson', 'mark', 'absent',]
 
 class ResultDateRestForm(forms.ModelForm):
     class Meta:

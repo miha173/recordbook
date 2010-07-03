@@ -24,7 +24,7 @@
                 </td>
                 <td>
                     <div class="mark-{{ pupil.get_marks_avg_type }}">
-                        {{ pupil.get_marks_avg }}
+                        {{ pupil.get_marks_avg|floatformat:"-2" }}
                     </div>
                 </td>
             </tr>

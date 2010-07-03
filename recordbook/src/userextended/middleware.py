@@ -11,6 +11,7 @@ class LazyUser(object):
         if not hasattr(request, '_cached_user'):
             user = get_user(request);
             userprofile = user
+            user.prefix = ''
             if user.is_authenticated():
                 try:
                     if Pupil.objects.filter(user_ptr=user).count()>0: 
@@ -24,8 +25,10 @@ class LazyUser(object):
                         userprofile.prefix = 'a'
                 except:
                     userprofile = user
+                    userprofile.prefix = ''
             else:
                 userprofile = user
+                userprofile.prefix = ''
             request._cached_user = userprofile
         return request._cached_user
 

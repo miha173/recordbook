@@ -21,4 +21,12 @@ urlpatterns = patterns("src.marks.views",
                        (r'^result/give/$', 'gradeResult'),
                        
                        (r'^subject/(?P<subject_id>\d+)/', 'marksView'),
+
+                       (r'^delivery/(?P<school>\d+)/$', 'delivery'),
+                       
+                       # Выставление оценок администратором
+                       
+                       (r'^set/(?P<school>\d+)/$', 'marksStep1'),
+                       (r'^set/(?P<school>\d+)/(?P<grade>\d+)/$', 'marksStep2'),
+                       (r'^set/(?P<school>\d+)/(?P<grade>\d+)/(?P<subject>\d+)/$', 'marksStep3'),
                        )

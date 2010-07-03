@@ -3,8 +3,14 @@ from django.db import models
 from src.userextended.models import Teacher, Subject, Grade
 from src.rest.models import RestModel
 
+from smart_selects.db_fields import ChainedForeignKey, GroupedForeignKey, SimpleChainedForeignKey
+
 class Connection(RestModel):
-    teacher = models.ForeignKey(Teacher, verbose_name = u'Учитель')
+#    teacher = GroupedForeignKey(Teacher, 'grades', verbose_name = u'Учитель')
+#    teacher = models.ForeignKey(Teacher, verbose_name = u'Учитель')
+    teacher = SimpleChainedForeignKey(Teacher, ('subject', 'grade'), ('subjects', 'grades'), verbose_name = u'Учитель')
+#    teacher = ChainedForeignKey(Teacher, 'subject', 'subjects', verbose_name = u'Учитель')
+#    subject = SimpleChainedForeignKey(Subject, 'teacher', 'teacher', verbose_name = u'Предмет')
     subject = models.ForeignKey(Subject, verbose_name = u'Предмет')
     grade = models.ForeignKey(Grade, verbose_name = u'Класс')
     connection = models.CharField(verbose_name = u'Связь', max_length = 1, choices = (('0', 'Весь класс'),
@@ -13,4 +19,9 @@ class Connection(RestModel):
                                                                                      ('3', 'Юноши'),
                                                                                      ('4', 'Девушки'),
                                                                                      ('5', 'Спец. группа'),
-                                                                                     ))
+                                                                                     ), 
+                                default = '0')
+    class Meta:
+        ordering = ['teacher__last_name']
+        unique_together = ('teacher', 'subject', 'grade')
+        verbose_name = u'Связь'

@@ -34,7 +34,7 @@
 	  <tr>
 	    <td></td>
 	    <td><div class="date">Средний балл</div></td>
-	    <td><div class="mark-{{ subject.avg_type }}">{{ subject.avg|default:0 }}</div></td>
+	    <td><div class="mark-{{ subject.avg_type }}">{{ subject.avg|default:0|floatformat:"-2" }}</div></td>
 	  </tr>
 	  </tfoot>
 	</table>

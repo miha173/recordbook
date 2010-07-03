@@ -7,15 +7,20 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
+from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.db.models import Q
 from django.db.models.aggregates import Avg
 
-from src.userextended.models import Pupil, Teacher, Subject, Grade
+from src.userextended.models import Pupil, Teacher, Subject, Grade, School
 from src.curatorship.models import Connection
 from src.attendance.models import UsalTimetable
 from models import Lesson, Mark, ResultDate, Result
-from forms import LessonForm, MarkForm, ResultForm
+from forms import LessonForm, MarkForm, ResultForm, DeliveryForm, StatForm, MarksAdminForm
+
+class tempMark:
+    def __unicode__(self): return self.mark
+    
 
 @login_required
 def index(request):
@@ -23,8 +28,17 @@ def index(request):
     temp = request.user_type
     if request.user.prefix == 'p':
         dates = []
-        temp = date.today() - timedelta(days = 7)
-        while temp != date.today() + timedelta(days = 1) :
+        start = date.today() - timedelta(weeks = 2)
+        end = date.today() + timedelta(days = 1)
+        if request.method == 'GET': 
+            render['form'] = form = StatForm()
+        else:
+            render['form'] = form = StatForm(request.POST)
+            if form.is_valid():
+                start = form.cleaned_data['start']
+                end = form.cleaned_data['end']
+        temp = start
+        while temp != end:
             dates.append(temp)
             temp += timedelta(days = 1)
         marks = []
@@ -41,6 +55,20 @@ def index(request):
                     if not mark.absent:
                         sum += mark.mark
                         sum_n += 1
+                elif Mark.objects.filter(pupil = request.user, lesson__date = day, lesson__subject = subject).count()==2:
+                    temp = []
+                    for mark in Mark.objects.filter(pupil = request.user, lesson__date = day, lesson__subject = subject):
+                        temp.append(mark)
+                        if not mark.absent:
+                            sum += mark.mark
+                            sum_n += 1
+                    if temp[0].mark and temp[1].mark:
+                        mark = tempMark()
+                        mark.mark = "%d/%d" % (temp[0].mark, temp[1].mark)
+                        mark.get_type = temp[0].get_type()
+                        m.append(mark)
+                    else:
+                        m.append(temp[0])
                 else:
                     m.append('')
             subj.append(m)
@@ -48,6 +76,8 @@ def index(request):
                 subj.append(float(sum)/sum_n)
             else:
                 subj.append(0)
+#            subj.append(Teacher.objects.filter(grades = request.user.grade, subjects = subject)[0])
+#            subj.append(Teacher.objects.get(grades = request.user.grade, subjects = subject))
             subj.append(Connection.objects.get(Q(connection = 0) | Q(connection = request.user.group) | Q(connection = int(request.user.sex)+2), subject = subject, grade = request.user.grade).teacher)
             if subj[2]<3:
                 type = "bad"
@@ -69,7 +99,8 @@ def viewMarks(request, id):
     pupil = request.user
     subject = get_object_or_404(Subject, id = id, school = request.user.school)
     subject.teacher = Connection.objects.get(Q(connection = 0) | Q(connection = pupil.group) | Q(connection = int(pupil.sex)+2), subject = subject, grade = pupil.grade).teacher
-    subject.avg = Mark.objects.filter(pupil = pupil, absent = False, date__gte = datetime.now() - timedelta(weeks = 4), lesson__subject = subject).aggregate(Avg('mark'))['mark__avg']
+#    subject.teacher = Teacher.objects.filter(grades = request.user.grade, subjects = subject)[0]
+    subject.avg = Mark.objects.filter(pupil = pupil, absent = False, lesson__date__gte = datetime.now() - timedelta(weeks = 4), lesson__subject = subject).aggregate(Avg('mark'))['mark__avg']
     if subject.avg<3:
         subject.avg_type = "bad"
     elif subject.avg>=4:
@@ -369,3 +400,101 @@ def marksView(request, subject_id):
     render['paginator'] = paginator.num_pages - 1
     request.user.current_subject = int(subject_id)
     return render_to_response('marks/pupil/marks.html', render, context_instance = RequestContext(request))
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def delivery(request, school):
+    render = {}
+    school = get_object_or_404(School, id = school)
+    if request.method == 'GET':
+        render['form'] = DeliveryForm(school = school)
+    else:
+        form = DeliveryForm(school = school, data = request.POST)
+        if form.is_valid():
+#            form.save()
+            start = render['start'] = form.cleaned_data['start']
+            end = render['end'] = form.cleaned_data['end']
+            pupils = []
+            for grade in form.cleaned_data['grades']:
+                for pupil in Pupil.objects.filter(grade = grade):
+                    pupil.subjects = []
+                    for subject in pupil.get_subjects():
+                        subject.marks = Mark.objects.filter(lesson__date__gte = start, lesson__date__lte = end, pupil = pupil).order_by('lesson__date')
+                        pupil.subjects.append(subject)
+                    pupils.append(pupil)
+            render['pupils'] = pupils
+            return render_to_response('marks/teacher/deliveryPrint.html', render, context_instance = RequestContext(request))
+        else: render['form'] = form
+    return render_to_response('marks/teacher/delivery.html', render, context_instance = RequestContext(request))
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def marksStep1(request, school): 
+    render = {}
+    render['school'] = school = get_object_or_404(School, id = school)
+    render['grades'] = Grade.objects.filter(school = school)
+    return render_to_response('marks/administrator/marksStep1.html', render, context_instance = RequestContext(request))
+
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def marksStep2(request, school, grade): 
+    render = {}
+    render['school'] = school = get_object_or_404(School, id = school)
+    render['grade'] = grade = get_object_or_404(Grade, id = grade)
+    return render_to_response('marks/administrator/marksStep2.html', render, context_instance = RequestContext(request))
+
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def marksStep3(request, school, grade, subject): 
+    render = {}
+    render['school'] = school = get_object_or_404(School, id = school)
+    render['grade'] = grade = get_object_or_404(Grade, id = grade)
+    render['subject'] = subject = get_object_or_404(Subject, id = subject)
+    render['dates'] = dates = []
+    d = date.today() - timedelta(days = 14)
+    while d < date.today() + timedelta(days = 1):
+        dates.append(d)
+        d += timedelta(days = 1)
+    render['forms'] = forms = {}
+    if request.method == 'GET': data = None
+    else: data = request.POST
+    for pupil in Pupil.objects.filter(grade = grade).order_by('last_name'):
+        init = {}
+        for mark in Mark.objects.filter(lesson__date__range = (date.today() - timedelta(days = 14), date.today() + timedelta(days = 1)), pupil = pupil):
+            init['mark-%d%d%d' % (mark.lesson.date.day, mark.lesson.date.month, mark.lesson.date.year)] = mark.mark
+        forms[u'%s %s.' % (pupil.last_name, pupil.first_name[0])] = MarksAdminForm(pupil = pupil, dates = dates, init = init, prefix = 'p%d' % pupil.id, data = data)
+    if request.method == 'POST':
+        if all([forms[key].is_valid() for key in forms]):
+            for form in forms.itervalues():
+                for d in dates:
+                    field = 'mark-%d%d%d' % (d.day, d.month, d.year)
+                    if field in form.cleaned_data:
+                        if form.cleaned_data[field] != '': 
+                            lesson_kwargs = {'grade': grade, 'subject': subject, 'date': d}
+                            if Lesson.objects.filter(**lesson_kwargs).count() == 1:
+                                lesson = Lesson.objects.get(**lesson_kwargs)
+                            else:
+                                del lesson_kwargs['grade']
+                                lesson = Lesson(**lesson_kwargs)
+                                lesson.save()
+                                lesson.grade.add(grade)
+                                lesson.save()
+                            if Mark.objects.filter(lesson = lesson, pupil = form.pupil):
+                                mark = Mark.objects.get(lesson = lesson, pupil = form.pupil)
+                            else:
+                                mark = Mark(lesson = lesson, pupil = form.pupil)
+                            mark.mark = form.cleaned_data[field]
+                            mark.save()
+            return HttpResponseRedirect(reverse('src.marks.views.marksStep2', kwargs = {'grade': grade.id, 'school': school.id}))
+    return render_to_response('marks/administrator/marksStep3.html', render, context_instance = RequestContext(request))
+
+
+
+
+
+
+
+
+

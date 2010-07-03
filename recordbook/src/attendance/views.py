@@ -65,7 +65,10 @@ def timetableSet(request, id, school = 0):
             for lesson in settings.LESSON_NUMBERS:
                 for i in xrange(1, 3):
                     subject = request.POST.get('l_s_%s_%s_%d' % (day[0], lesson[0], i), '')
-                    if subject == '': continue
+                    if subject == '': 
+                        if UsalTimetable.objects.filter(grade = grade, number = lesson[0], group = i, school = school, workday = day[0]).count() != 0:
+                            UsalTimetable.objects.filter(grade = grade, number = lesson[0], group = i, school = school, workday = day[0]).delete()
+                        continue
                     subject = get_object_or_404(Subject, id = subject, school = school)
                     if UsalTimetable.objects.filter(grade = grade, number = lesson[0], group = i, school = school, workday = day[0]).count() == 0:
                         tt = UsalTimetable(grade = grade, number = lesson[0], group = i, school = school, workday = day[0])

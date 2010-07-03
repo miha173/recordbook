@@ -6,11 +6,7 @@ from django.contrib import admin
 from src.settings import REST_MODELS, MARKS_SECRET_KEY
 
 urlpatterns = patterns('src.api.views',
-#                       (r"^$", 'REST'),
-                       (r"^terminal/main/$", "terminalMain"),
-                       (r"^terminal/marks/$", "terminalMarks"),
-                       (r"^terminal/book/$", "terminalBook"),
-                       (r'^syncdb/$', 'syncdb')
+                       (r'^permissions/$', 'permissions'),
                        
 )
 
