@@ -27,7 +27,7 @@ class School(RestModel):
     gate_use = models.BooleanField(verbose_name = u'Использовать шлюз', default = False)
     gate_id = models.CharField(verbose_name = u'ID для смс-шлюза', max_length = 255, blank = True, null = True)
     gate_password  = models.CharField(verbose_name = u'Пароль для смс-шлюза', max_length = 255, blank = True, null = True)
-    gate_url = models.URLField(verbose_name = u'URL смс-шлюза', blank = True, null = True)
+    gate_url = models.URLField(verbose_name = u'URL смс-шлюза', blank = True, null = True, default = 'http://gate.school-record-book.ru')
 
     serialize_fields = ['id', 'name', 'saturday']
     serialize_name = 'school'
