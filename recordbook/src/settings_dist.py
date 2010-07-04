@@ -143,7 +143,7 @@ INSTALLED_APPS = (
     'django.contrib.admindocs',
     'django.contrib.messages',
 
-    'django_extensions',
+#    'django_extensions',
     
     'pytils',
     'smart_selects',
