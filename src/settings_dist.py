@@ -148,6 +148,7 @@ INSTALLED_APPS = (
     'pytils',
     'smart_selects',
     'src',
+    'src.attendance',
     'src.pages',
     'src.userextended',
     'src.marks',
