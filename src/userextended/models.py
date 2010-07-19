@@ -39,7 +39,7 @@ class School(RestModel):
         subjects = Subject.objects.filter(school = self).count() > 0
         pupils = Pupil.objects.filter(school = self).count() > 0
         teachers = Teacher.objects.filter(school = self).count() > 0
-        marks = Mark.objects.filter(pupil__school = self).count() > 0
+        marks = Pupil.objects.filter(school = self).count() > 0
         show = {}
         show['staff'] = show['subjects'] = show['grades'] = show['options'] = True
         show['pupils'] = grades
