@@ -8,9 +8,9 @@ from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.conf import settings
 
-from models import Teacher, Pupil, Grade, Subject, School, Staff, Option, Achievement
+from models import Teacher, Pupil, Grade, Subject, School, Staff, Cam, Option, Achievement
 from forms import SubjectForm, GradeForm, PupilForm, TeacherForm, ResultDateForm, StaffForm, \
-                  SchoolForm, OptionForm, AchievementForm
+                  SchoolForm, CamForm, OptionForm, AchievementForm
 from src.curatorship.models import Connection
 from src.curatorship.forms import ConnectionGlobalForm
 from src.marks.models import ResultDate
@@ -58,6 +58,8 @@ def objectList(request, object, ext = {}):
         Object = ResultDate
     if object == 'school':
         Object = School
+    if object == 'cam':
+        Object = Cam
     if object == 'option':
         Object = Option
     if object == 'achievement':
@@ -106,6 +108,9 @@ def objectEdit(request, object, mode, id = 0, ext = {}):
     if object == 'school':
         Object = School
         Form = SchoolForm
+    if object == 'cam':
+        Object = Cam
+        Form = CamForm
     if object == 'option':
         Object = Option
         Form = OptionForm

@@ -5,7 +5,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render_to_response
 from django.forms.util import ErrorList
 
-from models import Subject, Teacher, Pupil, Grade, School, Staff, Option, Achievement, Permission
+from models import Subject, Teacher, Pupil, Grade, School, Staff, Cam, Option, Achievement, Permission
 from src.marks.models import Lesson, ResultDate
 
 class SubjectForm(forms.ModelForm):
@@ -26,6 +26,13 @@ class OptionForm(forms.ModelForm):
     class Meta:
         model = Option
         fields = ['key', 'value']
+
+class CamForm(forms.ModelForm):
+    def __init__(self, school = None, *args, **kwargs):
+        super(CamForm, self).__init__(*args, **kwargs)
+    class Meta:
+        model = Cam
+        fields = ['name', 'ip', 'device1', 'device1_name', 'device2', 'device2_name']
 
 class GradeForm(forms.ModelForm):
     def __init__(self, school = None, *args, **kwargs):

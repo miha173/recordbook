@@ -3,7 +3,7 @@
 from django.conf.urls.defaults import *
 from django.contrib import admin
 
-from src.settings import REST_MODELS, MARKS_SECRET_KEY
+from src.settings import REST_MODELS
 
 urlpatterns = patterns('src.api.views',
                        (r'^permissions/$', 'permissions'),

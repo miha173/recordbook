@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import decimal
+
 from django.db import models
 
 from src.userextended.models import Pupil, Teacher, Staff

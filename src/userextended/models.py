@@ -13,9 +13,6 @@ from src.rest.models import RestModel, RestModelManager
 from src.utils import PlaningError
 
 
-
-
-
 class School(RestModel):
     u'Модель для школ'
     name = models.CharField(u"Имя учебного заведения", max_length = 100)
@@ -41,7 +38,7 @@ class School(RestModel):
         teachers = Teacher.objects.filter(school = self).count() > 0
         marks = Pupil.objects.filter(school = self).count() > 0
         show = {}
-        show['staff'] = show['subjects'] = show['grades'] = show['options'] = True
+        show['staff'] = show['subjects'] = show['grades'] = show['cams'] = show['options'] = True
         show['pupils'] = grades
         show['teachers'] = subjects and grades
         show['resultdates'] = grades
@@ -66,7 +63,17 @@ class School(RestModel):
         Teacher.objects.filter(school = self).delete()
         Pupil.objects.filter(school = self).delete()
         ResultDate.objects.filter(school = self).delete()
+        Cam.objects.filter(school = self).delete()
         super(School, self).delete()
+
+class Cam(models.Model):
+    name = models.CharField(max_length = 255, verbose_name = u'Название камеры')
+    ip = models.IPAddressField(verbose_name = u'IP камеры')
+    device1 = models.CharField(max_length = 255, verbose_name = u'Устройство 1', null = True, blank = True)
+    device1_name = models.CharField(max_length = 255, verbose_name = u'Устройство 1 - имя', null = True, blank = True)
+    device2 = models.CharField(max_length = 255, verbose_name = u'Устройство 2', null = True, blank = True)
+    device2_name = models.CharField(max_length = 255, verbose_name = u'Устройство 2 - имя', null = True, blank = True)
+    school = models.ForeignKey(School, verbose_name = u'Школа')
 
 class Option(models.Model):
     key = models.CharField(max_length = 255, verbose_name = u'Настройка')
@@ -207,6 +214,7 @@ class Clerk(User, RestModel):
         return username + last_name + '.' + first_name
     def save(self, force_insert = False, force_update = False, init = False, safe = False):
         from src.settings import GAPPS_DOMAIN, GAPPS_LOGIN, GAPPS_PASSWORD, GAPPS_USE
+        if hasattr(self, 'account'): self.account = str(self.account)
         if self.school.gate_use:
             from gate import Gate
             gate = Gate(self.school.gate_url, self.school.gate_id, self.school.gate_password)
@@ -225,7 +233,6 @@ class Clerk(User, RestModel):
                 old = Teacher.objects.get(id = self.id)
             if self.prefix == 's':
                 old = Staff.objects.get(id = self.id)
-            if old.cart == self.cart: make_card = False
         if not self.pk or init:
             if GAPPS_USE:
                 import gdata.apps.service
@@ -240,6 +247,7 @@ class Clerk(User, RestModel):
                 self.username = username
             self.set_password("123456789")
             super(Clerk, self).save(force_insert, force_update)
+        super(Clerk, self).save(force_insert, force_update)
     def search(self, search_str):
         values = []
         a = self.objects.filter(last_name__contains = search_str)
@@ -289,7 +297,7 @@ class Pupil(Clerk):
     insurance_policy = models.TextField(verbose_name = u'Страховой полис', null = True, blank = True)
     
     prefix = "p"
-    serialize_fields = ['id', 'account', 'last_name', 'first_name', 'middle_name', 'grade_id', 'group', 'school_id']
+    serialize_fields = ['id', 'cart', 'account', 'last_name', 'first_name', 'middle_name', 'grade_id', 'group', 'school_id']
     serialize_name = 'pupil'
     
     def curator(self):

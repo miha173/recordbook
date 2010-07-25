@@ -109,7 +109,11 @@
 				{% endif %}
 			</td>
 			<td>
-				
+				{% if school.show.cams %}
+					<a href="/administrator/uni/cam/{{ school.id }}/">Камеры</a>
+				{% else %}
+					Камеры
+				{% endif %}
 			</td>
 		</tr>
 		<tr>

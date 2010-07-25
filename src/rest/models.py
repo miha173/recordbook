@@ -12,7 +12,7 @@ class RestModel(models.Model):
     objects = RestModelManager()
     rest_modified = models.DateTimeField()
     def get_absolute_uri(self):
-        return '/api/%s/%d/' % (self.serialize_name, self.id)
+        return '/api/%s/%d/' % (self.serialize_name, int(self.id))
     def serialize(self, fields, safe = False):
         result = {}
         for field in fields:
