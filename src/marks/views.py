@@ -462,7 +462,7 @@ def marksStep3(request, school, grade, subject):
     else: data = request.POST
     for pupil in Pupil.objects.filter(grade = grade).order_by('last_name'):
         init = {}
-        for mark in Mark.objects.filter(lesson__date__range = (date.today() - timedelta(days = 14), date.today() + timedelta(days = 1)), pupil = pupil, subject = subject):
+        for mark in Mark.objects.filter(lesson__date__range = (date.today() - timedelta(days = 14), date.today() + timedelta(days = 1)), pupil = pupil, lesson__subject = subject):
             init['mark-%d%d%d' % (mark.lesson.date.day, mark.lesson.date.month, mark.lesson.date.year)] = mark.mark
         forms[u'%s %s.' % (pupil.last_name, pupil.first_name[0])] = MarksAdminForm(pupil = pupil, dates = dates, init = init, prefix = 'p%d' % pupil.id, data = data)
     if request.method == 'POST':
