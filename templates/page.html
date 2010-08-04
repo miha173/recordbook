@@ -58,7 +58,7 @@
 					<ul>
 						{% if user.subjects and not ROOT_CAN_ALL or user.is_administrator %}
 							<li{% if not DIR %}{% ifequal ACTIVE_URL "marks" %} class="active"{% endifequal %}{% endif %}><a href="/marks/">Выставление отметок</a>
-								{% ifequal ACTIVE_URL 'marks' %}
+								{% ifequal ACTIVE_URL "marks" %}
 									<ul>
 									{% if subjects %}
 										<li{% ifequal DIR "lesson" %} class="active"{% endifequal %}><a href="/marks/lesson/">Уроки</a></li>

@@ -23,8 +23,10 @@ def index(request):
 @user_passes_test(lambda u: u.prefix == 'a')
 def objectList4Administrator(request, object, school_id = 0):
     ext = {}
-    if object == 'achievement': ext['pupil'] = get_object_or_404(Pupil, id = school_id)
-    elif object == 'connection': ext['grade__school'] = get_object_or_404(School, id = school_id)
+    if object == 'achievement': 
+        ext['pupil'] = get_object_or_404(Pupil, id = school_id)
+    elif object == 'connection': 
+        ext['grade__school'] = get_object_or_404(School, id = school_id)
     else:
         if school_id: ext['school'] = get_object_or_404(School, id = school_id)
     return objectList(request, object, ext)
@@ -34,8 +36,10 @@ def objectList4Administrator(request, object, school_id = 0):
 #@user_passes_test(lambda u: u.is_administrator())
 def objectEdit4Administrator(request, object, mode, id = 0, school_id = 0):
     ext = {}
-    if object == 'achievement': ext['pupil'] = get_object_or_404(Pupil, id = school_id)
-    elif object == 'connection': ext['grade__school'] = get_object_or_404(School, id = school_id)
+    if object == 'achievement': 
+        ext['pupil'] = get_object_or_404(Pupil, id = school_id)
+    elif object == 'connection': 
+        ext['grade__school'] = get_object_or_404(School, id = school_id)
     else:
         if school_id: ext['school'] = get_object_or_404(School, id = school_id)
     return objectEdit(request, object, mode, id, ext)
@@ -176,6 +180,8 @@ def objectEdit(request, object, mode, id = 0, ext = {}):
                         obj.school = ext['school']
                     elif 'pupil' in ext.keys():
                         obj.pupil = ext['pupil']
+                    elif 'grade__school':
+                        pass
                     else:
                         obj.school = request.user.school
                 obj.save()
