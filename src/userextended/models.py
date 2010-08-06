@@ -94,7 +94,7 @@ class Grade(RestModel):
     
     def __unicode__(self):
         if self.number:
-            return "%d%s" % (self.number, self.long_name)
+            return "%d %s" % (self.number, self.long_name)
         else:
             return self.long_name
     def get_subjects(self):
@@ -218,13 +218,14 @@ class Clerk(User, RestModel):
         if self.school.gate_use:
             from gate import Gate
             gate = Gate(self.school.gate_url, self.school.gate_id, self.school.gate_password)
-            if not self.gate_id:
-                self.gate_id = gate.addUser(self.phone_mother)
-                self.gate_id = gate.addUser(self.phone_father)
-            else:
-                if self.prefix == 'p':
+            if self.prefix == 'p':
+                if not self.gate_id:
+                    self.gate_id = gate.addUser(self.phone_mother)
+                    self.gate_id = gate.addUser(self.phone_father)
+                else:
                     if old.phone_mother != self.phone_mother:
                         gate.changePhone(self.gate_id, self.phone_mother)
+                    if old.phone_father != self.phone_father:
                         gate.changePhone(self.gate_id, self.phone_father)
         if self.pk:
             if self.prefix == 'p':

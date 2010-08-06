@@ -66,7 +66,6 @@ class TeacherForm(forms.ModelForm):
     class Meta:
         model = Teacher
         fields = ('last_name', 'first_name', 'middle_name', 'grade', 'grades', 'subjects', 'cart')
-    help_text4MultipleChoice = u'Удерживайте «Control» (или «Command» на Mac) для выбора нескольких.'
     grades = forms.ModelMultipleChoiceField(queryset = Grade.objects.all(), required = False, widget = forms.CheckboxSelectMultiple())
     subjects = forms.ModelMultipleChoiceField(queryset = Subject.objects.all(), required = False, widget = forms.CheckboxSelectMultiple())
 
