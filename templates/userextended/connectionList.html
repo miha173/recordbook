@@ -18,6 +18,7 @@
 		<th>Учитель</th>
 		<th>Предмет</th>
 		<th>Класс</th>
+		<th>Ученики</th>
 		<th>Действия</th>
 	</thead>
 	{% for object in objects.object_list %}
@@ -25,6 +26,7 @@
 			<td>{{ object.teacher }}</td>
 			<td>{{ object.subject }}</td>
 			<td>{{ object.grade }}</td>
+			<td>{{ object.get_connection_display }}</td>
 			<td>
 				<a href="delete/{{ object.id }}" class="delete">Удалить</a>
 			</td>

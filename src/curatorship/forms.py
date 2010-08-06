@@ -26,7 +26,7 @@ class ConnectionStep3Wizard(forms.ModelForm):
 class ConnectionGlobalForm(forms.ModelForm):
     class Meta:
         model = Connection
-        fields = ('teacher', 'subject', 'grade')
+        fields = ('teacher', 'subject', 'grade', 'connection')
     def __init__(self, grade__school, *args, **kwargs):
         return super(ConnectionGlobalForm, self).__init__(*args, **kwargs)
         
