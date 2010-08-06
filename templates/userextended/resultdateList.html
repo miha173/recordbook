@@ -23,7 +23,7 @@
 		<tr class="{% cycle 'gray' '' %}">
 			<td>{{ object.get_period_display }}</td>
 			<td>{{ object.enddate|date:"d.n.Y" }}</td>
-			<td>{% for grade in object.grades.all %}{{ grade.small_name }}; {% endfor %}</td>
+			<td>{% for grade in object.grades.all %}{{ grade }}; {% endfor %}</td>
 			<td>{% include "helpers/buttons/edit.html" %}</td>
 	{% endfor %}
 </table>
