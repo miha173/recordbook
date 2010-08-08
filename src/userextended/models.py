@@ -169,7 +169,6 @@ class Clerk(User, RestModel):
     school = models.ForeignKey(School, verbose_name = "Школа")
     cart = models.CharField(u'Карта', max_length = 10, null = True, blank = True)
     cart_ext = models.CharField(u'Карта (рат.)', max_length = 10, null = True, blank = True)
-    gate_id = models.IntegerField(null = True, blank = True)
     phone = models.CharField(max_length = 20, verbose_name = u'Номер телефона', null = True, blank = True)
     def __unicode__(self):
         result = self.last_name + ' ' + self.first_name + ' ' + self.middle_name
@@ -215,18 +214,6 @@ class Clerk(User, RestModel):
     def save(self, force_insert = False, force_update = False, init = False, safe = False):
         from src.settings import GAPPS_DOMAIN, GAPPS_LOGIN, GAPPS_PASSWORD, GAPPS_USE
         if hasattr(self, 'account'): self.account = str(self.account)
-        if self.school.gate_use:
-            from gate import Gate
-            gate = Gate(self.school.gate_url, self.school.gate_id, self.school.gate_password)
-            if self.prefix == 'p':
-                if not self.gate_id:
-                    self.gate_id = gate.addUser(self.phone_mother)
-                    self.gate_id = gate.addUser(self.phone_father)
-                else:
-                    if old.phone_mother != self.phone_mother:
-                        gate.changePhone(self.gate_id, self.phone_mother)
-                    if old.phone_father != self.phone_father:
-                        gate.changePhone(self.gate_id, self.phone_father)
         if self.pk:
             if self.prefix == 'p':
                 old = Pupil.objects.get(id = self.id)
@@ -234,6 +221,20 @@ class Clerk(User, RestModel):
                 old = Teacher.objects.get(id = self.id)
             if self.prefix == 's':
                 old = Staff.objects.get(id = self.id)
+        if self.school.gate_use:
+            from gate import Gate
+            gate = Gate(self.school.gate_url, self.school.gate_id, self.school.gate_password)
+            if self.prefix == 'p':
+                if not self.gate_id:
+                    if len(self.phone_mother) > 5:
+                        self.gate_id = gate.addUser(self.phone_mother)
+                    if len(self.phone_father) > 5:
+                        self.gate_id = gate.addUser(self.phone_father)
+                else:
+                    if old.phone_mother != self.phone_mother:
+                        gate.changePhone(self.gate_id, self.phone_mother)
+                    if old.phone_father != self.phone_father:
+                        gate.changePhone(self.gate_id, self.phone_father)
         if not self.pk or init:
             if GAPPS_USE:
                 import gdata.apps.service
@@ -296,6 +297,7 @@ class Pupil(Clerk):
     phone_father = models.CharField(max_length = 255, verbose_name = u'Телефон отца', blank = True, null = True)
     delivery = models.BooleanField(default = True, verbose_name = u'Отправлять смс')
     insurance_policy = models.TextField(verbose_name = u'Страховой полис', null = True, blank = True)
+    gate_id = models.IntegerField(null = True, blank = True)
     
     prefix = "p"
     serialize_fields = ['id', 'cart', 'account', 'last_name', 'first_name', 'middle_name', 'grade_id', 'group', 'school_id']

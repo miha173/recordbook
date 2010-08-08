@@ -10,7 +10,7 @@
 {% block content %}
 <table class="table">
 	{% for grade in grades %}
-		<tr><td><a href="set/{{ grade.id }}/">{{ grade.long_name }}</a></td></tr>
+		<tr><td><a href="set/{{ grade.id }}/">{{ grade }}</a></td></tr>
 	{% endfor %}
 </table>
 {% endblock %}

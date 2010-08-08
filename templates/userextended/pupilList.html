@@ -24,7 +24,7 @@
 		<tr class="{% cycle 'gray' '' %}">
 			<td>{{ object.fio }}</td>
 			<td>{{ object.username }}</td>
-			<td>{{ object.grade.long_name }}</td>
+			<td>{{ object.grade }}</td>
 			<td>{% include "helpers/buttons/edit.html" %} <a href="/administrator/uni/achievement/{{ object.id }}/">Достижения.</a></td>
 	{% endfor %}
 </table>
