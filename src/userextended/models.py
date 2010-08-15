@@ -31,12 +31,13 @@ class School(RestModel):
     
     def __init__(self, *args, **kwargs):
         from src.marks.models import Mark
+        from src.curatorship.models import Connection
         super(School, self).__init__(*args, **kwargs)
         grades = Grade.objects.filter(school = self).count() > 0
         subjects = Subject.objects.filter(school = self).count() > 0
         pupils = Pupil.objects.filter(school = self).count() > 0
         teachers = Teacher.objects.filter(school = self).count() > 0
-        marks = Pupil.objects.filter(school = self).count() > 0
+        marks = Connection.objects.filter(teacher__school = self).count() > 0
         show = {}
         show['staff'] = show['subjects'] = show['grades'] = show['cams'] = show['options'] = True
         show['pupils'] = grades
@@ -304,8 +305,11 @@ class Pupil(Clerk):
     serialize_name = 'pupil'
     
     def curator(self):
-        # FIXME
-        return Teacher.objects.filter(grade = self.grade)[0]
+        teacher = Teacher.objects.filter(grade = self.grade)
+        if teacher.count() == 0:
+            return Teacher(grade = self.grade, last_name = '', first_name = '', middle_name = '')
+        else:
+            return teacher[0]
     
     def get_marks_avg(self, delta = timedelta(weeks = 4)):
         from decimal import *

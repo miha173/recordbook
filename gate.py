@@ -25,7 +25,13 @@ class Gate:
         req = demjson.encode(body)
         connection.request("POST", "/api/gate/%s/" % method, req)
         data = connection.getresponse().read()
-        return demjson.decode(data)
+        try:
+            return demjson.decode(data)
+        except demjson.JSONDecodeError:
+            f = open('/home/entropius/GTD/job/ika/special_recordbook/gate-error.html', 'w')
+            f.write(data)
+            f.close()
+            raise
     
     def checkUser(self, phone):
         body = {'schoolID': self.username, 'schoolAccessKey': self.password}
