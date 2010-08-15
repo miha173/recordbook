@@ -25,6 +25,12 @@ class School(RestModel):
     gate_id = models.CharField(verbose_name = u'ID для смс-шлюза', max_length = 255, blank = True, null = True)
     gate_password  = models.CharField(verbose_name = u'Пароль для смс-шлюза', max_length = 255, blank = True, null = True)
     gate_url = models.URLField(verbose_name = u'URL смс-шлюза', blank = True, null = True, default = 'http://gate.school-record-book.ru')
+    max_mark = models.IntegerField(verbose_name = u'Максимальный балл', default = 5)
+    gapps_use = models.BooleanField(verbose_name = u'Использовать Google Apps', default = False)
+    gapps_login = models.CharField(max_length = 255, default = '', verbose_name = u'Логин для Google Apps')
+    gapps_password = models.CharField(max_length = 255, default = '', verbose_name = u'Пароль для Google Apps')
+    gapps_domain = models.CharField(max_length = 255, default = '', verbose_name = u'Домен для Google Apps')
+    
 
     serialize_fields = ['id', 'name', 'saturday']
     serialize_name = 'school'
@@ -213,7 +219,6 @@ class Clerk(User, RestModel):
                     first_name = first_name[:28-len(first_name)-prefix]
         return username + last_name + '.' + first_name
     def save(self, force_insert = False, force_update = False, init = False, safe = False):
-        from src.settings import GAPPS_DOMAIN, GAPPS_LOGIN, GAPPS_PASSWORD, GAPPS_USE
         if hasattr(self, 'account'): self.account = str(self.account)
         if self.pk:
             if self.prefix == 'p':
@@ -237,9 +242,9 @@ class Clerk(User, RestModel):
                     if old.phone_father != self.phone_father:
                         gate.changePhone(self.gate_id, self.phone_father)
         if not self.pk or init:
-            if GAPPS_USE:
+            if self.school.gapps_use:
                 import gdata.apps.service
-                service = gdata.apps.service.AppsService(email=GAPPS_LOGIN, domain=GAPPS_DOMAIN, password=GAPPS_PASSWORD)
+                service = gdata.apps.service.AppsService(email = self.school.gapps_login, domain = self.school.gapps_domain, password = self.school.gapps_password)
                 service.ProgrammaticLogin()
                 service.CreateUser(self.username, self.last_name, self.first_name, '123456789', quota_limit=1000)
             else: 

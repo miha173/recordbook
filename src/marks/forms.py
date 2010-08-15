@@ -63,11 +63,14 @@ class StatForm(forms.Form):
     start = forms.DateField(('%d.%m.%Y',), label = u'Дата начала периода', initial = date.today() - timedelta(weeks = 2))
     end = forms.DateField(('%d.%m.%Y',), label = u'Дата окончания периода', initial = date.today())
 
-def MarkValidator(mark):
-    if int(mark) in range(1, settings.MAX_MARK + 1):
-        return int(mark)
-    else:
-        raise forms.ValidationError(u'Неверная оценка')
+def MarkValidator(school):
+    def _validator(mark): 
+        if int(mark) in range(1, max_mark + 1):
+            return int(mark)
+        else:
+            raise forms.ValidationError(u'Неверная оценка')
+    max_mark = school.max_mark
+    return _validator
 
 class MarksAdminForm(forms.Form):
     def __init__(self, dates, pupil, init, *args, **kwargs):
@@ -77,11 +80,5 @@ class MarksAdminForm(forms.Form):
             field = 'mark-%d%d%d' % (date.day, date.month, date.year)
             t = None
             if field in init: t = str(init[field])
-            self.fields[field] = forms.CharField(initial = t, validators = [MarkValidator], required = False, widget = forms.TextInput(attrs = {'size': 1, 'class': 'mark'}))
-#            if field in init:
-#                a = dir(self[field].field)
-#                ss
-#                self[field].field.initial = 'sasaas'
-#                self[field].field.initial = init[field]
-    
-    
+            self.fields[field] = forms.CharField(initial = t, validators = [MarkValidator(pupil.school)], required = False, widget = forms.TextInput(attrs = {'size': 1, 'class': 'mark'}))
+  
