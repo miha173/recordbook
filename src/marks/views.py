@@ -402,7 +402,7 @@ def marksView(request, subject_id):
     return render_to_response('marks/pupil/marks.html', render, context_instance = RequestContext(request))
 
 @login_required
-@user_passes_test(lambda u: u.is_superuser)
+@user_passes_test(lambda u: u.is_administrator())
 def delivery(request, school):
     render = {}
     school = get_object_or_404(School, id = school)
@@ -428,7 +428,7 @@ def delivery(request, school):
     return render_to_response('marks/teacher/delivery.html', render, context_instance = RequestContext(request))
 
 @login_required
-@user_passes_test(lambda u: u.is_superuser)
+@user_passes_test(lambda u: u.is_administrator())
 def marksStep1(request, school): 
     render = {}
     render['school'] = school = get_object_or_404(School, id = school)
@@ -437,7 +437,7 @@ def marksStep1(request, school):
 
 
 @login_required
-@user_passes_test(lambda u: u.is_superuser)
+@user_passes_test(lambda u: u.is_administrator())
 def marksStep2(request, school, grade): 
     render = {}
     render['school'] = school = get_object_or_404(School, id = school)
@@ -446,7 +446,7 @@ def marksStep2(request, school, grade):
 
 
 @login_required
-@user_passes_test(lambda u: u.is_superuser)
+@user_passes_test(lambda u: u.is_administrator())
 def marksStep3(request, school, grade, subject): 
     render = {}
     render['school'] = school = get_object_or_404(School, id = school)

@@ -21,7 +21,7 @@ def index(request):
     return render_to_response('attendance/page_pupil.html', render, context_instance = RequestContext(request))
 
 @login_required
-@user_passes_test(lambda u: u.prefix=='a')
+@user_passes_test(lambda u: u.is_administrator())
 def timetableSelect(request, school = 0):
     render = {}
     if school:
@@ -33,7 +33,7 @@ def timetableSelect(request, school = 0):
     return render_to_response('attendance/timetableSelect.html', render, context_instance = RequestContext(request))
     
 @login_required
-@user_passes_test(lambda u: u.prefix=='a')
+@user_passes_test(lambda u: u.is_administrator())
 def timetableSet(request, id, school = 0):
     from forms import TempForm
     from django import forms
