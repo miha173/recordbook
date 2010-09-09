@@ -26,6 +26,7 @@ class LazyUser(object):
                     elif user.is_superuser: 
                         userprofile = user
                         userprofile.prefix = 'a'
+                        userprofile.is_administrator = lambda: userprofile.is_superuser
                 except:
                     userprofile = user
                     userprofile.prefix = ''
