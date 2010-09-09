@@ -66,14 +66,22 @@
 	<fieldset>
 		<legend>Другое</legend>
 		<table>
-			<tr>
-				<td class="label"><label for="id_grade">Классное руководство:</label></td>
-				<td>{{ form.grade }}</td>
-				<td>
-					{% if form.grade.errors %}<div class="error_text">{{ form.grade.errors }}</div>{% endif %}
-					{% if form.grade.help_text %}<div class="help_text">{{ form.grade.help_text }}</div>{% endif %}
-				</td>
-			</tr>
+      <tr>
+        <td class="label"><label for="id_grade">Классное руководство:</label></td>
+        <td>{{ form.grade }}</td>
+        <td>
+          {% if form.grade.errors %}<div class="error_text">{{ form.grade.errors }}</div>{% endif %}
+          {% if form.grade.help_text %}<div class="help_text">{{ form.grade.help_text }}</div>{% endif %}
+        </td>
+      </tr>
+      <tr>
+        <td class="label"><label for="id_grade">Администратор школы:</label></td>
+        <td>{{ form.administrator }}</td>
+        <td>
+          {% if form.administrator.errors %}<div class="error_text">{{ form.administrator.errors }}</div>{% endif %}
+          {% if form.administrator.help_text %}<div class="help_text">{{ form.administrator.help_text }}</div>{% endif %}
+        </td>
+      </tr>
 			<tr>
 				<td class="label"><label for="id_cart">Номер карты: </label></td>
 				<td>{{ form.cart }}

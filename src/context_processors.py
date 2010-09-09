@@ -53,7 +53,9 @@ def environment(request):
         elif request.user.prefix == 'p':
             render['BASE_TEMPLATE'] = 'page_pupil.html'
             render['subjects'] = user.get_subjects()
-        elif request.user.prefix == 'a':
+        else:
+            request.user.is_administrator = lambda: request.user.is_superuser
+        if request.user.prefix == 'a' or request.user.is_administrator():
             render['BASE_TEMPLATE'] = 'administrator.html'
     render['ROOT_CAN_ALL'] = settings.ROOT_CAN_ALL
     render['current_year'] = date.today().year

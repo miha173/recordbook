@@ -3,7 +3,7 @@
 from django.template import RequestContext
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.loader import render_to_string
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.conf import settings
@@ -20,20 +20,33 @@ def index(request):
     return render_to_response('userextended/page.html', context_instance = RequestContext(request))
 
 @login_required
-@user_passes_test(lambda u: u.prefix == 'a')
+@user_passes_test(lambda u: u.is_administrator())
 def objectList4Administrator(request, object, school_id = 0):
     ext = {}
+    school_id = int(school_id)
+    school = None
+    if school_id: school = get_object_or_404(School, id = school_id)
+    if request.user.prefix == 'a':
+        pass
+    elif request.user.is_administrator() and request.user.prefix != 'a':
+        school = request.user.school
+        if school_id:
+            if school.id != school_id: raise Http404()
+        else:
+            ext['id'] = school.id
+    else:
+        school = get_object_or_404(School, id = school_id)
     if object == 'achievement': 
         ext['pupil'] = get_object_or_404(Pupil, id = school_id)
     elif object == 'connection': 
-        ext['grade__school'] = get_object_or_404(School, id = school_id)
+        ext['grade__school'] = school
     else:
-        if school_id: ext['school'] = get_object_or_404(School, id = school_id)
+        if school_id: ext['school'] = school
     return objectList(request, object, ext)
 
 @login_required
-@user_passes_test(lambda u: u.prefix == 'a')
-#@user_passes_test(lambda u: u.is_administrator())
+#@user_passes_test(lambda u: u.prefix == 'a')
+@user_passes_test(lambda u: u.is_administrator())
 def objectEdit4Administrator(request, object, mode, id = 0, school_id = 0):
     ext = {}
     if object == 'achievement': 
@@ -86,6 +99,7 @@ def objectList(request, object, ext = {}):
     except:
         render['objects'] = paginator.page(paginator.num_pages)
     render['paginator'] = paginator.num_pages - 1
+
     return render_to_response('userextended/%sList.html' % templ, render, context_instance = RequestContext(request))
 
 @login_required

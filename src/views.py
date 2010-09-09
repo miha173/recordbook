@@ -31,6 +31,8 @@ def sms(request):
 @login_required()
 def index(request):
     render = {}
+    if request.user.prefix == 'a' or request.user.is_administrator():
+        return objectList4Administrator(request, 'school')
     if request.user.prefix == 'p':
         pupil = request.user
         render['curator'] = pupil.curator().fio()
@@ -38,8 +40,6 @@ def index(request):
         render['classmates'] = Pupil.objects.filter(grade = pupil.grade)
         
         render['timetable'] = TimetableDay(grade = pupil.grade, group = pupil.group, workday = datetime.now().isoweekday())
-    if request.user.prefix == 'a':
-        return objectList4Administrator(request, 'school')
     return render_to_response('root/index.html', render, context_instance=RequestContext(request))
 
 

@@ -55,7 +55,7 @@ class StaffForm(forms.ModelForm):
         super(StaffForm, self).__init__(*args, **kwargs)
     class Meta:
         model = Staff
-        fields = ('last_name', 'first_name', 'middle_name', 'cart')
+        fields = ('last_name', 'first_name', 'middle_name', 'administrator', 'cart')
 
 class TeacherForm(forms.ModelForm):
     def __init__(self, school = None, *args, **kwargs):
@@ -65,7 +65,7 @@ class TeacherForm(forms.ModelForm):
         self.fields['grade'].queryset = Grade.objects.filter(school = school)
     class Meta:
         model = Teacher
-        fields = ('last_name', 'first_name', 'middle_name', 'grade', 'grades', 'subjects', 'cart')
+        fields = ('last_name', 'first_name', 'middle_name', 'grade', 'grades', 'subjects', 'cart', 'administrator')
     grades = forms.ModelMultipleChoiceField(queryset = Grade.objects.all(), required = False, widget = forms.CheckboxSelectMultiple())
     subjects = forms.ModelMultipleChoiceField(queryset = Subject.objects.all(), required = False, widget = forms.CheckboxSelectMultiple())
 

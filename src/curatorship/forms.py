@@ -28,7 +28,8 @@ class ConnectionGlobalForm(forms.ModelForm):
         model = Connection
         fields = ('teacher', 'subject', 'grade', 'connection')
     def __init__(self, grade__school, *args, **kwargs):
-        return super(ConnectionGlobalForm, self).__init__(*args, **kwargs)
+        super(ConnectionGlobalForm, self).__init__(*args, **kwargs)
+        self.fields['teacher'].queryset = self.fields['teacher'].queryset.filter(school = grade__school)
         
 class PupilForm(forms.ModelForm):
     class Meta:

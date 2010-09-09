@@ -22,14 +22,14 @@ class School(RestModel):
     address = models.CharField(verbose_name = u'Адрес школы', max_length = 255)
     phone = models.CharField(verbose_name = u'Телефон школы', max_length = 255)
     gate_use = models.BooleanField(verbose_name = u'Использовать шлюз', default = False)
-    gate_id = models.CharField(verbose_name = u'ID для смс-шлюза', max_length = 255, blank = True, null = True)
-    gate_password  = models.CharField(verbose_name = u'Пароль для смс-шлюза', max_length = 255, blank = True, null = True)
-    gate_url = models.URLField(verbose_name = u'URL смс-шлюза', blank = True, null = True, default = 'http://gate.school-record-book.ru')
+    gate_id = models.CharField(verbose_name = u'ID для SMS-шлюза', max_length = 255, blank = True, null = True)
+    gate_password  = models.CharField(verbose_name = u'Пароль для SMS-шлюза', max_length = 255, blank = True, null = True)
+    gate_url = models.URLField(verbose_name = u'URL SMS-шлюза', blank = True, null = True, default = 'http://gate.school-record-book.ru')
     max_mark = models.IntegerField(verbose_name = u'Максимальный балл', default = 5)
     gapps_use = models.BooleanField(verbose_name = u'Использовать Google Apps', default = False)
-    gapps_login = models.CharField(max_length = 255, default = '', verbose_name = u'Логин для Google Apps')
-    gapps_password = models.CharField(max_length = 255, default = '', verbose_name = u'Пароль для Google Apps')
-    gapps_domain = models.CharField(max_length = 255, default = '', verbose_name = u'Домен для Google Apps')
+    gapps_login = models.CharField(max_length = 255, default = '', verbose_name = u'Логин для Google Apps', blank = True, null = True)
+    gapps_password = models.CharField(max_length = 255, default = '', verbose_name = u'Пароль для Google Apps', blank = True, null = True)
+    gapps_domain = models.CharField(max_length = 255, default = '', verbose_name = u'Домен для Google Apps', blank = True, null = True)
     
 
     serialize_fields = ['id', 'name', 'saturday']
@@ -266,7 +266,7 @@ class Clerk(User, RestModel):
         ordering = ['last_name', 'first_name', 'middle_name']
 
 class Teacher(Clerk):
-    # Для доступа к администраторским функциям (неадмин-панель)
+    # Для доступа к администраторским функциям 
     administrator = models.BooleanField(u"Администратор")
     # Какие предметы ведёт
     subjects = models.ManyToManyField(Subject, verbose_name = u"Предметы", related_name = 'subjects', blank = True, null = True)
@@ -283,7 +283,7 @@ class Teacher(Clerk):
     serialize_name = 'teacher'
     
     def is_administrator(self):
-        return self.is_staff or self.administrator
+        return self.is_superuser or self.is_staff or self.administrator
 
     def delete(self):
         from src.marks.models import Lesson
@@ -301,7 +301,7 @@ class Pupil(Clerk):
     parent_father = models.CharField(max_length = 255, verbose_name = u'Отец', blank = True, null = True)
     phone_mother = models.CharField(max_length = 255, verbose_name = u'Телефон матери', blank = True, null = True)
     phone_father = models.CharField(max_length = 255, verbose_name = u'Телефон отца', blank = True, null = True)
-    delivery = models.BooleanField(default = True, verbose_name = u'Отправлять смс')
+    delivery = models.BooleanField(default = True, verbose_name = u'Отправлять SMS')
     insurance_policy = models.TextField(verbose_name = u'Страховой полис', null = True, blank = True)
     gate_id = models.IntegerField(null = True, blank = True)
     
@@ -341,6 +341,9 @@ class Pupil(Clerk):
         from src.curatorship.models import Connection
         return [connection.subject for connection in Connection.objects.filter(grade = self.grade) if connection.connection == '0' or connection.connection == self.group or (int(connection.connection)-2) == self.sex or (int(connection.connection)-4) == int(self.special)]
 
+    def is_administrator(self):
+        return False
+
 class Achievement(models.Model):
     title = models.CharField(verbose_name = u'Достижение', max_length = 255)
     description = models.TextField(verbose_name = u'Описание достижения')
@@ -352,6 +355,12 @@ class Staff(Clerk):
     Модель персонала
     '''
     prefix = 's'
+    
+    # Для доступа к администраторским функциям 
+    administrator = models.BooleanField(u"Администратор", default = False)
+
+    def is_administrator(self):
+        return self.is_superuser or self.is_staff or self.administrator
 
 class Permission(models.Model):
     user_id = models.IntegerField()
