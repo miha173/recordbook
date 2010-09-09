@@ -244,6 +244,7 @@ class Clerk(User, RestModel):
         if not self.pk or init:
             if self.school.gapps_use:
                 import gdata.apps.service
+                self.username = self.gen_username()
                 service = gdata.apps.service.AppsService(email = self.school.gapps_login, domain = self.school.gapps_domain, password = self.school.gapps_password)
                 service.ProgrammaticLogin()
                 service.CreateUser(self.username, self.last_name, self.first_name, '123456789', quota_limit=1000)
