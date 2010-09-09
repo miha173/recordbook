@@ -4,7 +4,7 @@ from django.contrib.auth import get_user
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 
-from models import Pupil, Teacher
+from models import Pupil, Teacher, Staff
 
 class LazyUser(object):
     def __get__(self, request, obj_type=None):
@@ -14,16 +14,18 @@ class LazyUser(object):
             user.prefix = ''
             if user.is_authenticated():
                 try:
-                    if Pupil.objects.filter(user_ptr=user).count()>0: 
+                    if Pupil.objects.filter(user_ptr = user): 
                         userprofile = Pupil.objects.get(user_ptr=user)
                         userprofile.prefix = 'p'
-                    elif Teacher.objects.filter(user_ptr=user).count()>0: 
+                    elif Teacher.objects.filter(user_ptr = user): 
                         userprofile = Teacher.objects.get(user_ptr=user)
                         userprofile.prefix = 't'
+                    elif Staff.objects.filter(user_ptr = user):
+                        userprofile = Staff.objects.get(user_ptr = user)
+                        userprofile.prefix = 's'
                     elif user.is_superuser: 
                         userprofile = user
                         userprofile.prefix = 'a'
-                    userprofile.is_administrator = lambda: user.is_superuser
                 except:
                     userprofile = user
                     userprofile.prefix = ''

@@ -17,7 +17,8 @@ from src.marks.models import ResultDate
 from src.utils import PlaningError
 
 def index(request):
-    return render_to_response('userextended/page.html', context_instance = RequestContext(request))
+    return HttpResponseRedirect('/')
+#    return render_to_response('userextended/page.html', context_instance = RequestContext(request))
 
 @login_required
 @user_passes_test(lambda u: u.is_administrator())

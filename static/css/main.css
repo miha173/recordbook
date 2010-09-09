@@ -124,20 +124,27 @@ body#site #header {
 		padding:0.5em 20px 1.5em 37px;
 	}
 
-	#header #exit a {
-		display:block;
-		float:left;
-		min-height:20px;
-		padding-left:20px;
-		color:#fff;
-		font-size:80%;
-		background:url(/media/images/design/exit.gif) 4px -52px no-repeat;
-	}
+  #header #exit a{
+    display:block;
+    float:left;
+    min-height:20px;
+    padding-left:20px;
+    margin-left: 10px;
+    color:#fff;
+    font-size:80%;
+/*    text-transform: lowercase;*/
+  }
+  #header #exit a:last-child {
+    background:url(/media/images/design/exit.gif) 4px -52px no-repeat;
+  }
 
-	#header #exit a:hover {
-		color:#D52023;
-		background:url(/media/images/design/exit.gif) -56px 3px no-repeat;
-	}
+  #header #exit a:hover {
+    color:#D52023;
+  }
+  #header #exit a:last-child:hover {
+    color:#D52023;
+    background:url(/media/images/design/exit.gif) -56px 3px no-repeat;
+  }
 	
 
 	body#site #header #login-button {
