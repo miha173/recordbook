@@ -45,9 +45,9 @@ class School(RestModel):
         teachers = Teacher.objects.filter(school = self).count() > 0
         marks = Connection.objects.filter(teacher__school = self).count() > 0
         show = {}
-        show['staff'] = show['subjects'] = show['grades'] = show['cams'] = show['options'] = True
+        show['teachers'] = show['staff'] = show['subjects'] = show['grades'] = show['cams'] = show['options'] = True
         show['pupils'] = grades
-        show['teachers'] = subjects and grades
+#        show['teachers'] = subjects and grades
         show['resultdates'] = grades
         show['connections'] = teachers
         show['deliveryes'] = marks
