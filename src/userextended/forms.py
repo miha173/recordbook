@@ -19,6 +19,10 @@ class SchoolForm(forms.ModelForm):
     class Meta:
         model = School
         fields = ['name', 'prefix', 'saturday', 'url', 'address', 'phone', 'gate_use', 'gate_url', 'gate_id', 'gate_password', 'max_mark', 'gapps_use', 'gapps_login', 'gapps_password', 'gapps_domain']
+    def __init__(self, school = None, *args, **kwargs):
+        super(SchoolForm, self).__init__(*args, **kwargs)
+        self.fields['gapps_password'].widget = forms.PasswordInput()
+        self.fields['gate_password'].widget = forms.PasswordInput()
         
 class OptionForm(forms.ModelForm):
     def __init__(self, school = None, *args, **kwargs):
