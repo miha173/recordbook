@@ -9,6 +9,10 @@
 			left: 35%;
 			text-align: center;
 		}
+		.salute{
+		  text-align: center;
+		  font-family: sans-serif;
+		}
 		input{
 			width: 300px;
 			height: 30px;
@@ -21,6 +25,9 @@
 <center>
 	{{ form.errors }}
 </center>
+<div class="salute">
+  <h1>{{ user.private_salute }}</h1>
+</div>
 <div id="content">
 	<form action="?next=/" method="post">{% csrf_token %}
 		Логин:<br />

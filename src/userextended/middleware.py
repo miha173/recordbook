@@ -4,7 +4,7 @@ from django.contrib.auth import get_user
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 
-from models import Pupil, Teacher, Staff
+from models import Pupil, Teacher, Staff, School
 
 class LazyUser(object):
     def __get__(self, request, obj_type=None):
@@ -33,6 +33,8 @@ class LazyUser(object):
             else:
                 userprofile = user
                 userprofile.prefix = ''
+                if School.objects.filter(private_domain = request.META['HTTP_HOST']):
+                    userprofile.private_salute = School.objects.filter(private_domain = request.META['HTTP_HOST'])[0].private_salute
             request._cached_user = userprofile
         return request._cached_user
 

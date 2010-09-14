@@ -30,6 +30,8 @@ class School(RestModel):
     gapps_login = models.CharField(max_length = 255, default = '', verbose_name = u'Логин для Google Apps', blank = True, null = True)
     gapps_password = models.CharField(max_length = 255, default = '', verbose_name = u'Пароль для Google Apps', blank = True, null = True)
     gapps_domain = models.CharField(max_length = 255, default = '', verbose_name = u'Домен для Google Apps', blank = True, null = True)
+    private_domain = models.CharField(max_length = 255, verbose_name = u'Система привязана к домену')
+    private_salute = models.CharField(max_length = 255, verbose_name = u'Персональное приветствие')
     
 
     serialize_fields = ['id', 'name', 'saturday']
