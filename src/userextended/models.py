@@ -249,10 +249,10 @@ class Clerk(User, RestModel):
                 service.ProgrammaticLogin()
                 try:
                     service.CreateUser(self.username, self.last_name, self.first_name, '123456789', quota_limit=1000)
-                except gdata.apps.service.AppsForYourDomainException:
+                except gdata.apps.service.AppsForYourDomainException, (error, ):
                     self.set_password('123456789')
                     super(Clerk, self).save(force_insert, force_update)
-                    raise gdata.apps.service.AppsForYourDomainException
+                    raise gdata.apps.service.AppsForYourDomainException(error)
             else: 
                 from random import randint
                 username = self.school.prefix + str(randint(10**6, 9999999))
