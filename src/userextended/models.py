@@ -198,10 +198,10 @@ class Clerk(User, RestModel):
         #Удаление нехороших символов из траслитерации
         last_name = pytils.translit.translify(self.last_name.lower())
         last_name = last_name.replace("'","")
-        last_name = last_name.replace("`","")
+        last_name = last_name.replace("`","").strip()
         first_name = pytils.translit.translify(self.first_name.lower())
         first_name = first_name.replace("'","")
-        first_name = first_name.replace("`","")
+        first_name = first_name.replace("`","").strip()
         if school:
             prefix = len(self.school.prefix)
             username +=  self.school.prefix + "."
