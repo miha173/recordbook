@@ -247,7 +247,12 @@ class Clerk(User, RestModel):
                 self.username = self.gen_username()
                 service = gdata.apps.service.AppsService(email = self.school.gapps_login, domain = self.school.gapps_domain, password = self.school.gapps_password)
                 service.ProgrammaticLogin()
-                service.CreateUser(self.username, self.last_name, self.first_name, '123456789', quota_limit=1000)
+                try:
+                    service.CreateUser(self.username, self.last_name, self.first_name, '123456789', quota_limit=1000)
+                except gdata.apps.service.AppsForYourDomainException:
+                    self.set_password('123456789')
+                    super(Clerk, self).save(force_insert, force_update)
+                    raise gdata.apps.service.AppsForYourDomainException
             else: 
                 from random import randint
                 username = self.school.prefix + str(randint(10**6, 9999999))
