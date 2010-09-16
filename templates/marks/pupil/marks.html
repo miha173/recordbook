@@ -14,17 +14,19 @@
 	  <thead>
 	  <tr>
 	    <th class="ajax_link"><span>Дата</span></th>
-	    {#<th>Название работы</th>#}
+	    <th>Тема</th>
 	    <th class="ajax_link"><span>Оценка</span></th>
+      <th>Домашнее задание</th>
 	  </tr>
 	  </thead>
 	  
 	  <tbody>
-	  	{% for mark in marks %}
+	  	{% for lesson in lessons %}
 		  <tr class="{% cycle 'gray' '' %}">
-		    <td><div class="date">{{ mark.lesson.date|date:"d.m" }}</div></td>
-		    {#<td><a href="#">{{ mark.lesson.topic }}</a></td>#}
-		    <td><div class="mark-{{ mark.get_type }}">{{ mark }}</div></td>
+		    <td><div class="date">{{ lesson.date|date:"d.m" }}</div></td>
+		    <td>{{ lesson.topic }}</td>
+		    <td><div class="mark-{{ lesson.mark.get_type }}"><span title="{{ lesson.mark.comment }}">{{ lesson.mark }}</span></div></td>
+		    <td>{{ lesson.task }}</td>
 		  </tr>
 		{% endfor %}
 	  
@@ -35,6 +37,7 @@
 	    <td></td>
 	    <td><div class="date">Средний балл</div></td>
 	    <td><div class="mark-{{ subject.avg_type }}">{{ subject.avg|default:0|floatformat:"-2" }}</div></td>
+	    <td></td>
 	  </tr>
 	  </tfoot>
 	</table>

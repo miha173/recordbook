@@ -115,9 +115,13 @@ def viewMarks(request, id):
             6: u'Вс',
             }
     subject.days = []
-    [subject.days.append(int(lesson.workday)) for lesson in UsalTimetable.objects.filter(grade = pupil.grade, subject = subject, group = pupil.group).order_by('workday') if int(lesson.workday) not in subject.days]
+    subject.days = [int(lesson.workday) for lesson in UsalTimetable.objects.filter(grade = pupil.grade, subject = subject, group = pupil.group).order_by('workday') if int(lesson.workday) not in subject.days]
     subject.days = [days[day] for day in subject.days]
-    render['marks'] = Mark.objects.filter(pupil = pupil, lesson__date__gte = datetime.now() - timedelta(weeks = 4), lesson__subject = subject)
+#    render['marks'] = Mark.objects.filter(pupil = pupil, lesson__date__gte = datetime.now() - timedelta(weeks = 4), lesson__subject = subject)
+    render['lessons'] = Lesson.objects.filter(grade = pupil.grade, date__gte = datetime.now() - timedelta(weeks = 4), subject = subject)
+    for lesson in render['lessons']:
+        if Mark.objects.filter(pupil = pupil, lesson = lesson):
+            lesson.mark = Mark.objects.get(pupil = pupil, lesson = lesson)
 
     render['subject'] = subject
     return render_to_response('marks/%s/marks.html' % request.user_type, render, context_instance = RequestContext(request))
