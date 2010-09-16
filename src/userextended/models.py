@@ -365,6 +365,7 @@ class Staff(Clerk):
     '''
     Модель персонала
     '''
+    objects = ClerkManager(['last_name', 'first_name', 'middle_name'])
     prefix = 's'
     
     # Для доступа к администраторским функциям 
