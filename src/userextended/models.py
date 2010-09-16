@@ -196,14 +196,17 @@ class Clerk(User, RestModel):
         return "%s %s %s" % (self.last_name, self.first_name, self.middle_name)
     def gen_username(self, school = False):
         #Генерация имени пользователя
+        def _clean_name(name):
+            '''Чистка фамилии и имени от инородных символов и транслитерация'''
+            name = pytils.translit.translify(self.name.lower())
+            name = name.replace("'","")
+            name = name.replace("`","").strip()
+            name = name.replace(' ', '_')
+
         username = self.prefix + "."
         #Удаление нехороших символов из траслитерации
-        last_name = pytils.translit.translify(self.last_name.lower())
-        last_name = last_name.replace("'","")
-        last_name = last_name.replace("`","").strip()
-        first_name = pytils.translit.translify(self.first_name.lower())
-        first_name = first_name.replace("'","")
-        first_name = first_name.replace("`","").strip()
+        last_name = _clean_name(last_name)
+        first_name = _clean_name(first_name)
         if school:
             prefix = len(self.school.prefix)
             username +=  self.school.prefix + "."

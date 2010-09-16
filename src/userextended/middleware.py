@@ -4,7 +4,7 @@ from django.contrib.auth import get_user
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 
-from models import Pupil, Teacher, Staff, School
+from models import Pupil, Teacher, Staff, School, Option
 
 class LazyUser(object):
     def __get__(self, request, obj_type=None):
@@ -17,6 +17,9 @@ class LazyUser(object):
                     if Pupil.objects.filter(user_ptr = user): 
                         userprofile = Pupil.objects.get(user_ptr=user)
                         userprofile.prefix = 'p'
+                        if Option.objects.filter(key = 'personal_data', school = userprofile.school):
+                            if Option.objects.get(key = 'personal_data', school = userprofile.school):
+                                userprofile.hide_other_persons = True
                     elif Teacher.objects.filter(user_ptr = user): 
                         userprofile = Teacher.objects.get(user_ptr=user)
                         userprofile.prefix = 't'
