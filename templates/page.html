@@ -53,7 +53,7 @@
     <div id="navigation">
         <div id="sidebar">
             <div id="menu">
-				{{ user.username }}
+				{{ user.fio }} ({{ user.username }})
             	{% ifequal user.prefix "t" %} 
 					<ul>
 						{% if user.subjects and not ROOT_CAN_ALL or user.is_administrator %}
