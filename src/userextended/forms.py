@@ -72,8 +72,12 @@ class TeacherForm(forms.ModelForm):
     class Meta:
         model = Teacher
         fields = ('last_name', 'first_name', 'middle_name', 'grade', 'grades', 'subjects', 'cart', 'administrator')
+        
     grades = forms.ModelMultipleChoiceField(queryset = Grade.objects.all(), required = False, widget = forms.CheckboxSelectMultiple())
     subjects = forms.ModelMultipleChoiceField(queryset = Subject.objects.all(), required = False, widget = forms.CheckboxSelectMultiple())
+#    def clean_grade(self):
+#        if Teacher.objects.filter(school = self.school, grade = self.grade):
+#            pass
 
 class ResultDateForm(forms.ModelForm):
     def __init__(self, school = None, *args, **kwargs):

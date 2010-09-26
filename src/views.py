@@ -14,7 +14,7 @@ from gate import Gate
 from src.userextended.models import Pupil, Teacher, Subject, School
 from src.userextended.views import objectList4Administrator
 from src.curatorship.models import Connection
-from src.attendance.models import UsalTimetable
+from src.attendance.models import UsalTimetable, UsalRingTimetable
 from src.attendance.utils import TimetableDay
 from src.marks.models import Mark
 
@@ -39,7 +39,12 @@ def index(request):
         
         render['classmates'] = Pupil.objects.filter(grade = pupil.grade)
         
-        render['timetable'] = TimetableDay(grade = pupil.grade, group = pupil.group, workday = datetime.now().isoweekday())
+        render['timetables'] = [
+                                TimetableDay(grade = pupil.grade, group = pupil.group, workday = datetime.now().isoweekday()),
+                                TimetableDay(grade = pupil.grade, group = pupil.group, workday = (datetime.now() + timedelta(days = 1)).isoweekday()),                                
+        ]
+        
+        render['lessons'] = UsalRingTimetable.objects.filter(workday = datetime.now().isoweekday(), school = request.user.school)
     return render_to_response('root/index.html', render, context_instance=RequestContext(request))
 
 

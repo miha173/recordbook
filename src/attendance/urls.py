@@ -11,11 +11,6 @@ urlpatterns = patterns("src.attendance.views",
                        (r'^timetable/set/(?P<id>\d+)/$', 'timetableSet'),
                        
                        
-                       (r'^ringtimetable/$', 'ringtimetableList'),
+                       (r'^ringtimetable/(?P<school>\d+)/$', 'ringtimetableList'),
 
-                       (r'^ringtimetable/new/$', 'ringtimetableList'),
-                       (r'^ringtimetable/edit/(?P<id>\d+)/$', 'ringtimetableList'),
-                       (r'^ringtimetable/delete/(?P<id>\d+)/$', 'ringtimetableList'),
-                       
-#                       (r'^ringtimetable/(?P<id>\d+)/$', 'ringList'),
                        )

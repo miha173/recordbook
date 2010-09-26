@@ -27,16 +27,15 @@ def objectList4Administrator(request, object, school_id = 0):
     school_id = int(school_id)
     school = None
     if school_id: school = get_object_or_404(School, id = school_id)
-    if request.user.prefix == 'a':
-        pass
-    elif request.user.is_administrator() and request.user.prefix != 'a':
+    if not request.user.is_superuser:
         school = request.user.school
         if school_id:
             if school.id != school_id: raise Http404()
         else:
             ext['id'] = school.id
     else:
-        school = get_object_or_404(School, id = school_id)
+        if school_id:
+            school = get_object_or_404(School, id = school_id)
     if object == 'achievement': 
         ext['pupil'] = get_object_or_404(Pupil, id = school_id)
     elif object == 'connection': 

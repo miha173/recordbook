@@ -1,4 +1,5 @@
                         <td{% if timetable.today %} id="today"{% endif %}>
+                            {#<small><a href="/marks/get_homework/{{ timetable.timestamp }}/">{{ timetable.date }}</a></small>#}
                             <small>{{ timetable.date }}</small>
                             <big>{{ timetable.day_ru }}</big>
                             <table class="table">
@@ -27,7 +28,9 @@
                                     <tr>
                                         <td colspan="3">
                                             <div class="end">
-                                                {#<strong>Уроки заканчиваются в 13:35</strong>#}
+                                               {% if timetable.rings %}
+                                                <strong>Уроки заканчиваются в {{ timetable.rings.end_of_day.end|time:"H:i" }}</strong>
+                                               {% endif %}
                                             </div>
                                         </td>
                                     </tr>

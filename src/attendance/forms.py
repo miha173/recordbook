@@ -7,7 +7,7 @@ from django.forms.util import ErrorList
 
 from src import settings
 
-class TempForm(forms.Form):
+class TimetableForm(forms.Form):
     def get_fields(self):
         str = ''
         for day in settings.WORKDAYS:
@@ -26,5 +26,23 @@ class TempForm(forms.Form):
 <tr><td colspan='3'>&nbsp;</td></tr>
         '''
         return str
-    
+
+class RingTimetableForm(forms.Form):
+    def get_fields(self):
+        str = ''
+        for day in settings.WORKDAYS:
+            str += "<tr><td colspan='3'><h3>%s</h3></td></tr>" % day[1]
+            for lesson in settings.LESSON_NUMBERS:
+                str +='''
+<tr>
+<td>''' + lesson[1]  + '''</td>
+    <td>''' + self['l_s_%s_%s' % (day[0], lesson[0])].__str__() + '''</td>
+    <td>''' + self['l_e_%s_%s' % (day[0], lesson[0])].__str__() + '''</td>
+</tr>
+        '''
+        return str
+
+
+
+
     

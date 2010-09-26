@@ -30,8 +30,8 @@ class School(RestModel):
     gapps_login = models.CharField(max_length = 255, default = '', verbose_name = u'Логин для Google Apps', blank = True, null = True)
     gapps_password = models.CharField(max_length = 255, default = '', verbose_name = u'Пароль для Google Apps', blank = True, null = True)
     gapps_domain = models.CharField(max_length = 255, default = '', verbose_name = u'Домен для Google Apps', blank = True, null = True)
-    private_domain = models.CharField(max_length = 255, verbose_name = u'Система привязана к домену')
-    private_salute = models.CharField(max_length = 255, verbose_name = u'Персональное приветствие')
+    private_domain = models.CharField(max_length = 255, verbose_name = u'Система привязана к домену', null = True, blank = True)
+    private_salute = models.CharField(max_length = 255, verbose_name = u'Персональное приветствие', null = True, blank = True)
     
 
     serialize_fields = ['id', 'name', 'saturday']
@@ -55,6 +55,7 @@ class School(RestModel):
         show['deliveryes'] = marks
         show['timetables'] = teachers
         show['marks'] = marks
+        show['ringtimetable'] = True
         self.show = show
     
     def __unicode__(self):
@@ -74,6 +75,14 @@ class School(RestModel):
         ResultDate.objects.filter(school = self).delete()
         Cam.objects.filter(school = self).delete()
         super(School, self).delete()
+    def save(self, *args, **kwargs):
+        super(School, self).save(*args, **kwargs)
+        subjects = [u'Русский язык', u'Физкультура', u'Информатика', 
+                    u'Обществознание', u'Литература', u'География', 
+                    u'Химия', u'Физика', u'Биология', u'История', 
+                    u'ОБЖ', u'Алгебра', u'Геометрия', u'Ин. яз.']
+        for subject in subjects:
+            Subject(school = self, name = subject).save()
 
 class Cam(models.Model):
     name = models.CharField(max_length = 255, verbose_name = u'Название камеры')
@@ -300,6 +309,9 @@ class Teacher(Clerk):
         from src.marks.models import Lesson
         Lesson.objects.filter(teacher = self).delete()
         super(Teacher, self).delete()
+    
+    class Meta:
+        unique_together = ('grade', )
 
 class Pupil(Clerk):
     grade = models.ForeignKey(Grade, verbose_name = u"Класс")

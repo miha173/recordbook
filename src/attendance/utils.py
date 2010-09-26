@@ -3,7 +3,7 @@
 from datetime import date, timedelta
 import pytils
 
-from src.attendance.models import UsalTimetable
+from src.attendance.models import UsalTimetable, UsalRingTimetable
 
 class TimetableDay:
     def __init__(self, grade, group, workday):
@@ -18,12 +18,18 @@ class TimetableDay:
         if today == workday:
             self.date = u'Сегодня'
             self.today = True
-        elif today == workday -1:
+        elif today == workday - 1:
             self.date = u'Завтра'
         elif today == workday + 1:
             self.date = u'Вчера'
         else:
             self.date = pytils.dt.ru_strftime(u"%d %B", inflected=True, date=date.today() + timedelta(days = (workday - today)))
+        self.timestamp = (date.today() + timedelta(days = (workday - today))).isoformat()
+        self.rings = {}
+        for ring in UsalRingTimetable.objects.filter(school = grade.school, workday = workday):
+            self.rings[ring.number] = ring
+        if UsalRingTimetable.objects.filter(school = grade.school, workday = workday, number = len(self.lessons)):
+            self.rings['end_of_day'] = UsalRingTimetable.objects.get(school = grade.school, workday = workday, number = len(self.lessons))
             
     
     def numDay2ruday(self, workday):

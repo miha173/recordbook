@@ -139,29 +139,42 @@
 				{% endif %}
 			</td>
 		</tr>
-		<tr>
-			<td>
-				{% if school.show.deliveryes %}
-					<a href="/marks/delivery/{{ school.id }}/">Рассылки</a>
-				{% else %}
-					Рассылки
-				{% endif %}
-			</td>
-			<td>
-				{% if school.show.connections %}
-					<a href="/administrator/uni/connection/{{ school.id }}/">Связки</a>
-				{% else %}
-					Связки
-				{% endif %}
-			</td>
-			<td>
-				{% if school.show.marks %}
-					<a href="{% url src.marks.views.marksStep1 school.id %}">Оценки</a>
-				{% else %}
-					Оценки
-				{% endif %}
-			</td>
-		</tr>
+    <tr>
+      <td>
+        {% if school.show.deliveryes %}
+          <a href="/marks/delivery/{{ school.id }}/">Рассылки</a>
+        {% else %}
+          Рассылки
+        {% endif %}
+      </td>
+      <td>
+        {% if school.show.connections %}
+          <a href="/administrator/uni/connection/{{ school.id }}/">Связки</a>
+        {% else %}
+          Связки
+        {% endif %}
+      </td>
+      <td>
+        {% if school.show.marks %}
+          <a href="{% url src.marks.views.marksStep1 school.id %}">Оценки</a>
+        {% else %}
+          Оценки
+        {% endif %}
+      </td>
+    </tr>
+    <tr>
+      <td>
+        {% if school.show.ringtimetable %}
+          <a href="/attendance/ringtimetable/{{ school.id }}/">Расписание звонков</a>
+        {% else %}
+          Расписание звонков
+        {% endif %}
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+    </tr>
 		<tr>
 			<td colspan="3"><hr /></td>
 		</tr>

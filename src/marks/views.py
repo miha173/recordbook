@@ -409,7 +409,7 @@ def marksView(request, subject_id):
 @user_passes_test(lambda u: u.is_administrator())
 def delivery(request, school):
     render = {}
-    school = get_object_or_404(School, id = school)
+    render['school'] = school = get_object_or_404(School, id = school)
     if request.method == 'GET':
         render['form'] = DeliveryForm(school = school)
     else:

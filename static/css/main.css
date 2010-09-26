@@ -598,7 +598,7 @@ body#site #header {
 		font-size:80%;
 	}
 	
-	table#shedule td#today small {
+	table#shedule td#today small, table#shedule td#today small a {
 		color:#090;
 	}
 	

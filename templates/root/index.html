@@ -1,14 +1,5 @@
 {% extends BASE_TEMPLATE %}
 
-{% comment %}
-{% block menu %}
-<ul>
-	<li><a href="/marks/">Выставление отметок</a>{% block marks_menu %}{% endblock %}</li>
-	<li><a href="/curator/">Классное руководство</a>{% block curator_menu %}{% endblock %}</li>
-</ul>
-{% endblock %}
-{% endcomment %}
-
 {% block padding %}
 	{% if BASE_TEMPLATE == 'administrator.html' %}
 		<a href="/administrator/uni/school/add/"><h1>Добавить школу</h1></a>
@@ -22,8 +13,9 @@
                         <td>
                             {% include 'helpers/classmates.html' %}
                         </td>
-						
+          {% for timetable in timetables %}						
 						{% include 'attendance/day.html' %}
+					{% endfor %}
 						
                         <td>
                             <div id="class-teacher">
@@ -63,6 +55,21 @@
                             </div>
                             <!-- / Объявление -->
 							{% endcomment %}
+                        </td>
+                        <td>
+<table id="shedule">
+<tr><td>
+  {% if lessons %}
+    <div id="bells">
+      <big style="padding:0;margin:0px;">Расписание звонков</big>
+      {# <small style="margin:0px;padding-bottom: 5px;">{{ ringtimetable_workday }}</small>#}
+      {% for lesson in lessons %}
+        <p>{{ lesson.number }} {{ lesson.start|time:"H:i" }}—{{ lesson.end|time:"H:i" }}</p>
+      {% endfor %}
+    </div>
+  {% endif %}
+</td></tr></table>
+
                         </td>
                     </tr>
                 </table>
