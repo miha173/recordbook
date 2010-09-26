@@ -163,8 +163,9 @@ class Subject(RestModel):
         if lessons.count()<>0:
             Mark.objects.filter(lesson = lessons).delete()
             lessons.delete()
-        if Teacher.objects.filter(subjects = self).count()!=0:
+        for teacher in Teacher.objects.filter(subjects = self):
             teacher.subjects.remove(self)
+            teacher.save()
         super(Subject, self).delete()
     class Meta:
         ordering = ['name']
