@@ -104,7 +104,7 @@ def ringtimetableList(request, school):
         for day in settings.WORKDAYS:
             if not school.saturday and day[0] == 6: continue 
             for lesson in settings.LESSON_NUMBERS:
-                start = request.POST.get('l_s_%s_%s' % (day[0], lesson[0]), '')
+                start = request.POST.get('l_s_%s_%s' % (day[0], lesson[0]), '').replace('-', '-')
                 if start == '': 
                     if UsalRingTimetable.objects.filter(number = lesson[0], school = school, workday = day[0]).count() != 0:
                         UsalRingTimetable.objects.filter(number = lesson[0], school = school, workday = day[0]).delete()
@@ -114,7 +114,7 @@ def ringtimetableList(request, school):
                 else:
                     tt = UsalRingTimetable.objects.get(number = lesson[0], school = school, workday = day[0])
                 tt.start = start
-                tt.end = request.POST.get('l_e_%s_%s' % (day[0], lesson[0]), '')
+                tt.end = request.POST.get('l_e_%s_%s' % (day[0], lesson[0]), '').replace('-', '-')
                 tt.save()
     render['form'] = form
     return render_to_response('attendance/ringtimetable.html', render, context_instance = RequestContext(request))
