@@ -3,11 +3,30 @@
 <head>
 	<title>{% block title %}Система электронных дневников{% endblock %}</title>
 	<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/paginator3000.css" />
-	<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/print.css" media="print" />
+  <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/print.css" media="print" />
+  
+  <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/datepicker.css" /> 
+  <link type="text/css" href="{{ MEDIA_URL }}css/blitzer_/jquery-ui-1.7.2.custom.css" rel="stylesheet" />  
+  <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery-1.3.2.min.js"></script>
+  <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery-ui-1.7.2.custom.min.js"></script> 
+  
 	<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/default.css" media="screen" />
 	<script type="text/javascript" src="{{ MEDIA_URL }}js/paginator3000.js"></script>
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
 	<script type="text/javascript" src="{{ MEDIA_URL }}js/all.js"></script>
+  <script type="text/javascript">
+    $(function(){
+      options = {
+        inline: true,
+        dateFormat: 'dd.mm.y',
+        dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+        dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+        monthNames: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+        monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Ил', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+        firstDay: 1,
+      }
+      $('#id_date').datepicker(options);
+    });
+  </script>
 	<style>
 /*
 		body{
