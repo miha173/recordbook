@@ -28,6 +28,10 @@ class TimetableForm(forms.Form):
         return str
 
 class RingTimetableForm(forms.Form):
+    def clean(self):
+        for field in self.cleaned_data:
+            if field.find(':') == -1: raise forms.ValidationError(u'Время указывается через двоеточие')
+            
     def get_fields(self):
         str = ''
         for day in settings.WORKDAYS:
