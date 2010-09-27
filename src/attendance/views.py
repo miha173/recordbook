@@ -52,8 +52,12 @@ def timetableSet(request, id, school = 0):
                 subject = None
                 if UsalTimetable.objects.filter(grade = grade, number = lesson[0], group = i, school = school, workday = day[0]).count() != 0:
                     u = UsalTimetable.objects.get(grade = grade, number = lesson[0], group = i, school = school, workday = day[0])
-                form.fields['l_s_%s_%s' % (day[0], lesson[0])] = forms.TimeField(initial = u.start)
-                form.fields['l_e_%s_%s' % (day[0], lesson[0])] = forms.TimeField(initial = u.end)
+                    start = u.start
+                    end = u.end
+                else:
+                    start = end = None
+                form.fields['l_s_%s_%s' % (day[0], lesson[0])] = forms.TimeField(initial = start)
+                form.fields['l_e_%s_%s' % (day[0], lesson[0])] = forms.TimeField(initial = end)
     if request.method == 'POST':
         form.initial = request.POST
         for day in settings.WORKDAYS:
