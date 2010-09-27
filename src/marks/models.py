@@ -3,6 +3,7 @@
 from django.db import models
 from src.rest.models import RestModel, RestModelManager
 from src.userextended.models import Pupil, Teacher, Subject, Grade, School
+from src import settings
 
 class LessonManager(RestModelManager):
     def search(self, str):
@@ -23,6 +24,7 @@ class Lesson(RestModel):
     task = models.CharField(u'Домашнее задание', max_length = 200, blank = True, null = True)
     subject = models.ForeignKey(Subject, verbose_name = u'Предмет')
     grade = models.ManyToManyField(Grade, verbose_name = u'Класс')
+    file = models.FileField(verbose_name = u'Приложить файл', null = True, blank = True, upload_to = 'lessons')
 
     serialize_fields = ['id', 'teacher_id', 'date', 'topic', 'task', 'subject_id', 'grade']
     serialize_name = 'lesson'

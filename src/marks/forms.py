@@ -15,7 +15,7 @@ from src import settings
 class LessonForm(forms.ModelForm):
     class Meta:
         model = Lesson
-        fields = ['date', 'topic', 'task', 'grade']
+        fields = ['date', 'topic', 'task', 'grade', 'file']
     date = forms.DateField(('%d.%m.%y',), label=u'Дата', widget=forms.DateTimeInput(format='%d.%m.%y'))
 
 class MarkForm(forms.ModelForm):
@@ -65,6 +65,9 @@ class StatForm(forms.Form):
 
 def MarkValidator(school):
     def _validator(mark): 
+        import re
+        if not re.match('\d', mark):
+            raise forms.ValidationError(u'Неверная оценка')
         if int(mark) in range(1, max_mark + 1):
             return int(mark)
         else:

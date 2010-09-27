@@ -49,15 +49,14 @@ def timetableSet(request, id, school = 0):
         if not school.saturday and day[0] == 6: continue 
         for lesson in settings.LESSON_NUMBERS:
             for i in xrange(1, 3):
+                room = ''
                 subject = None
                 if UsalTimetable.objects.filter(grade = grade, number = lesson[0], group = i, school = school, workday = day[0]).count() != 0:
                     u = UsalTimetable.objects.get(grade = grade, number = lesson[0], group = i, school = school, workday = day[0])
-                    start = u.start
-                    end = u.end
-                else:
-                    start = end = None
-                form.fields['l_s_%s_%s' % (day[0], lesson[0])] = forms.TimeField(initial = start)
-                form.fields['l_e_%s_%s' % (day[0], lesson[0])] = forms.TimeField(initial = end)
+                    room = u.room
+                    subject = u.subject.id
+                form.fields['l_r_%s_%s_%d' % (day[0], lesson[0], i)] = forms.CharField(initial = room, required = False)
+                form.fields['l_s_%s_%s_%d' % (day[0], lesson[0], i)] = forms.ModelChoiceField(initial = subject, queryset = grade.get_subjects(), required = False)
     if request.method == 'POST':
         form.initial = request.POST
         for day in settings.WORKDAYS:
