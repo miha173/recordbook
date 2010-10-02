@@ -2,7 +2,9 @@
 
 {% block padding %}
 	{% if BASE_TEMPLATE == 'administrator.html' %}
-		<a href="/administrator/uni/school/add/">Добавить школу</a>
+  	{% if user.is_superuser %}
+  		<a href="/administrator/uni/school/add/">Добавить школу</a>
+    {% endif %}
 	{% endif %}
 {% endblock %}
 

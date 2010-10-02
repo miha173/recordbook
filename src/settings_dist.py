@@ -30,6 +30,8 @@ TIME_ZONE = 'Europe/Moscow'
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
+MEDIA_ROOT = os.path.join(PROJECT_DIR, "..", "static")
+
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = 'ru-ru'

@@ -183,7 +183,7 @@ def lessonEdit(request, mode, id = 0):
             render['form'].fields['grade'].queryset = Grade.objects.filter(id__in = grades_id)
             return render_to_response('marks/teacher/lesson.html', render, context_instance = RequestContext(request))
     else:
-        form = LessonForm(request.POST)
+        form = LessonForm(request.POST, request.FILES)
         grades_id = []
         for connection in Connection.objects.filter(teacher = request.user):
             grades_id.append(connection.grade.id)
@@ -191,7 +191,7 @@ def lessonEdit(request, mode, id = 0):
         if mode == 'edit':
             if form.is_valid():
                 lesson = get_object_or_404(Lesson, id = id, teacher = request.user)
-                form = LessonForm(request.POST, instance = lesson)
+                form = LessonForm(request.POST, request.FILES, instance = lesson)
                 form.save()
                 return HttpResponseRedirect('/marks/lesson/')
             else:

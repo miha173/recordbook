@@ -48,7 +48,9 @@
                     {% if ACTIVE_URL == 'marks' %}<big class="red">Оценки</big>{% else %}<a href="/marks/">Оценки</a>{% endif %}
                     {% if ACTIVE_URL == 'grade' %}<big class="purple">Класс</big>{% else %}<a href="/grade/">Класс</a>{% endif %}
                     {% if ACTIVE_URL == 'teachers' %}<big class="blue">Учителя</big>{% else %}<a href="/teachers/">Учителя</a>{% endif %}
-                    {% if ACTIVE_URL == 'sms' %}<big class="blue">SMS-уведомления</big>{% else %}<a href="/sms/">SMS-уведомления</a>{% endif %}
+                    {% if user.school.gate_use %}
+                      {% if ACTIVE_URL == 'sms' %}<big class="blue">SMS-уведомления</big>{% else %}<a href="/sms/">SMS-уведомления</a>{% endif %}
+                    {% endif %}
                 </div>
             </div>
             <!-- / Шапка --><!-- Тень -->
