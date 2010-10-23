@@ -493,15 +493,11 @@ def marksStep3(request, school, grade, subject):
         forms[u'%s %s.' % (pupil.last_name, pupil.first_name[0])] = MarksAdminForm(pupil = pupil, dates = dates, init = init, prefix = 'p%d' % pupil.id, data = data)
     if request.method == 'POST':
         if all([forms[key].is_valid() for key in forms]):
-            a = []
             for form in forms.itervalues():
                 for d in dates:
                     field = 'mark-%d%d%d' % (d.day, d.month, d.year)
-#                    a.append(field)
                     if field in form.cleaned_data:
-#                        if field == 'mark-1692010': saas
                         if form.cleaned_data[field] != '': 
-#                            asas1
                             lesson_kwargs = {'grade': grade, 'subject': subject, 'date': d}
                             if Lesson.objects.filter(**lesson_kwargs).count() == 1:
                                 lesson = Lesson.objects.get(**lesson_kwargs)

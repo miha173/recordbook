@@ -1,4 +1,6 @@
 # -*- coding: UTF-8 -*-
+import re
+
 
 from django.template import RequestContext
 from django.shortcuts import render_to_response, get_object_or_404
@@ -118,6 +120,7 @@ def ringtimetableList(request, school):
                     tt = UsalRingTimetable.objects.get(number = lesson[0], school = school, workday = day[0])
                 tt.start = start
                 tt.end = request.POST.get('l_e_%s_%s' % (day[0], lesson[0]), '').replace('-', ':')
+                if not (re.match('^\d2:\d2$', tt.start) and re.match('^\d2:\d2$', tt.end)) : continue
                 tt.save()
     render['form'] = form
     return render_to_response('attendance/ringtimetable.html', render, context_instance = RequestContext(request))
