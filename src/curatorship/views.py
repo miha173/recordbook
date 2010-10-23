@@ -154,9 +154,9 @@ def pupilEdit(request, mode, id = 0):
 def graphiks(request):
     render = {}
     if request.method == 'GET':
-        render['form'] = GraphiksForm()
+        render['form'] = GraphiksForm(school = request.user.school)
     else:
-        form = GraphiksForm(request.POST)
+        form = GraphiksForm(school = request.user.school, data = request.POST)
         form.is_valid()
         render['subjects'] = form.cleaned_data['subjects']
         render['resultdates'] = form.cleaned_data['resultDates']

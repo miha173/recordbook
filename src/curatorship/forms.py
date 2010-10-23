@@ -41,3 +41,7 @@ class PupilForm(forms.ModelForm):
 class GraphiksForm(forms.Form):
     subjects = forms.ModelMultipleChoiceField(queryset=Subject.objects.all(), label = u'Предметы')
     resultDates = forms.ModelMultipleChoiceField(queryset=ResultDate.objects.all(), label = u'Значения')
+    def __init__(self, school, *args, **kwargs):
+        super(GraphiksForm, self).__init__(*args, **kwargs)
+        self.fields['subjects'].queryset = self.fields['subjects'].queryset.filter(school = school)
+        self.fields['resultDates'].queryset = self.fields['resultDates'].queryset.filter(school = school)
