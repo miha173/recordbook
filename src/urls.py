@@ -15,7 +15,7 @@ urlpatterns = patterns('',
                        (r"^sms/$", "src.views.sms"),
                        
                        (r'^admin/doc/', include('django.contrib.admindocs.urls')),
-                       (r'^admin/(.*)', admin.site.root),
+                       (r'^admin/(.*)', include(admin.site.urls)),
                        
                        (r'^accounts/', include('src.userextended.urls')),
                        (r'^marks/', include('src.marks.urls')),

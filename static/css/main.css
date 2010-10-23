@@ -40,7 +40,7 @@ a:hover {color:#D52023;}
 
 /* Все */
 #all {
-	max-width:1600px;
+	/*max-width:1600px;*/
 	min-width:900px;
 	width:expression((document.documentElement.clientWidth	|| document.body.clientWidth) < 980 ? '980px' : (document.documentElement.clientWidth || document.body.clientWidth) > 1600 ? '1635px' : '99.9%' );
 }
