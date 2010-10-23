@@ -49,6 +49,8 @@ class PupilForm(forms.ModelForm):
     def __init__(self, school = None, *args, **kwargs):
         super(PupilForm, self).__init__(*args, **kwargs)
         self.fields['grade'].queryset = Grade.objects.filter(school = school)
+        if not Option.objects.filter(school = school, key = 'TC_IP'):
+            del self.fields['cart']
     photo = forms.FileField(required = False)
     class Meta:
         model = Pupil
@@ -57,6 +59,8 @@ class PupilForm(forms.ModelForm):
 class StaffForm(forms.ModelForm):
     def __init__(self, school = None, *args, **kwargs):
         super(StaffForm, self).__init__(*args, **kwargs)
+        if not Option.objects.filter(school = school, key = 'TC_IP'):
+            del self.fields['cart']
     class Meta:
         model = Staff
         fields = ('last_name', 'first_name', 'middle_name', 'administrator', 'cart')
@@ -67,8 +71,8 @@ class TeacherForm(forms.ModelForm):
         self.fields['grades'].queryset = Grade.objects.filter(school = school)
         self.fields['subjects'].queryset = Subject.objects.filter(school = school)
         self.fields['grade'].queryset = Grade.objects.filter(school = school)
-#        if not Option.objects.filter(key = 'TC_IP', school = school):
-#            del self.fields['cart']
+        if not Option.objects.filter(school = school, key = 'TC_IP'):
+            del self.fields['cart']
     class Meta:
         model = Teacher
         fields = ('last_name', 'first_name', 'middle_name', 'grade', 'grades', 'subjects', 'cart', 'administrator')

@@ -82,6 +82,7 @@
           {% if form.administrator.help_text %}<div class="help_text">{{ form.administrator.help_text }}</div>{% endif %}
         </td>
       </tr>
+      {% if form.cart %}
 			<tr>
 				<td class="label"><label for="id_cart">Номер карты: </label></td>
 				<td>{{ form.cart }}
@@ -90,6 +91,7 @@
 					{% if form.cart.help_text %}<div class="help_text">{{ form.cart.help_text }}</div>{% endif %}
 				</td>
 			</tr>
+		{% endif %}
 		</table>
 	</fieldset>
 	</td></tr><tr><td>

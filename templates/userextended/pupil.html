@@ -112,14 +112,16 @@
 					{% if form.special.help_text %}<div class="help_text">{{ form.cpecial.help_text }}</div>{% endif %}
 			</td>
 			</tr>
-			<tr>
-				<td class="label"><label for="id_cart">Номер карты: </label></td>
-				<td>{{ form.cart }}
-				<td>
-					{% if form.cart.errors %}<div class="error_text">{{ form.cart.errors }}</div>{% endif %}
-					{% if form.cart.help_text %}<div class="help_text">{{ form.cart.help_text }}</div>{% endif %}
-				</td>
-			</tr>
+			{% if form.cart %} 
+				<tr>
+					<td class="label"><label for="id_cart">Номер карты: </label></td>
+					<td>{{ form.cart }}
+					<td>
+						{% if form.cart.errors %}<div class="error_text">{{ form.cart.errors }}</div>{% endif %}
+						{% if form.cart.help_text %}<div class="help_text">{{ form.cart.help_text }}</div>{% endif %}
+					</td>
+				</tr>
+			{% endif %}
 			<tr>
 				<td class="label"><label for="id_cart">Фотография </label></td>
 				<td>{{ form.photo }}
