@@ -443,9 +443,22 @@ def marksStep1(request, school):
 @login_required
 @user_passes_test(lambda u: u.is_administrator())
 def marksStep2(request, school, grade): 
+    from django import forms
+    class _SetMarks(StatForm):
+        subject = forms.ModelChoiceField(queryset = Subject.objects.all(), label = u'Класс', empty_label = None)
+        def __init__(self, grade, *args, **kwargs):
+            super(_SetMarks, self).__init__(*args, **kwargs)
+            self.fields['subject'].queryset = grade.get_subjects()
     render = {}
     render['school'] = school = get_object_or_404(School, id = school)
     render['grade'] = grade = get_object_or_404(Grade, id = grade)
+    if request.method == 'POST': data = request.POST
+    else: data = None
+    render['form'] = form = _SetMarks(grade, data)
+    if form.is_valid():
+        return HttpResponseRedirect('/marks/set/%d/%d/%d/?start=%s&end=%s' % 
+                                    (school.id, grade.id, form.cleaned_data['subject'].id, request.POST.get('start'), request.POST.get('end'))
+                                    )
     return render_to_response('marks/administrator/marksStep2.html', render, context_instance = RequestContext(request))
 
 
@@ -457,25 +470,38 @@ def marksStep3(request, school, grade, subject):
     render['grade'] = grade = get_object_or_404(Grade, id = grade)
     render['subject'] = subject = get_object_or_404(Subject, id = subject)
     render['dates'] = dates = []
-    d = date.today() - timedelta(days = 14)
-    while d < date.today() + timedelta(days = 1):
-        dates.append(d)
-        d += timedelta(days = 1)
+    d_st = d_end = None
+    t = StatForm(request.GET)
+    if t.is_valid():
+        d_st, d_end = t.cleaned_data['start'], t.cleaned_data['end']
+    if not(d_st and d_end):
+        d_st = date.today() - timedelta(days = 14)
+        d_end = date.today()
+    d_end += timedelta(days = 1)
+    d_start = d_st
+    while d_st < d_end:
+        dates.append(d_st)
+        d_st += timedelta(days = 1)
+    render['start'], render['end'] = d_start, d_end
     render['forms'] = forms = {}
     if request.method == 'GET': data = None
     else: data = request.POST
     for pupil in Pupil.objects.filter(grade = grade).order_by('last_name'):
         init = {}
-        for mark in Mark.objects.filter(lesson__date__range = (date.today() - timedelta(days = 14), date.today() + timedelta(days = 1)), pupil = pupil, lesson__subject = subject):
+        for mark in Mark.objects.filter(lesson__date__range = (d_start, d_end), pupil = pupil, lesson__subject = subject):
             init['mark-%d%d%d' % (mark.lesson.date.day, mark.lesson.date.month, mark.lesson.date.year)] = mark.mark
         forms[u'%s %s.' % (pupil.last_name, pupil.first_name[0])] = MarksAdminForm(pupil = pupil, dates = dates, init = init, prefix = 'p%d' % pupil.id, data = data)
     if request.method == 'POST':
         if all([forms[key].is_valid() for key in forms]):
+            a = []
             for form in forms.itervalues():
                 for d in dates:
                     field = 'mark-%d%d%d' % (d.day, d.month, d.year)
+#                    a.append(field)
                     if field in form.cleaned_data:
+#                        if field == 'mark-1692010': saas
                         if form.cleaned_data[field] != '': 
+#                            asas1
                             lesson_kwargs = {'grade': grade, 'subject': subject, 'date': d}
                             if Lesson.objects.filter(**lesson_kwargs).count() == 1:
                                 lesson = Lesson.objects.get(**lesson_kwargs)

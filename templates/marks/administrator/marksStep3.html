@@ -13,7 +13,7 @@
 		{{ item.errors }}
 	{% endfor %}
 </ul>
-<form method="post" action=".">
+<form method="post" action="?start={{ start|date:"d.m.Y" }}&end={{ end|date:"d.m.Y" }}">
 	<table class="table">
 		<thead>
 			<th>Ученики</th>
