@@ -66,7 +66,7 @@ class StatForm(forms.Form):
 def MarkValidator(school):
     def _validator(mark): 
         import re
-        if not re.match('\d', mark):
+        if not re.match('^\d+$', mark):
             raise forms.ValidationError(u'Неверная оценка')
         if int(mark) in range(1, max_mark + 1):
             return int(mark)
