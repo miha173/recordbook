@@ -215,8 +215,8 @@ class Clerk(User, RestModel):
 
         username = self.prefix + "."
         #Удаление нехороших символов из траслитерации
-        last_name = _clean_name(last_name)
-        first_name = _clean_name(first_name)
+        last_name = _clean_name(self.last_name)
+        first_name = _clean_name(self.first_name)
         if school:
             prefix = len(self.school.prefix)
             username +=  self.school.prefix + "."
