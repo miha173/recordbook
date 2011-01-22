@@ -1,0 +1,261 @@
+@charset "utf-8";
+/* Основные */
+* {
+	margin:0;
+	padding:0;
+}
+
+body {
+	width:100%;
+	color:#000;
+	font-family:Arial;
+	font-size:100%;
+	background:#F3F3E3;
+	behavior:url(/hover.htc);
+}
+
+table {
+	font-size:100%;
+	border-collapse:collapse;
+}
+
+.clear {
+	width:100%;
+	clear:both;
+	float:none !important;
+	overflow:hidden;
+	height:0;
+	font-size:0;
+}
+
+a {color:#0E90B8;}
+a:hover {color:#D52023;}
+
+
+
+
+/* Все */
+#all {
+	max-width:1600px;
+	min-width:900px;
+	width:expression((document.documentElement.clientWidth	|| document.body.clientWidth) < 980 ? '980px' : (document.documentElement.clientWidth || document.body.clientWidth) > 1600 ? '1635px' : '99.9%' );
+}
+
+
+
+
+
+/* Логотип */
+#logo {
+	position:absolute;
+	top:1em;
+	left:0;
+	width:33%;
+	z-index:99;
+}
+
+#logo img {
+	margin-left:20px;
+}
+
+
+
+
+
+/* Навигация */
+#navigation {
+	position:absolute;
+	top:1.5em;
+	left:33%;
+	width:66%;
+	z-index:99;
+}
+
+#navigation strong {display:block; float:left; margin:0 1em 0 0; color:#E0FF84; font-size:80%; font-weight:bold;}
+#navigation a {display:block; float:left; margin:0 1em 0 0; color:#fff; font-size:80%;}
+#navigation a:hover {color:#E0FF84;}
+
+
+
+
+
+/* Экран */
+#screen {
+	float:left;
+	width:66%;
+	margin-top:-200px;
+	padding:0 34% 2em 0;
+	background:#1F2F02 url(/img/design/site/screen-bg.jpg) 0 6em repeat-x;
+}
+
+#screen #margin {
+	margin:6em -251px 0 16px;
+}
+
+#screen #tl {
+	float:left;
+	width:99%;
+	background:url(/img/design/site/screen-tl.jpg) top left no-repeat;
+}
+
+#screen #tr {
+	float:left;
+	width:100%;
+	background:url(/img/design/site/screen-tr.jpg) top right no-repeat;
+}
+
+#screen #bl {
+	float:left;
+	width:100%;
+	background:url(/img/design/site/screen-bl.jpg) bottom left no-repeat;
+}
+
+#screen #br {
+	float:left;
+	width:100%;
+	background:url(/img/design/site/screen-br.jpg) bottom right no-repeat;
+}
+
+#screen #bc {
+	float:left;
+	width:100%;
+	min-width:840px;
+	min-height:300px;
+	//height:300px;
+	background:url(/img/design/site/screen-bc.jpg) bottom center no-repeat;
+}
+
+*+html #screen #bc {min-height:300px; height:auto;}
+
+#screen #left {
+	float:left;
+	width:100%;
+	margin:210px 0 0 0;
+	padding:0 0 34px 0;
+}
+
+#screen #left #padding {
+	padding:0 295px 0 40px;
+}
+
+#screen #login {
+	float:right;
+	width:271px;
+	margin:210px 0 0 -280px;
+	//margin:210px 0 0 -273px;
+	padding:150px 0 40px 0;
+}
+
+	#screen #login p {
+		display:block;
+		float:left;
+		width:11em;
+		height:1.5em;
+		margin:0 2em 1em 0;
+		padding:0 0 0 45px;
+		font-size:80%;
+		color:#fff;
+		font-weight:bold;
+	}
+
+	#screen #login input {
+		display:block;
+		float:left;
+		width:11em;
+		height:1.5em;
+		margin:0 2em 1em 45px;
+		padding-left:1.5em;
+		font-size:80%;
+		background:#EBEBEB;
+		border:1px solid #9C9C9C;
+		border-bottom:1px solid #fff;
+		border-right:1px solid #fff;
+	}
+
+	#screen #login input.login {
+		background:#EBEBEB url(/img/design/site/login.gif) 3px 0.3em no-repeat;
+	}
+
+	#screen #login input.password {
+		background:#EBEBEB url(/img/design/site/password.gif) 5px 0.3em no-repeat;
+	}
+
+	#screen #login input:focus {
+		background-color:#fff;
+		border:1px solid #E0FF84;
+		border-bottom:1px solid #E0FF84;
+		border-right:1px solid #E0FF84;
+	}
+
+	#screen #login input.button {
+		display:block;
+		float:left;
+		width:12.5em;
+		height:2.5em;
+		margin:0 2em 1em 45px;
+		padding:0 0 0 1.5em;
+		font-weight:bold;
+		text-align:left;
+		background:#EBEBEB;
+		border:2px solid #fff;
+		border-bottom:2px solid #9C9C9C;
+		border-right:2px solid #9C9C9C;
+		cursor:pointer;
+	}
+
+
+
+
+
+/* Колонки */
+#columns {
+	float:left;
+	width:100%;
+	background:#fff;
+}
+
+#columns div {
+	float:left;
+	width:33%;
+	padding:1.5em 0 2em 0;
+}
+
+#columns div  a, 
+#columns div  p {
+	display:block;
+	margin:0 20px;
+}
+
+#columns div  a {
+	font-size:130%;
+}
+
+#columns div  p {
+	font-size:80%;
+	padding-top:1em;
+}
+
+	
+	
+	
+	
+
+/* © */
+#copyright {
+clear:both;
+	width:100%;
+	border-top:1px solid #DCDCD0;
+	background:#F3F3E3;
+}
+
+#copyright div.column {
+	float:left;
+	width:33%;
+	padding:1.5em 0;
+}
+
+#copyright div.column p {
+	padding:0 20px;
+	color:#999;
+	font-size:70%;
+}

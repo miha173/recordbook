@@ -1,0 +1,9 @@
+{% extends 'marks/page.html' %}
+
+{% block marks_p_menu %}
+<ul>
+	{% for subject in subjects %}
+	<li{% ifequal current_subject subject.id %} class="active"{% endifequal %}><a href="/marks/subject/{{ subject.id }}/">{{ subject.name }}</a></li>
+	{% endfor %}
+</ul>
+{% endblock %}

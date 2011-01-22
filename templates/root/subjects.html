@@ -1,0 +1,35 @@
+{% extends 'page_pupil.html' %}
+
+{% block padding %}
+{#<h1>I четверть</h1> <a href="#">II четверть</a> <a href="#">III четверть</a> <span>IV четверть</span>#}
+{% endblock %}
+
+{% block sort_headers %}{1: {sorter: false}, 3: {sorter: false}}{% endblock %}
+
+{% block content %}
+
+<table class="table sort">
+  <thead>
+  <tr>
+    <th class="ajax_link"><span>Уроки</span></th>
+    {#<th>Кабинеты</th>#}
+    <th>Дни</th>
+    <th class="ajax_link"><span>Средний балл</span></th>
+    <th>Учитель</th>
+  </tr>
+  </thead>
+  
+  <tbody>
+  	{% for subject in subjects %}
+	  <tr class="{% cycle 'gray' '' %}">
+	    <td><a href="/marks/{{ subject.id }}/">{{ subject }}</a></td>
+	    {#<td><div class="classroom"><div><div>205</div></div></div></td>#}
+	    <td><div class="calendar">{{ subject.days|join:", " }}</div></td>
+	    <td><div class="mark-normal">{{ subject.avg|default:0|floatformat:"-1" }}</div></td>
+	    <td><div class="teacher"><a href="/teachers/{{ subject.teacher.id }}/">{{ subject.teacher.fio }}</a></div></td>
+	  </tr>
+  	{% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

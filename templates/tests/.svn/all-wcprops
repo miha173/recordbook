@@ -1,0 +1,83 @@
+K 25
+svn:wc:ra_dav:version-url
+V 38
+/svn/!svn/ver/78/trunk/templates/tests
+END
+page.html
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/!svn/ver/78/trunk/templates/tests/page.html
+END
+questionAEdit.html
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/!svn/ver/78/trunk/templates/tests/questionAEdit.html
+END
+test.html
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/!svn/ver/78/trunk/templates/tests/test.html
+END
+questionBEdit.html
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/!svn/ver/78/trunk/templates/tests/questionBEdit.html
+END
+groupEdit.html
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/!svn/ver/78/trunk/templates/tests/groupEdit.html
+END
+variantA.html
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/!svn/ver/78/trunk/templates/tests/variantA.html
+END
+variantB.html
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/!svn/ver/78/trunk/templates/tests/variantB.html
+END
+groupView.html
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/!svn/ver/78/trunk/templates/tests/groupView.html
+END
+question.html
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/!svn/ver/78/trunk/templates/tests/question.html
+END
+index.html
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/svn/!svn/ver/78/trunk/templates/tests/index.html
+END
+variants.html
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/!svn/ver/78/trunk/templates/tests/variants.html
+END
+testView.html
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/!svn/ver/78/trunk/templates/tests/testView.html
+END
+testList.html
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/!svn/ver/78/trunk/templates/tests/testList.html
+END

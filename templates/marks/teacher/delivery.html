@@ -1,0 +1,14 @@
+{% extends BASE_TEMPLATE %}
+
+{% block padding %}
+    <a href="/#sch{{ school.id }}">{{ school }}</a>
+    <span>&rarr;</span>
+    <h1>Создание рассылки</h1>
+    <table><tr style="vertical-align: baseline;"><td>
+  </td><td style="padding-left: 20px;">
+  </td></tr></table>
+{% endblock %}
+
+{% block content %}
+	{% include 'helpers/uniForm.html' %}
+{% endblock %}

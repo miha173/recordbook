@@ -1,0 +1,10 @@
+{% extends 'page.html' %}
+
+{% block curatorship_menu %}
+<ul>
+	<li{% ifequal path "connections" %} class="active"{% endifequal %}><a href="/curatorship/connections/">Связки</a></li>
+	<li{% ifequal path "pupil" %} class="active"{% endifequal %}><a href="/curatorship/pupil/">Ученики</a></li>
+	<li{% ifequal path "pupil_passwords" %} class="active"{% endifequal %}><a href="/curatorship/pupil_passwords/">Пароли учеников</a></li>
+	<li{% ifequal path "graphics" %} class="active"{% endifequal %}><a href="/curatorship/graphics/">Аналитика</a></li>
+</ul>
+{% endblock %}

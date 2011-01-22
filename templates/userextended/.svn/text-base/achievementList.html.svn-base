@@ -1,0 +1,31 @@
+{% extends BASE_TEMPLATE %}
+
+{% block padding %}
+    <a href="/administrator/uni/school/#sch{{ pupil.school.id }}">{{ pupil.school }}</a>
+    <span>&rarr;</span>
+    <h1>Достижения</h1>
+    <table><tr style="vertical-align: baseline;"><td>
+		<a href="add/">Добавить</a>
+	</td><td style="padding-left: 20px;">
+		{% include 'helpers/search_form.html' %}
+	</td></tr></table>
+{% endblock %}
+
+{% block content %}
+{% if objects.object_list %}
+<table class="table">
+	<thead>
+		<th>Заголовок</th>
+		<th>Дата</th>
+		<th>Действия</th>
+	</thead>
+	{% for object in objects.object_list %}
+		<tr class="{% cycle 'gray' '' %}">
+			<td>{{ object.title }}</td>
+			<td>{{ object.date|date:"d.m.Y" }}</td>
+			<td>{% include "helpers/buttons/edit.html" %}</td>
+	{% endfor %}
+</table>
+{% include "helpers/paginator.html" %}
+	{% endif %}
+{% endblock %}

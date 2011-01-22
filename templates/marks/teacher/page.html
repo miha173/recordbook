@@ -1,0 +1,15 @@
+{% extends 'marks/page.html' %}
+
+{% block topmenu %} 
+	{% spaceless %}
+	<ul>
+	{% for subject in subjects %}
+		{% ifequal subject.id user.current_subject.id %}
+			<li class="active">{{ subject.name }}</li>
+		{% else %}
+			<li><a href="/marks/set_current_subject/{{ subject.id }}?next={{ next }}">{{ subject.name }}</a></li>
+		{% endifequal %}
+	{% endfor %}
+	</ul>
+	{% endspaceless %}
+{% endblock %}

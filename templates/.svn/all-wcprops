@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 33
+/svn/!svn/ver/127/trunk/templates
+END
+page.html
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/svn/!svn/ver/116/trunk/templates/page.html
+END
+administrator.html
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/!svn/ver/112/trunk/templates/administrator.html
+END
+sms.html
+K 25
+svn:wc:ra_dav:version-url
+V 41
+/svn/!svn/ver/95/trunk/templates/sms.html
+END
+500.html
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/svn/!svn/ver/122/trunk/templates/500.html
+END
+page_pupil.html
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/svn/!svn/ver/121/trunk/templates/page_pupil.html
+END

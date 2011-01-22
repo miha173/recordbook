@@ -1,0 +1,102 @@
+{% extends BASE_TEMPLATE %}
+
+{% block padding %}
+    <a href="/administrator/uni/school/#sch{{ school.id }}">{{ school }}</a>
+    <span>&rarr;</span>
+    <a href="/administrator/uni/teacher/{{ school.id }}/">Учителя</a>
+    <span>&rarr;</span>
+    <h1>Редактирование</h1>
+{% endblock %}
+
+{% block content %}
+<form method="post" action=".">{% csrf_token %}
+<table class="table"><tr><td>
+	<fieldset>
+		<legend>Личная информация</legend>
+		<table>
+			<tr>
+				<td class="label"><label for="id_last_name">Фамилия:</label></td>
+				<td>{{ form.last_name }}</td>
+				<td>
+					{% if form.last_name.errors %}<div class="error_text">{{ form.last_name.errors }}</div>{% endif %}
+					{% if form.last_name.help_text %}<div class="help_text">{{ form.last_name.help_text }}</div>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<td class="label"><label for="id_first_name">Имя:</label></td>
+				<td>{{ form.first_name }}</td>
+				<td>
+					{% if form.first_name.errors %}<div class="error_text">{{ form.first_name.errors }}</div>{% endif %}
+					{% if form.first_name.help_text %}<div class="help_text">{{ form.first_name.help_text }}</div>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<td class="label"><label for="id_middle_name">Отчество: </label></td>
+				<td>{{ form.middle_name }}</td>
+				<td>
+					{% if form.middle_name.errors %}<div class="error_text">{{ form.middle_name.errors }}</div>{% endif %}
+					{% if form.middle_name.help_text %}<div class="help_text">{{ form.middle_name.help_text }}</div>{% endif %}
+				</td>
+			</tr>
+		</table>
+	</fieldset>
+	</td></tr><tr><td>
+	<fieldset>
+		<legend>Преподавание</legend>
+		<table>
+			<tr>
+				<td class="label"><label for="id_subjects">Предметы:</label></td>
+				<td>{{ form.subjects }}</td>
+				<td>
+					{% if form.subjects.errors %}<div class="error_text">{{ form.subjects.errors }}</div>{% endif %}
+					{% if form.subjects.help_text %}<div class="help_text">{{ form.subjects.help_text }}</div>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<td class="label"><label for="id_grades">Классы:</label></td>
+				<td>{{ form.grades }}</td>
+				<td>
+					{% if form.grades.errors %}<div class="error_text">{{ form.grades.errors }}</div>{% endif %}
+					{% if form.grades.help_text %}<div class="help_text">{{ form.grades.help_text }}</div>{% endif %}
+				</td>
+			</tr>
+		</table>
+	</fieldset>
+	</td></tr><tr><td>
+	<fieldset>
+		<legend>Другое</legend>
+		<table>
+      <tr>
+        <td class="label"><label for="id_grade">Классное руководство:</label></td>
+        <td>{{ form.grade }}</td>
+        <td>
+          {% if form.grade.errors %}<div class="error_text">{{ form.grade.errors }}</div>{% endif %}
+          {% if form.grade.help_text %}<div class="help_text">{{ form.grade.help_text }}</div>{% endif %}
+        </td>
+      </tr>
+      <tr>
+        <td class="label"><label for="id_grade">Администратор школы:</label></td>
+        <td>{{ form.administrator }}</td>
+        <td>
+          {% if form.administrator.errors %}<div class="error_text">{{ form.administrator.errors }}</div>{% endif %}
+          {% if form.administrator.help_text %}<div class="help_text">{{ form.administrator.help_text }}</div>{% endif %}
+        </td>
+      </tr>
+      {% if form.cart %}
+			<tr>
+				<td class="label"><label for="id_cart">Номер карты: </label></td>
+				<td>{{ form.cart }}
+				<td>
+					{% if form.cart.errors %}<div class="error_text">{{ form.cart.errors }}</div>{% endif %}
+					{% if form.cart.help_text %}<div class="help_text">{{ form.cart.help_text }}</div>{% endif %}
+				</td>
+			</tr>
+		{% endif %}
+		</table>
+	</fieldset>
+	</td></tr><tr><td>
+		<input type="submit" value="Сохранить" />
+	</td></tr>
+</table>
+</form>
+{% endblock %}

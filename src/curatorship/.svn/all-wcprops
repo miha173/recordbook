@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 39
+/svn/!svn/ver/125/trunk/src/curatorship
+END
+views.py
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/!svn/ver/125/trunk/src/curatorship/views.py
+END
+__init__.py
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/!svn/ver/78/trunk/src/curatorship/__init__.py
+END
+models.py
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/svn/!svn/ver/112/trunk/src/curatorship/models.py
+END
+urls.py
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/svn/!svn/ver/78/trunk/src/curatorship/urls.py
+END
+forms.py
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/!svn/ver/125/trunk/src/curatorship/forms.py
+END

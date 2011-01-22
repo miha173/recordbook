@@ -1,0 +1,5 @@
+{% extends 'tests/page.html' %}
+
+{% block content %}
+	{% include 'helpers/uniForm.html' %}
+{% endblock %}

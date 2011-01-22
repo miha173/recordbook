@@ -1,0 +1,35 @@
+{% if not user.hide_other_persons %}
+  <table class="table sort" id="index">
+      <thead>
+          <tr>
+              <th>
+              </th>
+              <th class="ajax_link">
+                  <span>Ученики</span>
+              </th>
+              <th class="ajax_link">
+                  <span>Средний балл</span>
+              </th>
+          </tr>
+      </thead>
+      <tbody>
+      	{% for pupil in classmates %}
+              <tr class="{% cycle 'gray' '' %}"{% if pupil.id == user.id %} id="me"{% endif %}>
+                  <td class="padding-right">
+                      <div class="number">
+                          {{ forloop.counter }}
+                      </div>
+                  </td>
+                  <td>
+                      {{ pupil.fi }}
+                  </td>
+                  <td>
+                      <div class="mark-{{ pupil.get_marks_avg_type }}">
+                          {{ pupil.get_marks_avg|floatformat:"-2" }}
+                      </div>
+                  </td>
+              </tr>
+  		{% endfor %}
+      </tbody>
+  </table>
+{% endif %}

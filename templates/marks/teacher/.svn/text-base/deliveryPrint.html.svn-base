@@ -1,0 +1,14 @@
+<html>
+	<head><title></title></head>
+<body>
+	{% for pupil in pupils %}
+		<i>{{ pupil.school }}</i><br />
+		<i>Ведомость успеваемости с {{ start|date:"d.m.Y" }} по {{ end|date:"d.m.Y" }}</i>
+		<h1>{{ pupil }}</h1> 
+		{% for subject in pupil.subjects %}
+			{{ subject }}: {{ subject.marks|join:", " }}<br />
+		{% endfor %}
+		<br clear=all style='page-break-before:always'>
+	{% endfor %}
+</body>
+</html>

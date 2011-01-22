@@ -1,0 +1,22 @@
+{% extends 'curatorship/page.html' %}
+
+{% block content %}
+<a href="add/">Добавить ученика</a>
+<table>
+	<thead>
+		<td>Ученик</td>
+		<td>Логин</td>
+		<td>Действия</td>
+	</thead>
+	{% for pupil in pupils %}
+	<tr>
+		<td>{{ pupil.fi }}</td>
+		<td>{{ pupil.username }}</td>
+		<td><a href="edit/{{ pupil.id }}/">Редактировать</a>, <a href="delete/{{ pupil.id }}/" class="delete">удалить</a>.</td>
+	</tr>
+	{% endfor %}
+</table>
+{% load pytils_numeral %}
+<br />
+Всего {{ pupils|length }} {{ pupils|length|choose_plural:pupil_plural }}.
+{% endblock %}

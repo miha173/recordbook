@@ -1,0 +1,38 @@
+{% extends BASE_TEMPLATE %}
+
+{% block padding %}
+    <a href="/administrator/uni/school/#sch{{ school.id }}">{{ school }}</a>
+    <span>&rarr;</span>
+    <h1>Классы</h1>
+    <table><tr style="vertical-align: baseline;"><td>
+		<a href="add/">Добавить класс</a>
+	</td><td style="padding-left: 20px;">
+	</td></tr></table>
+{% endblock %}
+
+{% block content %}
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+<table class="table">
+	<thead>
+		<th>Порядковый номер</th>
+		<th>Имя класса</th>
+		<th>Короткое имя</th>
+		<th>Действия</th>
+	</thead>
+	{% for object in objects.object_list %}
+		<tr class="{% cycle 'gray' '' %}">
+			<td>{{ object.number|default:"" }}</td>
+			<td>{{ object.long_name }}</td>
+			<td>{{ object.small_name }}</td>
+			<td>{% include "helpers/buttons/edit.html" %}</td>
+		</tr>
+	{% endfor %}
+</table>
+{% include "helpers/paginator.html" %}
+{% endblock %}

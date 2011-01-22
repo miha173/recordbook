@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/svn/!svn/ver/78/trunk/templates/curatorship
+END
+page.html
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/!svn/ver/78/trunk/templates/curatorship/page.html
+END
+connectionsList.html
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/!svn/ver/78/trunk/templates/curatorship/connectionsList.html
+END
+pupilPasswords.html
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/!svn/ver/78/trunk/templates/curatorship/pupilPasswords.html
+END
+connectionWizard.html
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/!svn/ver/78/trunk/templates/curatorship/connectionWizard.html
+END
+pupilList.html
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/!svn/ver/78/trunk/templates/curatorship/pupilList.html
+END
+graphiks.html
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/!svn/ver/78/trunk/templates/curatorship/graphiks.html
+END
+pupil.html
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/!svn/ver/78/trunk/templates/curatorship/pupil.html
+END
+pupilPasswordsList.html
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/!svn/ver/78/trunk/templates/curatorship/pupilPasswordsList.html
+END

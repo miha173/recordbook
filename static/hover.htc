@@ -1,0 +1,382 @@
+<public:component>
+	<script>
+		/*
+		// 2007-02-14
+		// Copyright (c) Art. Lebedev | http://www.artlebedev.ru/
+		// Author - Vladimir Tokmakov
+		*/
+		var sCSS_HREF = '';
+		Function.prototype.closure = function( obj ){
+			if( !window.__objs ){
+				window.__objs = [];
+				window.__funs = [];
+			}
+			var fun = this, objId = obj.__objId;
+			if( !objId ){
+				__objs[objId = obj.__objId = __objs.length] = obj;
+			}
+			var funId = fun.__funId;
+			if( !funId){
+				__funs[funId = fun.__funId = __funs.length] = fun;
+			}
+			if( !obj.__closures ){
+				obj.__closures = [];
+			}
+			var closure = obj.__closures[funId];
+			if( closure ){
+				return closure;
+			}    
+			obj = null;
+			fun = null;
+			return __objs[objId].__closures[funId] = function(){
+				return __funs[funId].apply(__objs[objId], arguments);
+			};
+			
+		}
+		
+		function vInit_Pseudo(){
+			window.vAttach_event = function( eThis, sEvent, fEvent, bLow_priority ){
+				if( !eThis[sEvent] ){
+					eThis['a' + sEvent] = new Array();
+					eThis[sEvent] = ( function(){
+						for( var i = 0 ; i < this['a' + sEvent].length ; i++ ){
+							this['a' + sEvent][i]( this );
+						}
+					} ).closure( eThis );
+				}
+				if( bLow_priority ){
+					eThis['a' + sEvent].unshift( fEvent );
+				}else{
+					eThis['a' + sEvent][eThis['a' + sEvent].length] = fEvent;
+				}
+			}
+
+			window.vAfter_check = function( eThis ){
+				if( eThis.vAfter_Content && !( eThis.childNodes.length > 1 && eThis.childNodes[eThis.childNodes.length - 2].nodeValue == '' ) ){
+					if( eThis.lastChild && eThis.lastChild.nodeType == 3 && eThis.lastChild.nodeValue.match( /\s$/ ) ){ eThis.lastChild.nodeValue = eThis.lastChild.nodeValue.replace( /\s+$/, '' ); }
+					var eSPAN = window.document.createElement( 'span' );
+					eSPAN.innerHTML = eThis.vAfter_Content;
+					var sValue = eSPAN.firstChild.nodeValue;
+					eThis.appendChild( window.document.createTextNode( '' ) );
+					eThis.appendChild( eSPAN.firstChild );
+					for( var i = 2, ii = eThis.childNodes.length - 2 ; i < ii ; i++ ){
+						if( eThis.childNodes[i].nodeType == 3 && eThis.childNodes[i].nodeValue == '' && eThis.childNodes[i + 1].nodeValue == sValue ){
+							eThis.removeChild( eThis.childNodes[i + 1] );
+							eThis.removeChild( eThis.childNodes[i] );
+							break;
+						}
+					}
+				}
+			}
+			window.vBefore_check = function( eThis ){
+				if( eThis.vBefore_Content && !( eThis.firstChild && eThis.firstChild.nodeValue == '' ) ){
+					var eSPAN = window.document.createElement( 'span' );
+					eSPAN.innerHTML = eThis.vBefore_Content;
+					var sValue = eSPAN.firstChild.nodeValue;
+					eThis.insertBefore( eSPAN.firstChild, eThis.firstChild );
+					eThis.insertBefore( window.document.createTextNode( '' ), eThis.firstChild );
+					for( var i = 2, ii = eThis.childNodes.length ; i < ii ; i++ ){
+						if( eThis.childNodes[i].nodeType == 3 && eThis.childNodes[i].nodeValue == '' && eThis.childNodes[i + 1].nodeValue == sValue ){
+							eThis.removeChild( eThis.childNodes[i + 1] );
+							eThis.removeChild( eThis.childNodes[i] );
+							break;
+						}
+					}
+				}
+			}
+
+			window.vFirst_child_refresh = function( eThis ){
+				for( var i in eThis.childNodes ){
+					if( eThis.childNodes[i].vFirst_child_check ){
+						eThis.childNodes[i].vFirst_child_check( true );
+					}
+				}
+			}
+			window.vFirst_child_check = function( bBy_parent_change ){
+				var ePrevious = this.previousSibling, bPrevious = false;
+				while( ePrevious ){
+					if( ePrevious.nodeType == 1 ){
+						bPrevious = true;
+						break;
+					}
+					ePrevious = ePrevious.previousSibling;
+				}
+				this.className = this.className.replace( /\s*first-child/g, '' ) + ( !bPrevious ? ' first-child' : '' );
+				if( !bBy_parent_change && this.parentNode.onpropertychange ){ this.parentNode.onpropertychange(); }
+			}
+
+			window.vFollowing_refresh = function( eThis ){
+				for( var i in eThis.childNodes ){
+					if( eThis.childNodes[i].vFollowing_check ){
+						eThis.childNodes[i].vFollowing_check();
+					}
+				}
+			}
+			window.vFollowing_check = function(){
+				this.className = this.className.replace( new RegExp( '\\s*' + this.sFollowing_class, 'g' ), '' );
+				for( var i = 0, ii = 0, ePrevious = this.previousSibling ; ePrevious && i < this.asPreceding.length ; i++ ){
+					while( ePrevious && ePrevious.nodeType == 3 ){ ePrevious = ePrevious.previousSibling; }
+					if( ePrevious ){//alert(ePrevious.tagName + ePrevious.className.replace( /\s+/g, '.' ).replace( /\.v[A-Z]+[a-z]+/g, '' )+'='+this.asPreceding[i])
+						if( ( ePrevious.tagName + ePrevious.className.replace( /\s+/g, '.' ).replace( /\.v[A-Z]+[a-z]+/g, '' ) ).match( this.asPreceding[i] ) ){ ii++; }
+						ePrevious = ePrevious.previousSibling;
+					}
+				}
+				if( ii == this.asPreceding.length ){ this.className += ' ' + this.sFollowing_class; }
+			}
+
+			window.vHover_on = function( eThis ){
+				if( !eThis.className.match( /(^|\s+)hover(\s+|$)/ ) ){
+					eThis.className += ' hover';
+					eThis.style.vHover = true; // it is incredible, but increase speed
+					if( eThis.parentNode.onpropertychange ){ eThis.parentNode.onpropertychange(); }
+				}
+			}
+			window.vHover_out = function( eThis ){
+				if( eThis.className.match( /(^|\s+)hover(\s+|$)/ ) ){
+					eThis.className = eThis.className.replace( /(^|\s+)hover(\s+|$)/g, '$2' );
+					if( eThis.parentNode.onpropertychange ){ eThis.parentNode.onpropertychange(); }
+				}
+			}
+
+			window.vActive_on = function(){
+				event.srcElement.className += ' active';
+				window.vActive = event.srcElement;
+				if( event.srcElement.parentNode.onpropertychange ){ event.srcElement.parentNode.onpropertychange(); }
+			}
+			window.vActive_out = function(){
+				event.srcElement.className = event.srcElement.className.replace( /\s*active/g, '' );
+				if( event.srcElement.parentNode.onpropertychange ){ event.srcElement.parentNode.onpropertychange(); }
+			}
+			window.document.attachEvent( 'onmouseup', function(){
+				if( window.vActive ){
+					window.vActive.className = window.vActive.className.replace( /\s*active/g, '' );
+					window.vActive = false;
+				}
+			});
+
+			window.vFocus_on = function(){
+				event.srcElement.className += ' focus';
+				if( event.srcElement.parentNode.onpropertychange ){ event.srcElement.parentNode.onpropertychange(); }
+			}
+			window.vFocus_out = function(){
+				event.srcElement.className = event.srcElement.className.replace( /\s*focus/g, '' );
+				if( event.srcElement.parentNode.onpropertychange ){ event.srcElement.parentNode.onpropertychange(); }
+			}
+
+			for( var i in window.document.styleSheets ){
+				try{ sCSS_HREF = window.document.styleSheets[i].href.replace( /(.*\/|)[^\/]+/, '$1' ); }catch(e){}
+				vParse_CSS( window.document.styleSheets[i] );
+			}
+		}
+
+		function vNormalize_selector( sText ){
+			return sText.replace( /[:\.](hover|first-child|after|before|focus|active)([\.#\s]|$)/g, '.$1$2' );
+		}
+		function vGet_content( sStyle ){
+			return sStyle.replace( /.*(^|\s)content\s*:\s*(\'([^\}\']*)\'|\"([^\}\"]*)\"|([^\}\;]*))/, '$3$4$5' ).replace( /\"/g, '\\"' );
+		}
+
+		function vParse_CSS( oCSS ){
+			var i, s, sSelector, sSelector_new, sSelector_tag, sStyle, asSelector, iFollowing = 1, sArray, rePNG = /\s*BACKGROUND(-IMAGE)?:\s*url\(([^\/][^\.]*\.(png|PNG))\)[^;]*/, bRemoved, bPNG_fixed;
+			if( oCSS.imports ){
+				for( i = 0 ; i < oCSS.imports.length; i++ ){ vParse_CSS( oCSS.imports[i] ); }
+			}
+			try{
+				for( i = 0 ; i < oCSS.rules.length; i++ ){
+					sSelector = oCSS.rules[i].selectorText;
+					sSelector_tag = sSelector.replace( /.*[aA]([\.\#\:].*)/, 'a' );
+					sStyle = oCSS.rules[i].style.cssText;
+					if( sStyle.match( rePNG ) ){
+						bPNG_fixed = true;
+						sStyle = sStyle.replace( rePNG, 'background-image: none; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=' + sCSS_HREF + '$2,sizingMethod=crop)' );
+					}else{
+						bPNG_fixed = false;
+					}
+					bRemoved = false;
+					if( sSelector.match( /\:unknown/ ) || sSelector_tag.match( /\s*UNKNOWN\s*/ ) ){ oCSS.removeRule( i ); i--; sSelector = ''; sSelector_tag = ''; sStyle = ''; }
+					if( sSelector.match( /:hover([\.#\s]|$)/ ) ){
+						if( sSelector_tag != 'a' ){
+							if( !bRemoved ){ oCSS.removeRule( i ); bRemoved = true; }
+							sSelector_new = sSelector.replace( /:hover([\.#\s]|$)(.*)/, '' );
+							oCSS.addRule( sSelector_new,
+								'vHover: expression'
+								+ vMake_expression_action( 'vHover', [
+									'this.className += " vHover"',
+									'vAttach_event( this, "onmouseover", window.vHover_on )',
+									'vAttach_event( this, "onmouseout", window.vHover_out )'
+								] ),
+							i );
+							oCSS.addRule( sSelector_new + '.vHover', 'vHover: expression(0)', i );
+							i++;
+							if( !sSelector.match( / plus / ) ){
+								oCSS.addRule( vNormalize_selector( sSelector ),
+									sStyle,
+								i );
+								i++;
+							}
+						}
+					}
+					if( sSelector.match( /:active([\.#\s]|$)/ ) ){
+						if( sSelector_tag != 'a' ){
+							if( !bRemoved ){ oCSS.removeRule( i ); bRemoved = true; }
+							sSelector_new = sSelector.replace( /:active([\.#\s]|$)(.*)/, '' );
+							oCSS.addRule( sSelector_new,
+								'vActive: expression'
+								+ vMake_expression_action( 'vActive', [
+									'this.className += " vActive"',
+									'this.attachEvent( "onmousedown", window.vActive_on )',
+									'this.attachEvent( "onkeydown", window.vActive_on )',
+									'this.attachEvent( "onmouseup", window.vActive_out )',
+									'this.attachEvent( "onblur", window.vActive_out )',
+									'this.attachEvent( "onkeyup", window.vActive_out )'
+								] ),
+							i );
+							oCSS.addRule( sSelector_new + '.vActive', 'vActive: expression(0)', i );
+							i++;
+							if( !sSelector.match( / plus / ) ){
+								oCSS.addRule( vNormalize_selector( sSelector ),
+									sStyle,
+								i );
+								i++;
+							}
+						}
+					}
+					if( sSelector.match( /\.focus([\.#\s]|$)/ ) ){
+						if( !bRemoved ){ oCSS.removeRule( i ); bRemoved = true; }
+						sSelector_new = sSelector.replace( /\.focus([\.#\s]|$)(.*)/, '' );
+						oCSS.addRule( sSelector_new,
+							'vFocus: expression'
+							+ vMake_expression_action( 'vFocus', [
+								//'this.className += " vFocus"',
+								'this.attachEvent( "onfocus", window.vFocus_on )',
+								'this.attachEvent( "onblur", window.vFocus_out )'
+							] ),
+						i );
+						//oCSS.addRule( sSelector_new + '.vFocus', 'vActive: expression(0)', i );
+						//i++;
+						if( !sSelector.match( / plus / ) ){
+							oCSS.addRule( vNormalize_selector( sSelector ),
+								sStyle,
+							i );
+							i++;
+						}
+					}
+					if( sSelector.match( /\.after([\.#\s]|$)/ ) ){
+						if( !bRemoved ){ oCSS.removeRule( i ); bRemoved = true; }
+						s = vGet_content( sStyle );
+						if( s.length ){
+							sSelector_new = sSelector.replace( /\.after([\.#]|$)(\S*).*/, '$1$2' );
+							oCSS.addRule( sSelector_new,
+								'vAfter: expression'
+								+ vMake_expression_action( 'vAfter', [
+									'this.vAfter_Content = "' + s + '"',
+									'this.className += " vAfter"',
+									'vAttach_event( this, "onpropertychange", window.vAfter_check )'
+								] ),
+							i );
+							oCSS.addRule( sSelector_new + '.vAfter', 'vActive: expression(0)', i );
+							i++;
+						}
+					}
+					if( sSelector.match( /\.before([\.#\s]|$)/ ) ){
+						if( !bRemoved ){ oCSS.removeRule( i ); bRemoved = true; }
+						s = vGet_content( sStyle );
+						if( s.length ){
+							sSelector_new = sSelector.replace( /\.before([\.#]|$)(\S*).*/, '$1$2' );
+							oCSS.addRule( sSelector_new,
+								'vBefore: expression'
+								+ vMake_expression_action( 'vBefore', [
+									'this.vBefore_Content = "' + s + '"',
+									'this.className += " vBefore"',
+									'vAttach_event( this, "onpropertychange", window.vBefore_check )'
+								] ),
+							i );
+							oCSS.addRule( sSelector_new + '.vBefore', 'vActive: expression(0)', i );
+							i++;
+						}
+					}
+					if( sSelector.match( /\.first-child([\.#\s]|$)/ ) ){
+						if( !bRemoved ){ oCSS.removeRule( i ); bRemoved = true; }
+						oCSS.addRule( sSelector.replace( /\.first-child([\.#]|$)(\S*).*/, '$1$2' ),
+							'vFirst_child: expression'
+							+ vMake_expression_action( 'vFirst_child', [
+								'this.vFirst_child_check = window.vFirst_child_check',
+								'this.vFirst_child_check()',
+								vMake_expression_action( 'parentNode.vFirst_child_parent', [
+									'vAttach_event( this.parentNode, "onpropertychange", window.vFirst_child_refresh )',
+									'this.parentNode.onpropertychange()'
+								] )
+							] ),
+						i );
+						oCSS.addRule( sSelector_new + '.vFirst_child', 'vActive: expression(0)', i );
+						i++;
+						if( !sSelector.match( / plus / ) ){
+							oCSS.addRule( vNormalize_selector( sSelector ),
+								sStyle,
+							i );
+							i++;
+						}
+					}
+					if( sSelector.match( /\splus\s[^\s]+$/ ) ){
+						asSelector = sSelector.split( ' plus ' );
+						sArray = '';
+						for( j = asSelector.length - 2 ; j > 0 ; j-- ){
+							sArray += "new RegExp( '" + vNormalize_selector( asSelector[j] ) + "' ),";
+						}
+						sArray += "new RegExp( '" + vNormalize_selector( asSelector[j] ) + "' )";
+						s = ( iFollowing / 100000 ).toString().substr(2);
+						if( !bRemoved ){ oCSS.removeRule( i ); }
+						oCSS.addRule( asSelector[asSelector.length - 1],
+							'vFollowing: expression'
+							+ vMake_expression_action( 'vFollowing', [
+								'this.asPreceding = [' + sArray + ']',
+								"this.sFollowing_class = 'vFollowing" + s + "'",
+								'this.vFollowing_check = window.vFollowing_check',
+								'this.vFollowing_check()',
+								vMake_expression_action( 'parentNode.vFollowing_parent', [
+									'vAttach_event( this.parentNode, "onpropertychange", window.vFollowing_refresh, false )'
+								] )
+							] ),
+						i );
+						if( !bRemoved ){ bRemoved = true; }else{ i++; }
+						oCSS.addRule( vNormalize_selector( asSelector[asSelector.length - 1] ) + '.vFollowing' + s,
+							sStyle,
+						i );
+						i++;
+						iFollowing++;
+					}
+					if( bPNG_fixed && !bRemoved ){
+						oCSS.removeRule( i );
+						oCSS.addRule( vNormalize_selector( sSelector ),
+							sStyle,
+						i );
+					}
+				}
+			}catch(e){}
+			//if( oCSS.cssText ){alert(oCSS.cssText)}
+		}
+
+		function vMake_expression_action( sName, asActions ){
+			for( var i = 0, sActions = '' ; i < asActions.length ; i++ ) sActions += ' | ( ' + asActions[i] + ' )'
+			return '( !this.' + sName + ' ? this.' + sName + ' = ( 1' + sActions + ' ) : 1 )';
+		}
+
+		function vInit_PNG(){
+			if( style.backgroundImage.match( /\.png/ ) ){
+				element.runtimeStyle.filter = 'progid:DXImageTransform.Microsoft.AlphaImageLoader(src="' + style.backgroundImage.substr( 4, style.backgroundImage.length - 5 ) + '", sizingMethod="crop")';
+				style.backgroundImage = '';
+				element.className += ''
+			}
+		}
+
+		function vInit(){
+			if( this.className.match( /(^|\s)png(\s|$)/ ) ){
+				vInit_PNG();
+			}else{
+				vInit_Pseudo();
+			}
+		}
+
+		vInit();
+	</script>
+</public:component>

@@ -1,0 +1,13 @@
+{% extends BASE_TEMPLATE %}
+
+{% block padding %}
+    <a href="/administrator/uni/school/#sch{{ school.id }}">{{ school }}</a>
+    <span>&rarr;</span>
+    <a href="/administrator/uni/subject/{{ school.id }}/">Предметы</a>
+    <span>&rarr;</span>
+    <h1>Редактирование</h1>
+{% endblock %}
+
+{% block content %}
+	{% include 'helpers/uniForm.html' %}
+{% endblock %}

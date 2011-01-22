@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 27
+/svn/!svn/ver/129/trunk/src
+END
+manage.py
+K 25
+svn:wc:ra_dav:version-url
+V 36
+/svn/!svn/ver/78/trunk/src/manage.py
+END
+settings_simple.py
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/svn/!svn/ver/78/trunk/src/settings_simple.py
+END
+views.py
+K 25
+svn:wc:ra_dav:version-url
+V 36
+/svn/!svn/ver/112/trunk/src/views.py
+END
+__init__.py
+K 25
+svn:wc:ra_dav:version-url
+V 38
+/svn/!svn/ver/78/trunk/src/__init__.py
+END
+utils.py
+K 25
+svn:wc:ra_dav:version-url
+V 35
+/svn/!svn/ver/78/trunk/src/utils.py
+END
+settings_dist.py
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/svn/!svn/ver/123/trunk/src/settings_dist.py
+END
+urls.py
+K 25
+svn:wc:ra_dav:version-url
+V 35
+/svn/!svn/ver/123/trunk/src/urls.py
+END
+context_processors.py
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/!svn/ver/96/trunk/src/context_processors.py
+END

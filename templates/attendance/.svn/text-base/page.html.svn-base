@@ -1,0 +1,10 @@
+{% extends 'page.html' %}
+
+{% block attendance_menu %}
+<ul>
+	{#<li><a href="administrator/attendance/">Расписание звонков</a></li>#}
+	{#<li><a href="/administrator/attendance/">Спец. расписание звонков</a></li>#}
+	<li{% ifequal object_name "timetable" %} class="active" {% endifequal %}><a href="/attendance/timetable/select/">Составить</a></li>
+</ul>
+{% endblock %}
+

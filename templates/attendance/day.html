@@ -1,0 +1,39 @@
+                        <td{% if timetable.today %} id="today"{% endif %}>
+                            {#<small><a href="/marks/get_homework/{{ timetable.timestamp }}/">{{ timetable.date }}</a></small>#}
+                            <small>{{ timetable.date }}</small>
+                            <big>{{ timetable.day_ru }}</big>
+                            <table class="table">
+                                <tbody>
+                                	{% for lesson in timetable.lessons %}
+	                                    <tr>
+	                                        <td class="padding-right">
+	                                            <div class="number">{{ forloop.counter }}</div>
+	                                        </td>
+	                                        <td>
+	                                            <a href="/marks/{{ lesson.subject.id }}">{{ lesson.subject }}</a>
+	                                        </td>
+	                                        <td>
+	                                            <div class="classroom">
+	                                                <div>
+	                                                    <div>{{ lesson.room }}</div>
+	                                                </div>
+	                                            </div>
+	                                        </td>
+	                                    </tr>
+									{% empty %}
+										<tr>
+											<td colspan="3">Уроков нет</td>
+										</tr>
+									{% endfor %}
+                                    <tr>
+                                        <td colspan="3">
+                                            <div class="end">
+                                               {% if timetable.rings %}
+                                                <strong>Уроки заканчиваются в {{ timetable.rings.end_of_day.end|time:"H:i" }}</strong>
+                                               {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>

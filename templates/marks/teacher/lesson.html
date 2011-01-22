@@ -1,0 +1,21 @@
+{% extends 'marks/teacher/page.html' %}
+{% block content %}
+<form method="post" action="." enctype="multipart/form-data">{% csrf_token %}
+	<fieldset>
+	<legend>Урок</legend>
+	<table class="fieldset">
+		{% for field in form %}
+		<tr>
+			<td class="label"><label for="{{ field.label }}">{{ field.label_tag }}:</label></td>
+			<td>{{ field }}</td>
+			<td>
+				{% if field.errors %}<div class="error_text">{{ field.errors }}</div>{% endif %}
+				{% if field.help_text %}<div class="help_text">{{ field.help_text}}</div>{% endif %}
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+	<input type="submit" value="Сохранить">
+	</fieldset>
+</form>
+{% endblock %}
