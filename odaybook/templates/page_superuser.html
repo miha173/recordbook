@@ -1,0 +1,96 @@
+<html>
+<head>
+    <title>Администрирование</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="shortcut icon" href="{{ MEDIA_URL }}images/design/favicon.ico">
+    <link href="{{ MEDIA_URL }}css/main.css" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/paginator3000.css" />
+    <link href="{{ MEDIA_URL }}css/start/jquery-ui-1.8.11.custom.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL}}/js/jquery-ui-1.8.11.custom.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.hotkeys-0.7.9.min.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.tablesorter.min.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.clickmenu.pack.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/all.js"></script>
+	<script type="text/javascript" src="{{ MEDIA_URL }}js/paginator3000.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            {% block js_ready %}{% endblock %}
+        });
+	</script>
+</head>
+<body id="admin">
+    <!-- Все -->
+    <div id="all">
+        <!-- Верхняя полоса -->
+        <div id="headline">
+            <a href="http://school-record-book.ru">Система электронных дневников</a> 
+        </div>
+        <!-- / Верхняя полоса --><!-- Шапка -->
+        <div id="header">
+            <div id="user">
+                <big>Администратор</big>
+            </div>
+            <div id="exit">
+                <ul id="change_user_mode">
+                    <li><a href="#" onclick="$('#change_user_mode').toggleClass('menu_on');return false">
+                            {{ user.get_current_role_cyrillic }}
+                        <img src="{{ MEDIA_URL }}images/arrow-down-medium.png" />
+                        </a>
+                        <ul>
+                            {% for role in user.get_base_roles_list %}
+                                {% if user.get_current_role_cyrillic != role.0 %}
+                                    <li>
+                                        <a href="/accounts/set_role/{{ role.4.id }}/">
+                                            {{ role.0 }}
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </li>
+                </ul>
+                <a href="/accounts/password_change/" style="padding-left: 0px">Смена пароля</a>
+                <a href="/accounts/logout">Выход</a>
+            </div>
+            <div class="clear"></div>
+            <div id="navigation">
+                {% if path == 'userextended_baseuser' %}
+                    <big class="blue">Кадры</big>{% else %}<a href="/accounts/baseuser/">Аккаунты</a>
+                {% endif %}
+                {% if path == 'userextended_schools' %}
+                    <big class="yellow">Школы</big>{% else %}<a href="/accounts/uni/userextended.School/">Школы</a>
+                {% endif %}
+            </div>
+        </div>
+        <!-- / Шапка --><!-- Тень -->
+        <div id="shadow"></div>
+        <!-- / Тень --><!-- Заголовки и подразделы -->
+        <div id="sub-navigation">
+            <div id="padding">
+            	{% block padding %} {% endblock %}
+            </div>
+        </div>
+        <!-- / Заголовки и подразделы --><!-- Основное содержание -->
+		
+        <div id="content">
+            {% block content %} {% endblock %}
+        </div>
+        <!-- / Основное содержание -->
+        <!-- © -->
+        <div id="copyright">
+            <div class="column">
+                <p>
+                    &copy;&nbsp;2009&#150;{{ current_year }}&nbsp;<a href="http://aleks-komkov.ru/">Комков&nbsp;Александр</a>
+                </p>
+            </div>
+            <div class="column">
+                <p>
+                </p>
+            </div>
+        </div>
+        <!-- / © -->
+    </div>
+    <!-- / Все -->
+</body>
+</html>

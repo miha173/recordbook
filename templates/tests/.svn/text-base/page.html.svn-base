@@ -1,7 +1,0 @@
-{% extends 'page.html' %}
-
-{% block tests_menu %}
-<ul>
-	<li{% ifequal path "test" %} class="active"{% endifequal %}><a href="/tests/test/">Список тестов</a></li>
-</ul>
-{% endblock %}

@@ -1,0 +1,12 @@
+{% extends 'page.html' %}
+
+{% block padding %}
+    <a href="/administrator/uni/school/#sch{{ school.id }}">{{ school }}</a>
+    <span>&rarr;</span>
+    <h1>{{ grade }}</h1>
+{% endblock %}
+
+{% block content %}
+	<p style="margin: 30px 30px;">Выберите предмет и период выставления оценок</p>
+	{% include 'helpers/uniForm.html' %}
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends 'page.html' %}
+
+{% block padding %}
+    <a href="/administrator/uni/connection/{{ grade__school.id }}/">Аккаунты</a>
+    <span>&rarr;</span>
+    <h1>Редактирование</h1>
+{% endblock %}
+
+
+{% block content %}
+	{% include 'helpers/uniForm.html' %}
+{% endblock %}

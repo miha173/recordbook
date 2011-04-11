@@ -1,0 +1,13 @@
+{% extends 'page.html' %}
+
+{% block padding %}
+    <a href="/administrator/uni/school/#sch{{ pupil.school.id }}">{{ pupil.school }}</a>
+    <span>&rarr;</span>
+    <a href="/administrator/uni/achievement/{{ pupil.id }}/">Достижения</a>
+    <span>&rarr;</span>
+    <h1>Редактирование</h1>
+{% endblock %}
+
+{% block content %}
+	{% include 'helpers/uniForm.html' %}
+{% endblock %}

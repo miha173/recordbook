@@ -1,0 +1,20 @@
+{% extends 'page.html' %}
+
+{% block content %}
+	<div id="sub-navigation">
+	    <div id="padding">
+	        <h1>{{ user.grade }} класс</h1>
+	        <div class="gray">
+	            Классный руководитель <a href="/teachers/{{ user.curator.id }}/">{{ user.curator.fio }}</a>
+	        </div>
+	    </div>
+	</div>
+	
+	<br />
+	<br />
+	<br />
+	<br />
+	<br />
+	
+	{% include 'helpers/classmates.html' %}
+{% endblock %}

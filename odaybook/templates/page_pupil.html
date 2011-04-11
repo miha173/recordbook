@@ -1,0 +1,91 @@
+<html>
+    <head>
+        <title>Электронная школа</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <link rel="shortcut icon" href="{{ MEDIA_URL }}images/design/favicon.ico">
+        <link href="{{ MEDIA_URL }}css/main.css" rel="stylesheet" type="text/css">
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+		<script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.tablesorter.min.js"></script> 
+		<script type="text/javascript">
+			$(document).ready(function(){
+				$('.sort').tablesorter({
+					'cssAsc': 'active_asc',
+					'cssDesc': 'active_desc',
+					'headers': {% block sort_headers %}{}{% endblock %},
+				});
+				$('.sort').bind('sortEnd', function (){
+					$('.sort tr').removeClass('gray');
+					$(".sort tr:nth-child(odd)").addClass("gray");
+				});
+			});
+		</script>
+    </head>
+    <body>
+        <!-- Все -->
+        <div id="all">
+            <!-- Верхняя полоса -->
+            <div id="headline">
+              <a href="http://school-record-book.ru">Система электронных дневников</a> 
+				{% if user.school.url %}
+	                <a href="{{ user.school.url }}" id="right">{{ user.school }}</a>
+				{% endif %}
+            </div>
+            <!-- / Верхняя полоса --><!-- Шапка -->
+            <div id="header">
+                <div id="user">
+                    <big>{{ user.if_ }}</big>
+                </div>
+                <div id="exit">
+                    <a href="/accounts/password_change">Смена пароля</a>
+                    <a href="/accounts/logout">Выход</a>
+                </div>
+                <div class="clear">
+                </div>
+                <div id="navigation">
+                    {% if ACTIVE_URL == '' %}<big class="gay">Главная</big>{% else %}<a href="/">Главная</a>{% endif %}
+                    {% if ACTIVE_URL == 'subjects' %}<big class="yellow">Уроки</big>{% else %}<a href="/subjects/">Уроки</a>{% endif %}
+                    {% if ACTIVE_URL == 'attendance' %}<big class="green">Расписание</big>{% else %}<a href="/attendance/">Расписание</a>{% endif %}
+                    {% if ACTIVE_URL == 'marks' %}<big class="red">Оценки</big>{% else %}<a href="/marks/">Оценки</a>{% endif %}
+                    {% if ACTIVE_URL == 'grade' %}<big class="purple">Класс</big>{% else %}<a href="/grade/">Класс</a>{% endif %}
+                    {% if ACTIVE_URL == 'teachers' %}<big class="blue">Учителя</big>{% else %}<a href="/teachers/">Учителя</a>{% endif %}
+                    {% if user.school.gate_use %}
+                      {% if ACTIVE_URL == 'sms' %}<big class="blue">SMS-уведомления</big>{% else %}<a href="/sms/">SMS-уведомления</a>{% endif %}
+                    {% endif %}
+                </div>
+            </div>
+            <!-- / Шапка --><!-- Тень -->
+            <div id="shadow">
+            </div>
+
+<!-- Заголовки и подразделы -->
+<div id="sub-navigation">
+<div id="padding">
+	{% block padding %}{% endblock %}
+</div>
+</div>
+<!-- / Заголовки и подразделы -->
+
+            <!-- / Тень --><!-- Основное содержание -->
+            <div id="content">
+            	{% block content %}
+
+				{% endblock %}
+            </div>
+            <!-- / Основное содержание -->
+            <!-- © -->
+            <div id="copyright">
+                <div class="column">
+                    <p>
+              	      &copy;&nbsp;2009&#150;{{ current_year }}&nbsp;<a href="http://aleks-komkov.ru/">Комков&nbsp;Александр</a>
+                    </p>
+                </div>
+                <div class="column">
+                    <p>
+                    </p>
+                </div>
+            </div>
+            <!-- / © -->
+        </div>
+        <!-- / Все -->
+    </body>
+</html>

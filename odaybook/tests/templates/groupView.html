@@ -1,0 +1,33 @@
+{% extends 'tests/page.html' %}
+
+{% block content %}
+<h2>Часть A</h2>
+{#Список блоков заданий с перечеслением вопросов. С возможность добавить/отредактировать вопрос/группу.#}
+<a href="group/a/add/">Добавить группу вопросов</a>
+<ul>
+	{% for questionGroup in questionGroups %}
+		{% if questionGroup.type == 'A' %}
+			<li>
+				{{ questionGroup.title }} 
+				<a href="{% url odaybook.tests.views.groupView test=questionGroup.test.id,id=questionGroup.id %}edit/">
+					<img src="{{ MEDIA_URL }}images/edit.png" />
+				</a>
+				<a href="{% url odaybook.tests.views.groupView test=questionGroup.test.id,id=questionGroup.id %}delete/" class="delete">
+					<img src="{{ MEDIA_URL }}images/delete.png" />
+				</a>
+			</li>
+		{% endif %}
+	{% endfor %}
+</ul>
+
+<h2>Часть B</h2>
+<a href="group/b/add/">Добавить группу вопросов</a>
+<ul>
+	{% for questionGroup in questionGroups %}
+		{% if questionGroup.type == 'B' %}
+			<li><a href="{% url odaybook.tests.views.group test=questionGroup.test.id,id=questionGroup.id %}">{{ questionGroup.title }}</a></li>
+		{% endif %}
+	{% endfor %}
+</ul>
+
+{% endblock %}

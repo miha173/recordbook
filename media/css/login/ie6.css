@@ -1,0 +1,74 @@
+.link {
+	margin-bottom: 30px;
+}
+
+body {
+	margin-bottom: 30px;
+}
+
+#header {
+	padding: 20px 35px 0 35px;
+	height: 30px;
+	background: url(../images/ear-small.gif) 0 0 no-repeat;
+}
+
+#header #logo {
+	float: left;
+	text-align: left;
+}
+
+#header p#links-owner {
+	font-size: 0.9em;
+	color: #aeaeae;
+	text-align: left;
+}
+
+#header ul#account-nav {
+	float: right;
+}
+
+#header ul#account-nav li {
+	display: inline;
+}
+
+#header ul#account-nav li a {
+	margin-left: 6px;
+	padding-left: 14px;
+	background: url(../images/single-dot.gif) 0 49% no-repeat;
+}
+
+#header div {
+	text-align: right;
+}
+
+#header #q {
+	color: #aeaeae;
+	font-family: Helvetica, Arial, sans-serif;
+	font-size: 0.9em;
+	border: 1px solid #aeaeae;
+	padding: 6px 4px 6px 27px;
+	margin: 7px 0 0 0;
+	width: 15em;
+	background: url(../images/search-icon.gif) no-repeat;
+	background-color: #fff;
+	background-position: 7px 50%;
+}
+
+.active_search {
+	color: #4b4b4b;
+	font-weight: bold;
+}
+
+#header ul#nav {
+	clear: both;
+	float: left;
+	width: 100%;
+	margin: 22px -35px 0 -35px;
+	padding: 0 35px 0 70px;
+	list-style: none;
+	background: #fff url(../images/single-dot1x1.gif) repeat-x 0 100%;
+}
+
+#quick-post-page h1 {
+	margin-top: 10px;
+}

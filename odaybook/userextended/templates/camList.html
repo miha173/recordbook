@@ -1,0 +1,32 @@
+{% extends 'page.html' %}
+
+{% block padding %}
+    <a href="/administrator/uni/school/#sch{{ school.id }}">{{ school }}</a>
+    <span>&rarr;</span>
+    <h1>Камеры</h1>
+    <table><tr style="vertical-align: baseline;"><td>
+		<a href="add/">Добавить камеру</a>
+	</td><td style="padding-left: 20px;">
+		
+	</td></tr></table>
+{% endblock %}
+
+{% block content %}
+<table class="table">
+	<thead>
+		<th>Камера</th>
+		<th>IP-адрес</th>
+		<th>Действия</th>
+	</thead>
+	{% for object in objects.object_list %}
+		<tr class="{% cycle 'gray' '' %}">
+			<td>{{ object.name }}</td>
+			<td>{{ object.ip }}</td>
+			<td>{% include "helpers/buttons/edit.html" %}</td>
+		</tr>
+	{% empty %}
+		<tr><td colspan="3">Камер нет</td></tr>
+	{% endfor %}
+</table>
+{% include "helpers/paginator.html" %}
+{% endblock %}

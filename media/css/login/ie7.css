@@ -1,0 +1,27 @@
+#header {
+	height: 30px;
+	padding: 20px 35px 0 35px;
+	background: url(../images/ear-small.gif) 0 0 no-repeat;
+}
+
+#header ul#nav {
+	clear: both;
+	float: left;
+	width: 100%;
+	margin: 22px -35px 0 -35px;
+	padding: 0 35px;
+	list-style: none;
+	background: #fff url(../images/single-dot1x1.gif) repeat-x 0 100%;
+}
+
+#content {
+	margin-top: 80px;	
+}
+
+#content {
+	margin-top: 80px;	
+}
+
+#quick-post-page h1 {
+	margin-top: 10px;
+}

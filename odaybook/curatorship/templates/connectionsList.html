@@ -1,0 +1,21 @@
+{% extends 'curatorship_page.html' %}
+
+{% block content %}
+	<a href="/curatorship/connections/wizard/1/" class="title">Добавить связку</a>
+	<table>
+	<thead>
+		<th>Преподаватель</th>
+		<th>Предмет</th>
+		<th>Тип связи</th>
+		<th></th>
+	</thead>
+	{% for connection in connections %}
+		<tr class="{% cycle 'gray' '' %}">
+			<td>{{ connection.teacher.fio }}</td>
+			<td>{{ connection.subject }}</td>
+			<td>{{ connection.get_connection_display|lower }}</td>
+			<td><a href="/curatorship/connections/delete/{{ connection.id }}" class="delete">удалить</a></td>
+		</tr>
+	{% endfor %}
+	</table>
+{% endblock %}

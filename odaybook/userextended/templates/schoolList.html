@@ -1,0 +1,156 @@
+{% extends 'page.html' %}
+
+{% block padding %}
+	{% if user.type == 'Superuser' %}
+  		<a href="/administrator/uni/userextended.School/add/">Добавить школу</a>
+	{% endif %}
+{% endblock %}
+
+{% block content %}
+{% if user.type == 'Pupil' %}
+    <table id="index">
+        <tr>
+            <td>
+                {% include 'helpers/classmates.html' %}
+            </td>
+			
+			{% include 'day.html' %}
+			
+            <td>
+                <div id="class-teacher">
+                    <div class="gray">
+                        Классный руководитель
+                    </div>
+                    <h1>{{ curator }}</h1>
+                    {#<div class="subject"><a href="#">Литература</a></div>#}
+                    {#<div class="classroom"><div><div>23</div></div></div>#}
+                </div>
+				{% comment %}
+                <!-- Объявление -->
+                <div class="message">
+                    <p>
+                        Профилактические работы в ночь с 31 декабря на 1 января. 
+                    </p>
+                </div>
+                <!-- / Объявление -->
+                <!-- Объявление -->
+                <div class="message">
+                    <p>
+                        Обновление оценок от 20 января 2009.
+                    </p>
+                </div>
+                <!-- / Объявление -->
+                <!-- Объявление -->
+                <div class="message">
+                    <p>
+                        Спорный регион В&nbsp;этом году число нападений в&nbsp;Ираке резко сократилось.
+                    </p>
+                    <p>
+                        Киркук и&nbsp;Мосул остается опасным, указывает корреспондент 
+                        <nobr>
+                            Би-би
+                        </nobr>-си в&nbsp;Багдаде Хамфри Хоксли.
+                    </p>
+                </div>
+                <!-- / Объявление -->
+				{% endcomment %}
+            </td>
+        </tr>
+    </table>
+{% else %}
+<table class="table">
+	{% for school in objects.object_list %}
+		<tr id="sch{{ school.id }}">
+			<td colspan="3">
+				<h2>
+					{{ school.name }} 
+					<a href="/administrator/uni/userextended.School/edit/{{ school.id }}"><img src="{{ MEDIA_URL}}images/edit.png" /></a>
+					<a href="/administrator/uni/userextended.School/delete/{{ school.id }}" class="delete"><img src="{{ MEDIA_URL}}images/delete.png" /></a>
+				</h2>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				{% if school.show.pupils %}
+					<a href="/administrator/uni/userextended.Pupil/{{ school.id }}/">Ученики</a>
+				{% else %}
+					Ученики
+				{% endif %}
+			</td>
+			<td>
+				{% if school.show.teachers %}
+					<a href="/administrator/uni/userextended.Teacher/{{ school.id }}/">Учителя</a>
+				{% else %}
+					Учителя
+				{% endif %}
+			</td>
+			<td>
+                {% comment %}
+				{% if school.show.staff %}
+					<a href="/administrator/uni/userextended.Staff/{{ school.id }}/">Персонал</a>
+				{% else %}
+					Персонал
+				{% endif %}
+				{% if school.show.options %}
+					<a href="/administrator/uni/userextended.Option/{{ school.id }}/">Настройки</a>
+				{% else %}
+					Настройки
+				{% endif %}
+                {% endcomment %}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				{% if school.show.subjects %}
+					<a href="/administrator/uni/userextended.Subject/{{ school.id }}/">Предметы</a>
+				{% else %}
+					Предметы
+				{% endif %}
+			</td>
+			<td>
+				{% if school.show.grades %}
+					<a href="/administrator/uni/userextended.Grade/{{ school.id }}/">Классы</a>
+				{% else %}
+					Классы
+				{% endif %}
+			</td>
+			<td>
+		        {% if school.show.connections %}
+		          <a href="/administrator/uni/curatorship.Connection/{{ school.id }}/">Связки</a>
+		        {% else %}
+		          Связки
+		        {% endif %}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				{% if school.show.timetables %}
+					<a href="/attendance/timetable/select/{{ school.id }}">Расписания</a>
+				{% else %}
+					Расписания
+				{% endif %}
+			</td>
+			<td>
+                {% comment %}
+				{% if school.show.resultdates %}
+					<a href="/administrator/uni/marks.ResultDate/{{ school.id }}/">Итоговые периоды</a>
+				{% else %}
+					Итоговые периоды
+				{% endif %}
+                {% endcomment %}
+			</td>
+			<td>
+		        {% if school.show.ringtimetable %}
+		          <a href="/attendance/ringtimetable/{{ school.id }}/">Расписание звонков</a>
+		        {% else %}
+		          Расписание звонков
+		        {% endif %}
+			</td>
+		</tr>
+		<tr>
+			<td colspan="3"><hr /></td>
+		</tr>
+	{% endfor %}
+</table>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends 'page.html' %}
+
+{% load users %}
+
+{% block padding %}
+    {% if school %}
+    <a href="/administrator/uni/userextended.School/#sch{{ school.id }}">{{ school }}</a>
+    <span>&rarr;</span>
+    <h1>Классы</h1>
+    {% endif %}
+    <table><tr style="vertical-align: baseline;"><td>
+		<a href="add/">Добавить аккаунт</a>
+	</td><td style="padding-left: 20px;">
+	</td></tr></table>
+{% endblock %}
+
+{% block js_ready %}
+    user_id = 0;
+        
+    $( "#dialog" ).dialog({
+        height: 80,
+        width: 500,
+        modal: true,
+        autoOpen: false,
+        title: 'Выберите школу для администрирования',
+        
+    });
+
+{% endblock %}
+
+{% block content %}
+    <div id="dialog">
+        <select name="school_id" id="school_id">
+            {% for school in schools %}
+                <option value="{{ school.id }}">{{ school.name }}</option>
+            {% endfor %}
+        </select>
+        <input type="button" value="Выбрать" onclick="$.get('set/' + user_id + '/', {set_right: 'EduAdmin', 'school_id': $('#school_id').val()}, function(data){window.location.reload()})" />
+    </div>
+        
+        {# FIXME: messages в специальный блок #}
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+<table class="table">
+	<thead>
+        {# FIXME: сортировка #}
+		<th>Логин</th>
+		<th>ФИО</th>
+        <th>Email</th>
+        <th>Роли</th>
+        <th>Последний вход</th>
+        <th>Делегирование прав</th>
+		<th>Действия</th>
+	</thead>
+	{% for object in objects.object_list %}
+		<tr class="{% cycle 'gray' '' %}">
+			<td>{{ object.username }}</td>
+			<td>{{ object.fio }}</td>
+            <td>{{ object.email }}</td>
+            <td>
+                <ul>
+                    {% for role in object.get_roles_list %}
+                    {# FIXME: img onhover #}
+                        <li>
+                            {{ role.0 }}
+                            {% if role.4.c.school %}<i>({{ role.4.c.school }})</i>{% endif %}
+                            <a href="dismiss/{{ object.id }}/?right={{ role.1 }}&school_id={{ role.4.c.school.id }}">
+                                <img src="{{ MEDIA_URL }}images/delete.png" />
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </td>
+            <td>{{ object.last_login }}</td>
+            <td>
+                {% if object|has_role:"Superuser" %}
+
+                {% else %}
+                    <a href="set/{{ object.id }}/?set_right=Superuser">администратор</a><br />
+                {% endif %}
+
+                {% if object|has_role:"Superviser" %}
+
+                {% else %}
+                    <a href="set/{{ object.id }}/?set_right=Superviser">специалист УОН</a><br />
+                {% endif %}
+                <a href="#" onclick="$('#dialog').dialog('open'); user_id = {{ object.id }};return false;">администратор школы</a><br />
+            </td>
+            <td>
+                {% include "helpers/buttons/edit.html" %}
+            </td>
+		</tr>
+	{% endfor %}
+</table>
+{% include "helpers/paginator.html" %}
+{% endblock %}

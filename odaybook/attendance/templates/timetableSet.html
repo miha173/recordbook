@@ -1,0 +1,20 @@
+{% extends 'page.html' %}
+
+{% block padding %}
+    <a href="/administrator/uni/school/#sch{{ school.id }}">{{ school }}</a>
+    <span>&rarr;</span>
+    <a href="/attendance/timetable/select/{{ school.id }}/">Расписания</a>
+    <span>&rarr;</span>
+    <h1>Редактирование</h1>
+{% endblock %}
+
+{% block content %}
+	{{ valid }}
+	{{ form.errors }}
+	<form method="post" action=".">
+	<table class="table">
+		{{ form.get_fields|safe }}
+	<tr><td colspan="3"><input type="submit" /></td></tr>
+	</table>
+	</form>
+{% endblock %}

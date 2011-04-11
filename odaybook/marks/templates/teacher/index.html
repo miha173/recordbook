@@ -1,0 +1,194 @@
+{% extends 'teacher/page.html' %}
+{% load pytils_dt %}
+{% load marks_chart %}
+
+<script type="text/javascript">
+	var lesson_id = 0;
+</script>
+
+{% block js_ready %}
+lesson_id = 0;
+	$('#dialog').dialog({
+		autoOpen: false,
+		width: 420,
+		modal: true,
+		buttons: {
+			"Закрыть": function() { 
+				$.get('?set_lesson=1&lesson=' + lesson_id, $('#lesson_form').serializeArray());
+				$('#id_topic').val('');
+				$('#id_task').val('');
+				$(this).dialog("close"); 
+				$('lesson_form').css('display', 'none');
+			}, 
+		},
+		open: function(event, ui) {
+			$.get('/marks/?get_lesson_info=1', {lesson: lesson_id}, function(data){
+				$('#id_topic').val(data.topic);
+				$('#id_task').val(data.task);
+				$('#lesson_form').css('display', 'block');
+			}, 'json');
+			/*$('#dialog').children('p').append(lesson_id + '; ');*/
+		}
+	});
+	
+	$('.dialog_link').click(function(){
+		lesson_id = $(this).attr('lesson');
+		$('#dialog').dialog('open');
+		return false;
+	});
+	
+
+{% endblock %}
+
+{% block padding %}
+	{% if user.type == 'Superuser' %}
+		<a href="/administrator/uni/school/add/"><h1>Добавить школу</h1></a>
+	{% endif %}
+	
+	{% if user.type == 'Teacher'%}
+			<div id="sub-navigation">
+			<div id="padding">
+			{% for subject in subjects %}
+				{% ifequal subject.id user.current_subject.id %}
+					<h1>{{ subject.name }}</h1>
+				{% else %}
+					<a href="/marks/set_current_subject/{{ subject.id }}?next={{ next }}">{{ subject.name }}</a>
+				{% endifequal %}
+			{% endfor %}
+			</div>
+			</div>
+	{% endif %}
+	
+{% endblock %}
+
+
+{% block content %}
+
+	<div id="dialog" title="Заполните информацию об уроке">
+		<form action="." method="get" id="lesson_form" style="display: none;">
+			<table>
+				{{ lesson_form }}
+			</table>
+		</form>
+	</div>
+
+<table class="table mtable" style="margin-left: 0px;">
+	<tr><td style="vertical-align: top;">
+		<table class="table">
+			<thead>
+				<tr>
+					<td>Выберите класс:</td>
+				</tr>
+			</thead>
+			<tbody>
+				{% for gr in user.get_grades %}
+					<tr><td>
+						<ul
+							<li>{% if gr == user.current_grade %}{{ gr }}{% else %}<a href="#">{{ gr }}</a>{% endif %}</li>
+						</ul>
+					</td></tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</td>
+	<td>
+
+<div id="debug"></div>
+<table class="table table_marks">
+	<thead>
+		<tr>
+			<th style="border: none;"></th>
+			{% for month, value in monthes.items %}
+				<th style="border-bottom: none; border-right: 1px solid; border-left: 1px solid; text-align: center" colspan="{{ value.1 }}">{{ value.0 }}</th>
+			{% endfor %}
+		</tr>
+		<tr>
+		<th></td>
+		{% for lesson in lessons %}
+			<th><a style="border-bottom: 1px #0E90B8 dotted; text-decoration: none;" href="#" class="dialog_link" lesson="{{ lesson.id }}">{{ lesson.date|date:"d" }}</a></th>
+		{% endfor %}
+	</tr></thead>
+	<tbody>
+		{% for pupil in user.current_grade.pupils %}
+			<tr class="{% cycle 'gray' '' %}">
+				<td><nobr>{{ pupil.fi }}</nobr></td>
+				{% for lesson in lessons %}
+					<td class="for-mark" mark="true" pupil="{{ pupil.id }}" lesson="{{ lesson.id }}" left="p-{{ pupil.id }}-{{ lesson|prev_date:lessons }}" right="p-{{ pupil.id }}-{{ lesson|next_date:lessons }}" up="p-{{ pupil|up_pupil:user.current_grade.pupils }}-{{ lesson.id }}" down="p-{{ pupil|down_pupil:user.current_grade.pupils }}-{{ lesson.id }}" next="p-{{ pupil|first_pupil:user.current_grade.pupils }}-{{ lesson|next_date:lessons }}" id="p-{{ pupil.id }}-{{ lesson.id }}">
+						{{ pupil|get_mark:lesson }}
+					</td>
+				{% endfor %}
+			</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+	</td>
+	</tr>
+</table>
+<script type="text/javascript">
+	var active = null;
+	function hide_inputs(){ $('td.for-mark input').remove() }
+	function init_mark_input(id){
+		mark = $('#' + id.replace('m-', '')).children('div');
+		if(mark.html()){
+			$('#' + id.replace('m-', '')).attr('mark-class', mark.attr('class'));
+			$('#' + id.replace('m-', '')).attr('mark', mark.html());
+			$('#' + id.replace('m-', '')).append('<input type="input" class="mark" id="' + id + '" value="' + mark.html() + '" />');
+		}
+		else{
+			$('#' + id.replace('m-', '')).attr('mark', '');
+			$('#' + id.replace('m-', '')).append('<input type="input" class="mark" id="' + id + '" value="" />');
+		}
+		$('#' + id.replace('m-', '')).children('div').html('');
+		$('#' + id).focus();
+		active = id;
+	}
+
+	function register_chart_event(key){
+		$('td.for-mark').bind('keydown', key, function(){
+			mark = $(this);
+			mark_id = $(this).attr('id');
+			if( mark.attr('mark') != mark.children('input').val() ){
+				$.get('?', {pupil: $(this).attr('pupil'), lesson: $(this).attr('lesson'), 'mark': mark.children('input').val(), 'set_mark': 1}, function(data){
+					if (data.mark!='no'){
+						$('#' + data.id).html(data.mark);
+					}
+				}, 'json');
+			}
+			
+			if (key == 'Return') {
+				key = 'down';
+			}
+			new_id = 'm-' + $(this).attr(key);
+			if(key == 'down' & $(this).attr('right').search('None')==-1 & $(this).attr(key).search('None')!=-1){
+				new_id = 'm-' + $(this).attr('next');
+			}
+			if(new_id.search('None')==-1){
+				hide_inputs(); 
+				if( mark.attr('mark') != mark.children('input').val() ){
+					$(this).html('<div class="' + $(this).attr('mark-class') + '">' + $(this).attr('mark') + '</div>');
+				}
+				else{
+					$(this).html('<div class="' + $(this).attr('mark-class') + '">...</div>');
+				
+				}
+				init_mark_input(new_id);
+			}
+		});
+	}
+
+	register_chart_event('up');
+	register_chart_event('down');
+	register_chart_event('left');
+	register_chart_event('right');
+	register_chart_event('Return');
+
+	$('td.for-mark').click(function(){
+		id = 'm-' + $(this).attr('id')
+		if (active){
+			hide_inputs();
+		}
+		init_mark_input(id);
+	});
+</script>
+{% endblock %}

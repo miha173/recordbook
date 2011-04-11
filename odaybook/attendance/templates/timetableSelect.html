@@ -1,0 +1,16 @@
+{% extends 'page.html' %}
+
+{% block padding %}
+    <a href="/administrator/uni/school/#sch{{ school.id }}">{{ school }}</a>
+    <span>&rarr;</span>
+    <h1>Расписания</h1>
+{% endblock %}
+
+
+{% block content %}
+<table class="table">
+	{% for grade in grades %}
+		<tr><td><a href="set/{{ grade.id }}/">{{ grade }}</a></td></tr>
+	{% endfor %}
+</table>
+{% endblock %}
