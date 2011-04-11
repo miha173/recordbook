@@ -14,12 +14,15 @@ class LazyUser(object):
             if user.is_authenticated():
                 try:
                     userprofile = Clerk.objects.get(user_ptr = user)
+
+                    if userprofile.roles.all():
+                        userprofile.current_role = userprofile.roles.all()[0]
+
                     if userprofile.current_role:
-                        userprofile.type = userprofile.current_role.type
-                    elif userprofile.is_superuser:
-                        userprofile.type = 'Superuser'
-                    if userprofile.current_role:
-                        userprofile.c = userprofile.current_role.c
+                        userprofile = userprofile.current_role
+                    else:
+                        # FIXME: 
+                        raise Exception
                 except Clerk.DoesNotExist:
                     userprofile = user
                     userprofile.type = 'Anonymous'

@@ -1,12 +1,13 @@
 # -*- coding: UTF-8 -*-
 
 from datetime import timedelta, datetime
+import pytils
 
 from django.db import models
 from django.db.models import Q
 from django.db.models.aggregates import Avg
 from django.contrib.auth.models import User, UserManager
-import pytils
+from django.db.models.signals import post_save
 
 from odaybook.rest.models import RestModel, RestModelManager
 from odaybook.utils import PlaningError
@@ -169,36 +170,49 @@ class ClerkManager(RestModelManager, UserManager):
         search_query = reduce(lambda x, y: x | y, search_query_list)
         return self.filter(search_query)
 
-class Clerk(User, RestModel):
+class BaseClerk(models.Model):
     # FIXME: прозрачное удаление, добавление ролей etc
-    objects = ClerkManager(['last_name', 'first_name', 'middle_name'])
+    # FIXME: REST
+#    objects = ClerkManager(['last_name', 'first_name', 'middle_name'])
     middle_name = models.CharField(u"Отчество", max_length = 30, blank = True)
     cart = models.CharField(u'Карта', max_length = 10, null = True, blank = True)
     phone = models.CharField(max_length = 20, verbose_name = u'Номер телефона', null = True, blank = True)
-    roles = models.ManyToManyField('BaseUser', null = True, blank = True, related_name = 'userextended_roles_related')
-    current_role = models.ForeignKey('BaseUser', null = True, blank = True, related_name = 'userextended_role_related')
+    roles = models.ManyToManyField('BaseUser', null = True, blank = True, related_name = '%(app_label)s_%(class)s_related_roles_related')
+    current_role = models.ForeignKey('BaseUser', null = True, blank = True, related_name = '%(app_label)s_%(class)s_related_role_related')
 
-    def __init__(self, *args, **kwargs):
-        super(Clerk, self).__init__(*args, **kwargs)
-        self.school = None
+    school = None
+
+    def get_roles(self):
+        result = []
+        for role in self.roles.all():
+            if role.type == 'Superuser': Object = Superuser
+            elif role.type == 'Superviser': Object = Superviser
+            elif role.type == 'Teacher': Object = Teacher
+            elif role.type == 'Pupil': Object = Pupil
+            elif role.type == 'Parent': Object = Parent
+            result.append(Object.objects.get(id = role.id))
+        return result
 
     def __unicode__(self):
         return ' '.join((self.last_name, self.first_name, self.middle_name))
-    
+
     def fio(self):
-        return self.last_name + ' ' + self.first_name + ' ' + self.middle_name
-    
+        if self.last_name or self.first_name or self.middle_name:
+            return self.last_name + ' ' + self.first_name + ' ' + self.middle_name
+        else:
+            return u'Имя не указано'
+
     def fi(self):
         u'''Вывод строки "Фамилия Имя"'''
         return self.last_name + ' ' + self.first_name
-    
+
     def if_(self):
         u'''Вывод строки "Имя Фамилия"'''
         return self.first_name + ' ' + self.last_name
-    
+
     def get_fio(self):
         return "%s %s %s" % (self.last_name, self.first_name, self.middle_name)
-    
+
     def gen_username(self, school = False):
         # Генерация буквенного имени пользователя
         def _clean_name(name):
@@ -250,20 +264,27 @@ class Clerk(User, RestModel):
               - экземпляр класса роли
         '''
         result = []
-        if self.is_superuser: result.append([self.get_role_display('Superuser'), 'Superuser', None, False, self])
         for role in self.roles.all():
             result.append([self.get_role_display(role.type), role.type, role.id, self.current_role == role, role])
         return result
 
     def get_roles_list(self):
+        '''
+            Возвращает список ролей.
+            Каждая роль представляется списком с полями:
+              - название
+              - код (латиница)
+              - id BaseUser если таковой имеется
+              - роль является текущей (bool)
+              - экземпляр класса роли
+        '''
         result = []
-        if self.is_superuser: result.append([self.get_role_display('Superuser'), 'Superuser', None, False, self])
-        for role in self.roles.all():
+        for role in self.get_roles():
             result.append([self.get_role_display(role.type), role.type, role.id, self.current_role == role, role])
             if role.type == 'Teacher':
-                if role.c.edu_admin:
+                if role.edu_admin:
                     result.append([self.get_role_display('EduAdmin'), 'EduAdmin', role.id, self.current_role == role, role])
-                if role.c.grade:
+                if role.grade:
                     result.append([self.get_role_display('Curator'), 'Curator', role.id, self.current_role == role, role])
         return result
 
@@ -272,7 +293,6 @@ class Clerk(User, RestModel):
             Список ролей, возожных для данного пользователя
         '''
         result = []
-        if self.is_superuser: result.append('Superuser')
         for role in self.roles.all():
             result.append(role.type)
         return result
@@ -282,12 +302,11 @@ class Clerk(User, RestModel):
             Список ролей, возожных для данного пользователя
         '''
         result = []
-        if self.is_superuser: result.append('Superuser')
-        for role in self.roles.all():
+        for role in self.get_roles():
             result.append(role.type)
             if role.type == 'Teacher':
-                if role.c.edu_admin: result.append('EduAdmin')
-                if role.c.grade: result.append('Curator')
+                if role.edu_admin: result.append('EduAdmin')
+                if role.grade: result.append('Curator')
         return result
 
     def get_role_obj(self, role, school = None):
@@ -322,7 +341,7 @@ class Clerk(User, RestModel):
             if 'Superuser' in self.get_base_roles_list_simple():
                 baseuser = None
             else:
-                raise 
+                raise
         else:
             try:
                 baseuser = BaseUser.objects.get(id = id)
@@ -332,6 +351,13 @@ class Clerk(User, RestModel):
                 raise
         self.current_role = baseuser
         self.save()
+
+    class Meta:
+        abstract = True
+
+class Clerk(User, RestModel, BaseClerk):
+
+    objects = UserManager()
 
     def save(self, init = False, safe = False, *args, **kwargs):
 
@@ -346,29 +372,89 @@ class Clerk(User, RestModel):
                 self.set_password("123456789")
             super(Clerk, self).save(*args, **kwargs)
         super(Clerk, self).save(*args, **kwargs)
+
+    def add_role(self, role):
+        self.roles.add(role)
+        self.save()
     
+    def create_role(self, Role):
+        role = Role()
+        role.set_clerk(self)
+        role.save()
+        return role
+
     class Meta:
         ordering = ['last_name', 'first_name', 'middle_name']
 
-class BaseUser(models.Model):
+class BaseUser(BaseClerk):
+    clerk = models.ForeignKey(Clerk, null = True, blank = True)
     type = models.CharField(max_length = 15)
+    username = models.CharField(max_length=30, null = True)
+    first_name = models.CharField(max_length=30, null = True, default = '')
+    last_name = models.CharField(max_length=30, null = True, default = '')
+    email = models.EmailField(null = True)
+
+    # FIXME:
+    is_staff = models.BooleanField('staff status', default=False, help_text= ("Designates whether the user can log into this admin site."))
+    is_active = models.BooleanField('active', default=True, help_text=("Designates whether this user should be treated as active. Unselect this instead of deleting accounts."))
+    is_superuser = models.BooleanField('superuser status', default=False, help_text=("Designates that this user has all permissions without explicitly assigning them."))
+    last_login = models.DateTimeField(('last login'), default=datetime.now)
+    date_joined = models.DateTimeField(('date joined'), default=datetime.now)
+    def is_authenticated(self):
+        return True
+
+    _append_to_clerk = False
+
     def __init__(self, *args, **kwargs):
         super(BaseUser, self).__init__(*args, **kwargs)
         self.types = []
-        if self.__class__.__name__ == 'BaseUser':
-            self.types.append(self.type)
-            if self.type == 'Teacher': Object = Teacher
-            elif self.type == 'Parent': Object = Parent
-            elif self.type == 'Pupil': Object = Pupil
-            elif self.type == 'Superviser': Object = Superviser
-            self.c = Object.objects.get(id = self.id)
+        if self.__class__.__name__ != 'BaseUser':
+#            self.types.append(self.type)
+#            if self.type == 'Teacher': Object = Teacher
+#            elif self.type == 'Parent': Object = Parent
+#            elif self.type == 'Pupil': Object = Pupil
+#            elif self.type == 'Superviser': Object = Superviser
+#            obj = Object.objects.get(id = self.id)
             if self.type == 'Teacher':
-                if self.c.edu_admin: self.types.append('EduAdmin')
-                if self.c.grade: self.types.append('Curator')
+                if self.edu_admin: self.types.append('EduAdmin')
+                if self.grade: self.types.append('Curator')
 
     def save(self, *args, **kwargs):
+        pk = self.pk
         self.type = self.__class__.__name__
+        if not self.clerk:
+            clerk = Clerk(last_name = self.last_name,
+                          first_name = self.first_name,
+                          middle_name = self.middle_name,
+                          email = self.middle_name,
+            )
+            clerk.save()
+            self.username = clerk.username
+            self.clerk = clerk
+            self._append_to_clerk = True
+
         super(BaseUser, self).save(*args, **kwargs)
+
+        if self._append_to_clerk:
+            self.clerk.roles.add(self)
+
+        super(BaseUser, self).save(*args, **kwargs)
+
+    def set_clerk(self, clerk):
+        '''
+            Устанавливает базового клерка. Копирует из него основные поля кроме ролей!
+        '''
+        self.clerk = clerk
+        self._append_to_clerk = True
+        for prop in ['last_name', 'first_name', 'middle_name', 'username', 'email']:
+            setattr(self, prop, getattr(clerk, prop))
+
+    def set_roles(self, clerk):
+        '''
+            Копирование прав доступа из базового клерка.
+        '''
+        for role in clerk.roles.all():
+            self.roles.add(role)
 
 class Scholar(models.Model):
     school = models.ForeignKey(School, null = True, blank = True)
@@ -405,8 +491,8 @@ class Parent(BaseUser):
     pupils = models.ManyToManyField('Pupil', related_name = 'userextended_pupils_related')
     current_pupil = models.ForeignKey('Pupil', related_name = 'userextended_pupil_related')
 
-class Pupil(Scholar):
-    grade = models.ForeignKey(Grade, verbose_name = u"Класс")
+class Pupil(BaseUser, Scholar):
+    grade = models.ForeignKey(Grade, verbose_name = u"Класс", null=True)
     sex = models.CharField(max_length = 1, choices = (('1', u'Юноша'), ('2', u'Девушка')), verbose_name = u'Пол')
     group = models.CharField(max_length = 1, choices = (('1', u'1 группа'), ('2', u'2 группа')), verbose_name = u'Группа')
     # FIXME: Специальная учебная группа (из тз)
@@ -475,7 +561,6 @@ class Pupil(Scholar):
     def get_subjects(self):
         return [connection.subject for connection in self.get_connections()]
 
-
 class Staff(BaseUser, Scholar):
     '''
     Модель персонала
@@ -488,6 +573,9 @@ class Staff(BaseUser, Scholar):
     tech_admin = models.BooleanField(u"Технический администратор", default = False)
 
 class Superviser(BaseUser):
+    pass
+
+class Superuser(BaseUser):
     pass
 
 # FIXME: WTF??

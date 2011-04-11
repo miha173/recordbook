@@ -69,7 +69,7 @@
                         <li>
                             {{ role.0 }}
                             {% if role.4.c.school %}<i>({{ role.4.c.school }})</i>{% endif %}
-                            <a href="dismiss/{{ object.id }}/?right={{ role.1 }}&school_id={{ role.4.c.school.id }}">
+                            <a href="dismiss/{{ object.id }}/?right={{ role.1 }}&role_id={{ role.4.id }}">
                                 <img src="{{ MEDIA_URL }}images/delete.png" />
                             </a>
                         </li>

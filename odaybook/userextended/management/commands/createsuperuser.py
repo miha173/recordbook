@@ -13,7 +13,7 @@ from django.core import exceptions
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.translation import ugettext as _
 
-from odaybook.userextended.models import Clerk
+from odaybook.userextended.models import Clerk, Superuser
 
 RE_VALID_USERNAME = re.compile('[\w.@+-]+$')
 
@@ -116,6 +116,7 @@ class Command(BaseCommand):
             sys.stderr.write("\nOperation cancelled.\n")
             sys.exit(1)
 
-        Clerk.objects.create_superuser(username, email, password)
+        clerk = Clerk.objects.create_user(username, email, password)
+        clerk.create_role(Superuser)
         self.stdout.write("Superuser created successfully.\n")
 

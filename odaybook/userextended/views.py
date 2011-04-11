@@ -8,7 +8,7 @@ from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.conf import settings
 
-from models import School, Clerk, Superviser, Teacher, Pupil, Parent, BaseUser
+from models import School, Clerk, Superviser, Teacher, Pupil, Parent, BaseUser, Superuser
 from forms import ClerkForm
 import odaybook.userextended.forms
 import odaybook.attendance.forms
@@ -145,24 +145,13 @@ def baseUserObjectEdit(request, mode, filter_id = None, id = 0):
 
             if right not in ['Superuser', 'Superviser', 'EduAdmin']: raise Http404
 
-            if right == 'Superuser':
-                if clerk.is_superuser:
+            if right in ['Superviser', 'Superuser']:
+                if right in clerk.get_roles_list_simple():
                     # FIXME: сообщение
                     pass
                 else:
-                    clerk.is_superuser = True
-                    clerk.save()
-
-            if right == 'Superviser':
-                if 'Supervisor' in clerk.get_roles_list_simple():
-                    # FIXME: сообщение
-                    pass
-                else:
-                    superviser = Superviser()
-                    superviser.save()
-                    baseuser = BaseUser.objects.get(id = superviser.id)
-                    clerk.roles.add(baseuser)
-                    clerk.save()
+                    if right == 'Superviser': clerk.create_role(Superviser)
+                    if right == 'Superuser': clerk.create_role(Superuser)
 
             if right == 'EduAdmin':
                 school = get_object_or_404(School, id = request.GET.get('school_id', 0))
@@ -170,11 +159,12 @@ def baseUserObjectEdit(request, mode, filter_id = None, id = 0):
                     # FIXME: сообщение
                     pass
                 else:
-                    teacher = Teacher(edu_admin = True, school = school)
+                    if clerk.has_role('Teacher', school):
+                        teacher = clerk.get_role_obj('Teacher', school)
+                    else:
+                        teacher = clerk.create_role(Teacher)
+                    teacher.edu_admin = True
                     teacher.save()
-                    baseuser = BaseUser.objects.get(id = teacher.id)
-                    clerk.roles.add(baseuser)
-                    clerk.save()
 
             return HttpResponseRedirect('/accounts/baseuser/')
 
@@ -203,25 +193,15 @@ def baseUserObjectEdit(request, mode, filter_id = None, id = 0):
                     pass
 
             if right == 'EduAdmin':
-                school = get_object_or_404(School, id = request.GET.get('school_id', 0))
-                if clerk.has_role('EduAdmin', school):
-                    teacher = clerk.get_role_obj('EduAdmin', school)[0]
-                    teacher.edu_admin = False
-                    teacher.save()
-                else:
-                    # FIXME: сообщение
-                    pass
+                role = get_object_or_404(Teacher, id = request.GET.get('role_id'), edu_admin = True, clerk = clerk)
+                role.edu_admin = False
+                role.save()
 
             if right == 'Teacher':
-                school = get_object_or_404(School, id = request.GET.get('school_id', 0))
-                if clerk.has_role('Teacher', school):
-                    teacher = clerk.get_role_obj('Teacher', school)[0]
-                    clerk.roles.remove(teacher)
-                    clerk.save()
-                    teacher.delete()
-                else:
-                    # FIXME: сообщение
-                    pass
+                role = get_object_or_404(Teacher, id = request.GET.get('role_id'), clerk = clerk)
+                clerk.roles.remove(role)
+                clerk.save()
+                role.delete()
 
             return HttpResponseRedirect('/accounts/baseuser/')
 

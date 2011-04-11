@@ -63,7 +63,7 @@ class Migration(SchemaMigration):
             ('middle_name', self.gf('django.db.models.fields.CharField')(max_length=30, blank=True)),
             ('cart', self.gf('django.db.models.fields.CharField')(max_length=10, null=True, blank=True)),
             ('phone', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('current_role', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='userextended_role_related', null=True, to=orm['userextended.BaseUser'])),
+            ('current_role', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='userextended_clerk_related_role_related', null=True, to=orm['userextended.BaseUser'])),
         ))
         db.send_create_signal('userextended', ['Clerk'])
 
@@ -78,9 +78,26 @@ class Migration(SchemaMigration):
         # Adding model 'BaseUser'
         db.create_table('userextended_baseuser', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('middle_name', self.gf('django.db.models.fields.CharField')(max_length=30, blank=True)),
+            ('cart', self.gf('django.db.models.fields.CharField')(max_length=10, null=True, blank=True)),
+            ('phone', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
+            ('current_role', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='userextended_baseuser_related_role_related', null=True, to=orm['userextended.BaseUser'])),
+            ('clerk', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['userextended.Clerk'], null=True, blank=True)),
             ('type', self.gf('django.db.models.fields.CharField')(max_length=15)),
+            ('username', self.gf('django.db.models.fields.CharField')(max_length=30, null=True)),
+            ('first_name', self.gf('django.db.models.fields.CharField')(max_length=30, null=True)),
+            ('last_name', self.gf('django.db.models.fields.CharField')(max_length=30, null=True)),
+            ('email', self.gf('django.db.models.fields.EmailField')(max_length=75, null=True)),
         ))
         db.send_create_signal('userextended', ['BaseUser'])
+
+        # Adding M2M table for field roles on 'BaseUser'
+        db.create_table('userextended_baseuser_roles', (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('from_baseuser', models.ForeignKey(orm['userextended.baseuser'], null=False)),
+            ('to_baseuser', models.ForeignKey(orm['userextended.baseuser'], null=False))
+        ))
+        db.create_unique('userextended_baseuser_roles', ['from_baseuser_id', 'to_baseuser_id'])
 
         # Adding model 'Teacher'
         db.create_table('userextended_teacher', (
@@ -130,14 +147,15 @@ class Migration(SchemaMigration):
 
         # Adding model 'Pupil'
         db.create_table('userextended_pupil', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('baseuser_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['userextended.BaseUser'], unique=True, primary_key=True)),
             ('school', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['userextended.School'], null=True, blank=True)),
-            ('grade', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['userextended.Grade'])),
+            ('grade', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['userextended.Grade'], null=True)),
             ('sex', self.gf('django.db.models.fields.CharField')(max_length=1)),
             ('group', self.gf('django.db.models.fields.CharField')(max_length=1)),
             ('special', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('health_group', self.gf('django.db.models.fields.CharField')(default='1', max_length=1, null=True)),
             ('health_note', self.gf('django.db.models.fields.CharField')(default='', max_length=255, null=True)),
+            ('order', self.gf('django.db.models.fields.CharField')(max_length=100, null=True)),
             ('parent_1', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
             ('parent_2', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
             ('parent_phone_1', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
@@ -160,6 +178,12 @@ class Migration(SchemaMigration):
             ('baseuser_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['userextended.BaseUser'], unique=True, primary_key=True)),
         ))
         db.send_create_signal('userextended', ['Superviser'])
+
+        # Adding model 'Superuser'
+        db.create_table('userextended_superuser', (
+            ('baseuser_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['userextended.BaseUser'], unique=True, primary_key=True)),
+        ))
+        db.send_create_signal('userextended', ['Superuser'])
 
         # Adding model 'Achievement'
         db.create_table('userextended_achievement', (
@@ -207,6 +231,9 @@ class Migration(SchemaMigration):
         # Deleting model 'BaseUser'
         db.delete_table('userextended_baseuser')
 
+        # Removing M2M table for field roles on 'BaseUser'
+        db.delete_table('userextended_baseuser_roles')
+
         # Deleting model 'Teacher'
         db.delete_table('userextended_teacher')
 
@@ -230,6 +257,9 @@ class Migration(SchemaMigration):
 
         # Deleting model 'Superviser'
         db.delete_table('userextended_superviser')
+
+        # Deleting model 'Superuser'
+        db.delete_table('userextended_superuser')
 
         # Deleting model 'Achievement'
         db.delete_table('userextended_achievement')
@@ -285,17 +315,27 @@ class Migration(SchemaMigration):
         },
         'userextended.baseuser': {
             'Meta': {'object_name': 'BaseUser'},
+            'cart': ('django.db.models.fields.CharField', [], {'max_length': '10', 'null': 'True', 'blank': 'True'}),
+            'clerk': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['userextended.Clerk']", 'null': 'True', 'blank': 'True'}),
+            'current_role': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'userextended_baseuser_related_role_related'", 'null': 'True', 'to': "orm['userextended.BaseUser']"}),
+            'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'null': 'True'}),
+            'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'null': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'type': ('django.db.models.fields.CharField', [], {'max_length': '15'})
+            'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'null': 'True'}),
+            'middle_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
+            'phone': ('django.db.models.fields.CharField', [], {'max_length': '20', 'null': 'True', 'blank': 'True'}),
+            'roles': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'userextended_baseuser_related_roles_related'", 'null': 'True', 'symmetrical': 'False', 'to': "orm['userextended.BaseUser']"}),
+            'type': ('django.db.models.fields.CharField', [], {'max_length': '15'}),
+            'username': ('django.db.models.fields.CharField', [], {'max_length': '30', 'null': 'True'})
         },
         'userextended.clerk': {
             'Meta': {'ordering': "['last_name', 'first_name', 'middle_name']", 'object_name': 'Clerk', '_ormbases': ['auth.User']},
             'cart': ('django.db.models.fields.CharField', [], {'max_length': '10', 'null': 'True', 'blank': 'True'}),
-            'current_role': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'userextended_role_related'", 'null': 'True', 'to': "orm['userextended.BaseUser']"}),
+            'current_role': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'userextended_clerk_related_role_related'", 'null': 'True', 'to': "orm['userextended.BaseUser']"}),
             'middle_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
             'phone': ('django.db.models.fields.CharField', [], {'max_length': '20', 'null': 'True', 'blank': 'True'}),
             'rest_modified': ('django.db.models.fields.DateTimeField', [], {}),
-            'roles': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'userextended_roles_related'", 'null': 'True', 'symmetrical': 'False', 'to': "orm['userextended.BaseUser']"}),
+            'roles': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'userextended_clerk_related_roles_related'", 'null': 'True', 'symmetrical': 'False', 'to': "orm['userextended.BaseUser']"}),
             'user_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True', 'primary_key': 'True'})
         },
         'userextended.grade': {
@@ -328,13 +368,14 @@ class Migration(SchemaMigration):
             'user_type': ('django.db.models.fields.CharField', [], {'max_length': '1'})
         },
         'userextended.pupil': {
-            'Meta': {'object_name': 'Pupil'},
-            'grade': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['userextended.Grade']"}),
+            'Meta': {'object_name': 'Pupil', '_ormbases': ['userextended.BaseUser']},
+            'baseuser_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['userextended.BaseUser']", 'unique': 'True', 'primary_key': 'True'}),
+            'grade': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['userextended.Grade']", 'null': 'True'}),
             'group': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
             'health_group': ('django.db.models.fields.CharField', [], {'default': "'1'", 'max_length': '1', 'null': 'True'}),
             'health_note': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '255', 'null': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'insurance_policy': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'order': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True'}),
             'parent_1': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'parent_2': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'parent_phone_1': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
@@ -373,6 +414,10 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'rest_modified': ('django.db.models.fields.DateTimeField', [], {}),
             'school': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['userextended.School']"})
+        },
+        'userextended.superuser': {
+            'Meta': {'object_name': 'Superuser', '_ormbases': ['userextended.BaseUser']},
+            'baseuser_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['userextended.BaseUser']", 'unique': 'True', 'primary_key': 'True'})
         },
         'userextended.superviser': {
             'Meta': {'object_name': 'Superviser', '_ormbases': ['userextended.BaseUser']},
