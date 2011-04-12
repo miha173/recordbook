@@ -64,6 +64,7 @@ class Migration(SchemaMigration):
             ('cart', self.gf('django.db.models.fields.CharField')(max_length=10, null=True, blank=True)),
             ('phone', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
             ('current_role', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='userextended_clerk_related_role_related', null=True, to=orm['userextended.BaseUser'])),
+            ('sync_timestamp', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
         ))
         db.send_create_signal('userextended', ['Clerk'])
 
@@ -82,12 +83,18 @@ class Migration(SchemaMigration):
             ('cart', self.gf('django.db.models.fields.CharField')(max_length=10, null=True, blank=True)),
             ('phone', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
             ('current_role', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='userextended_baseuser_related_role_related', null=True, to=orm['userextended.BaseUser'])),
+            ('sync_timestamp', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
             ('clerk', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['userextended.Clerk'], null=True, blank=True)),
             ('type', self.gf('django.db.models.fields.CharField')(max_length=15)),
             ('username', self.gf('django.db.models.fields.CharField')(max_length=30, null=True)),
-            ('first_name', self.gf('django.db.models.fields.CharField')(max_length=30, null=True)),
-            ('last_name', self.gf('django.db.models.fields.CharField')(max_length=30, null=True)),
+            ('first_name', self.gf('django.db.models.fields.CharField')(default='', max_length=30, null=True)),
+            ('last_name', self.gf('django.db.models.fields.CharField')(default='', max_length=30, null=True)),
             ('email', self.gf('django.db.models.fields.EmailField')(max_length=75, null=True)),
+            ('is_staff', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('is_active', self.gf('django.db.models.fields.BooleanField')(default=True)),
+            ('is_superuser', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('last_login', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now)),
+            ('date_joined', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now)),
         ))
         db.send_create_signal('userextended', ['BaseUser'])
 
@@ -318,13 +325,19 @@ class Migration(SchemaMigration):
             'cart': ('django.db.models.fields.CharField', [], {'max_length': '10', 'null': 'True', 'blank': 'True'}),
             'clerk': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['userextended.Clerk']", 'null': 'True', 'blank': 'True'}),
             'current_role': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'userextended_baseuser_related_role_related'", 'null': 'True', 'to': "orm['userextended.BaseUser']"}),
+            'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
             'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'null': 'True'}),
-            'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'null': 'True'}),
+            'first_name': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '30', 'null': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'null': 'True'}),
+            'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'is_staff': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'is_superuser': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
+            'last_name': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '30', 'null': 'True'}),
             'middle_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
             'phone': ('django.db.models.fields.CharField', [], {'max_length': '20', 'null': 'True', 'blank': 'True'}),
             'roles': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'userextended_baseuser_related_roles_related'", 'null': 'True', 'symmetrical': 'False', 'to': "orm['userextended.BaseUser']"}),
+            'sync_timestamp': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '15'}),
             'username': ('django.db.models.fields.CharField', [], {'max_length': '30', 'null': 'True'})
         },
@@ -336,6 +349,7 @@ class Migration(SchemaMigration):
             'phone': ('django.db.models.fields.CharField', [], {'max_length': '20', 'null': 'True', 'blank': 'True'}),
             'rest_modified': ('django.db.models.fields.DateTimeField', [], {}),
             'roles': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'userextended_clerk_related_roles_related'", 'null': 'True', 'symmetrical': 'False', 'to': "orm['userextended.BaseUser']"}),
+            'sync_timestamp': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'user_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True', 'primary_key': 'True'})
         },
         'userextended.grade': {

@@ -71,13 +71,23 @@ class ClerkForm(forms.ModelForm):
 class PupilForm(forms.ModelForm):
     def __init__(self, school = None, *args, **kwargs):
         super(PupilForm, self).__init__(*args, **kwargs)
+        self.school = school
         self.fields['grade'].queryset = Grade.objects.filter(school = school)
     class Meta:
         model = Pupil
         fields = [
-                'sex', 'grade', 'group', 'special',
+                'last_name', 'first_name', 'middle_name', 'email', 'phone',
+                'sex', 'grade', 'group', 'special', 'order', 'health_group', 'health_note',
                 'parent_phone_1', 'parent_phone_2',
         ]
+    def save(self, *args, **kwargs):
+        if self.school:
+            result = super(PupilForm, self).save(commit = False)
+            result.school = self.school
+            result.save()
+            return result
+        else:
+            return super(PupilForm, self).save(*args, **kwargs)
 
 class StaffForm(forms.ModelForm):
     def __init__(self, school = None, *args, **kwargs):
@@ -97,12 +107,10 @@ class TeacherForm(forms.ModelForm):
         self.fields['grades'].queryset = Grade.objects.filter(school = school)
         self.fields['subjects'].queryset = Subject.objects.filter(school = school)
         self.fields['grade'].queryset = Grade.objects.filter(school = school)
-        if not Option.objects.filter(school = school, key = 'TC_IP'):
-            del self.fields['cart']
     class Meta:
         model = Teacher
         fields = [
-#                'last_name', 'first_name', 'middle_name', 'cart', 'administrator'
+                'last_name', 'first_name', 'middle_name', 'edu_admin',
                 'grade', 'grades', 'subjects',
         ]
         

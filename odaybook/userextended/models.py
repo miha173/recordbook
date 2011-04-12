@@ -2,12 +2,14 @@
 
 from datetime import timedelta, datetime
 import pytils
+import time
 
 from django.db import models
 from django.db.models import Q
 from django.db.models.aggregates import Avg
 from django.contrib.auth.models import User, UserManager
 from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from odaybook.rest.models import RestModel, RestModelManager
 from odaybook.utils import PlaningError
@@ -106,10 +108,16 @@ class Grade(RestModel):
 
     def get_subjects(self):
         u'''
-            Получение всех предметов, которые ведут в этом классе
+            Получение списка всех предметов, которые ведут в этом классе
         '''
         from odaybook.curatorship.models import Connection
         return [c.subject for c in Connection.objects.filter(grade = self)]
+
+    def get_subjects_queryset(self):
+        u'''
+            Получение queryset всех предметов, которые ведут в этом классе
+        '''
+        return Subject.objects.filter(id__in = [s.id for s in self.get_subjects()])
         
     def delete(self):
         if Pupil.objects.filter(grade = self).count() == 0:
@@ -179,6 +187,9 @@ class BaseClerk(models.Model):
     phone = models.CharField(max_length = 20, verbose_name = u'Номер телефона', null = True, blank = True)
     roles = models.ManyToManyField('BaseUser', null = True, blank = True, related_name = '%(app_label)s_%(class)s_related_roles_related')
     current_role = models.ForeignKey('BaseUser', null = True, blank = True, related_name = '%(app_label)s_%(class)s_related_role_related')
+    sync_timestamp = models.IntegerField()
+
+    _sync_timestamp_set = False
 
     school = None
 
@@ -192,6 +203,12 @@ class BaseClerk(models.Model):
             elif role.type == 'Parent': Object = Parent
             result.append(Object.objects.get(id = role.id))
         return result
+
+    def save(self, *args, **kwargs):
+        if not self._sync_timestamp_set:
+            self.sync_timestamp = int(time.time())
+            self._sync_timestamp_set = True
+        super(BaseClerk, self).save(*args, **kwargs)
 
     def __unicode__(self):
         return ' '.join((self.last_name, self.first_name, self.middle_name))
@@ -312,9 +329,9 @@ class BaseClerk(models.Model):
     def get_role_obj(self, role, school = None):
         if role not in self.get_roles_list_simple(): raise self.DoesNotExist
         result = []
-        for r in self.roles.all():
+        for r in self.get_roles():
             if role in r.types:
-                if not school or r.c.school == school:
+                if not school or r.school == school:
                     result.append(r)
         if len(result) == 0: raise self.DoesNotExist
         else: return result
@@ -337,18 +354,12 @@ class BaseClerk(models.Model):
 
     def set_current_role(self, id, type):
         # FIXME: exceptions
-        if type == 'Superuser':
-            if 'Superuser' in self.get_base_roles_list_simple():
-                baseuser = None
-            else:
-                raise
-        else:
-            try:
-                baseuser = BaseUser.objects.get(id = id)
-            except BaseUser.DoesNotExist:
-                raise BaseUser.DoesNotExist
-            if baseuser not in self.roles.all():
-                raise
+        try:
+            baseuser = BaseUser.objects.get(id = id)
+        except BaseUser.DoesNotExist:
+            raise BaseUser.DoesNotExist
+        if baseuser not in self.roles.all():
+            raise
         self.current_role = baseuser
         self.save()
 
@@ -362,6 +373,7 @@ class Clerk(User, RestModel, BaseClerk):
     def save(self, init = False, safe = False, *args, **kwargs):
 
         if not self.pk or init:
+            # TODO: email
             if not self.username:
                 from random import randint
                 username = str(randint(10**6, 9999999))
@@ -382,6 +394,9 @@ class Clerk(User, RestModel, BaseClerk):
         role.set_clerk(self)
         role.save()
         return role
+
+    def get_current_role(self):
+        return eval(self.current_role.type).objects.get(id = self.current_role.id)
 
     class Meta:
         ordering = ['last_name', 'first_name', 'middle_name']
@@ -407,7 +422,7 @@ class BaseUser(BaseClerk):
 
     def __init__(self, *args, **kwargs):
         super(BaseUser, self).__init__(*args, **kwargs)
-        self.types = []
+        self.types = [self.type, ]
         if self.__class__.__name__ != 'BaseUser':
 #            self.types.append(self.type)
 #            if self.type == 'Teacher': Object = Teacher
@@ -421,7 +436,8 @@ class BaseUser(BaseClerk):
 
     def save(self, *args, **kwargs):
         pk = self.pk
-        self.type = self.__class__.__name__
+        if self.__class__.__name__ != 'BaseUser':
+            self.type = self.__class__.__name__
         if not self.clerk:
             clerk = Clerk(last_name = self.last_name,
                           first_name = self.first_name,
@@ -433,12 +449,23 @@ class BaseUser(BaseClerk):
             self.clerk = clerk
             self._append_to_clerk = True
 
-        super(BaseUser, self).save(*args, **kwargs)
+        if not pk:
+            super(BaseUser, self).save(*args, **kwargs)
 
         if self._append_to_clerk:
             self.clerk.roles.add(self)
 
         super(BaseUser, self).save(*args, **kwargs)
+
+        if not self._sync_timestamp_set:
+            self.sync_timestamp = int(time.time())
+            self._sync_timestamp_set = True
+
+        self.clerk._sync_timestamp_set = True
+        self.clerk.sync_timestamp = self.sync_timestamp
+        self.send_to_clerk()
+        self.send_roles_to_clerk()
+        self.clerk.save()
 
     def set_clerk(self, clerk):
         '''
@@ -446,7 +473,7 @@ class BaseUser(BaseClerk):
         '''
         self.clerk = clerk
         self._append_to_clerk = True
-        for prop in ['last_name', 'first_name', 'middle_name', 'username', 'email']:
+        for prop in ['last_name', 'first_name', 'middle_name', 'username', 'email', 'current_role']:
             setattr(self, prop, getattr(clerk, prop))
 
     def set_roles(self, clerk):
@@ -455,6 +482,29 @@ class BaseUser(BaseClerk):
         '''
         for role in clerk.roles.all():
             self.roles.add(role)
+
+    def send_to_clerk(self):
+        '''
+            Устанавливает базового клерка. Копирует из него основные поля кроме ролей!
+        '''
+        for prop in ['last_name', 'first_name', 'middle_name', 'username', 'email', 'current_role']:
+            setattr(self.clerk, prop, getattr(self, prop))
+
+    def send_roles_to_clerk(self):
+        '''
+            Копирование прав доступа из базового клерка.
+        '''
+        for role in self.roles.all():
+            self.clerk.roles.add(role)
+
+@receiver(post_save, sender = Clerk)
+def BaseUser_update(sender, instance, **kwargs):
+    for role in instance.get_roles():
+        if role.sync_timestamp != instance.sync_timestamp:
+            role.set_clerk(instance)
+            role.set_roles(instance)
+            role.save()
+
 
 class Scholar(models.Model):
     school = models.ForeignKey(School, null = True, blank = True)
@@ -503,7 +553,7 @@ class Pupil(BaseUser, Scholar):
                                                                                         ('4', '4'),
                                                                                         ),
                                     max_length = 1, verbose_name = u'Группа здоровья')
-    health_note = models.CharField(null = True, blank = False, default='', max_length = 255, verbose_name = u'Примечание')
+    health_note = models.CharField(null = True, blank = True, default='', max_length = 255, verbose_name = u'Примечание')
     order = models.CharField(null = True, blank = False, max_length = 100, verbose_name = u'Социальная группа', choices = (
         ('1', u'мать-одиночка'),
         ('2', u'малообеспеченные'),

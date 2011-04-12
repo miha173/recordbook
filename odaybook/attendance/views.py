@@ -23,7 +23,8 @@ def index(request):
     return render_to_response('page.html', render, context_instance = RequestContext(request))
 
 @login_required
-@user_passes_test(lambda u: u.is_administrator())
+@user_passes_test(lambda u: reduce(lambda x, y: x or y, map(lambda a: a in ['Superuser', 'EduAdmin'], u.types)))
+#@user_passes_test(lambda u: 'EduAdmin' in u.types)
 def timetableSelect(request, school = 0):
     render = {}
     if school:
@@ -35,7 +36,7 @@ def timetableSelect(request, school = 0):
     return render_to_response('timetableSelect.html', render, context_instance = RequestContext(request))
     
 @login_required
-@user_passes_test(lambda u: u.is_administrator())
+@user_passes_test(lambda u: reduce(lambda x, y: x or y, map(lambda a: a in ['Superuser', 'EduAdmin'], u.types)))
 def timetableSet(request, id, school = 0):
     from forms import TimetableForm
     from django import forms
@@ -58,7 +59,8 @@ def timetableSet(request, id, school = 0):
                     room = u.room
                     subject = u.subject.id
                 form.fields['l_r_%s_%s_%d' % (day[0], lesson[0], i)] = forms.CharField(initial = room, required = False)
-                form.fields['l_s_%s_%s_%d' % (day[0], lesson[0], i)] = forms.ModelChoiceField(initial = subject, queryset = grade.get_subjects(), required = False)
+#                form.fields['l_s_%s_%s_%d' % (day[0], lesson[0], i)] = forms.CharField(initial = room, required = False)
+                form.fields['l_s_%s_%s_%d' % (day[0], lesson[0], i)] = forms.ModelChoiceField(initial = subject, queryset = grade.get_subjects_queryset(), required = False)
     if request.method == 'POST':
         form.initial = request.POST
         for day in settings.WORKDAYS:

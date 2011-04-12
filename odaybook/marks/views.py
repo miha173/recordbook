@@ -127,11 +127,11 @@ def index(request):
             return HttpResponse(demjson.encode({'id': tr_id, 'mark': get_mark(pupil, lesson)}, encoding = 'utf-8'))
         
         from pytils import dt
-        if not request.user.current_role.c.current_grade:
-            if request.user.current_role.c.get_grades():
-                request.user.current_role.c.current_grade = request.user.get_grades()[0]
-                request.user.current_role.c.save()
-                request.user.current_role.c.current_grade.get_pupils_for_teacher(request.user)
+        if not request.user.current_grade:
+            if request.user.get_grades():
+                request.user.current_grade = request.user.get_grades()[0]
+                request.user.save()
+        request.user.current_grade.get_pupils_for_teacher(request.user)
         
         try:
             day, month, year = request.GET.get('date', '').split('.')
@@ -144,8 +144,8 @@ def index(request):
         for i in xrange(1, 13): monthes[i] = ('', 0)
         
         kwargs = {
-            'subject': request.user.current_role.c.current_subject,
-            'grade': request.user.current_role.c.current_grade
+            'subject': request.user.current_subject,
+            'grade': request.user.current_grade
         }
         conn = Connection.objects.filter(teacher = request.user, **kwargs)
         if not conn: raise Http404('No connections')
@@ -176,7 +176,7 @@ def index(request):
             if monthes[i][1] == 0: del monthes[i]
         render['lessons'] = lessons_range
         
-    return render_to_response('~marks/%s/index.html' % request.user_type, render, context_instance = RequestContext(request))
+    return render_to_response('~marks/%s/index.html' % request.user.type.lower(), render, context_instance = RequestContext(request))
 
 @login_required
 def viewMarks(request, id):

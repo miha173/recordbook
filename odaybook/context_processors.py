@@ -36,7 +36,6 @@ def environment(request):
     user = request.user
     if request.user.is_authenticated():
         if request.user.type == 'Teacher':
-            user = user.current_role.c
             subjects = []
             last_subject = None
             for connection in Connection.objects.filter(teacher = user).order_by('subject'):

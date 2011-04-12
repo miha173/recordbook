@@ -27,14 +27,23 @@ def objectList(request, app, model, filter_id = None):
     render = {}
     ext = {}
     app_model = '%s.%s' % (app, model)
-    if filter_id:
-        ext['school'] = get_object_or_404(School , id = filter_id)
-    if request.user.type == 'Teacher':
-        if app_model == 'userextended.School':
-            ext['id'] = request.user.c.school.id
-        else:
-            ext['school'] = request.user.c.school
     
+    if app_model == 'userextended.School':
+        if request.user.type == 'Teacher':
+            ext['id'] = request.user.school.id
+    elif app_model == 'curatorship.Connection':
+        if request.user.type == 'Teacher':
+            ext['grade__school'] = request.user.school
+        elif request.user.type == 'Superuser':
+            ext['grade__school'] = get_object_or_404(School, id = filter_id)
+    elif app_model == 'userextended.Clerk':
+        pass
+    else:
+        if request.user.type == 'Teacher':
+            ext['school'] = request.user.school
+        elif request.user.type == 'Superuser':
+            ext['school'] = get_object_or_404(School, id = filter_id)
+
     render.update(ext)
 
     allowed_apps = [
@@ -75,9 +84,7 @@ def objectList(request, app, model, filter_id = None):
 def objectEdit(request, app, model, mode, filter_id = None, id = 0):
     render = {}
     ext = {}
-
-    if filter_id:
-        ext['school'] = get_object_or_404(School , id = filter_id)
+    app_model = '%s.%s' % (app, model)
 
     allowed_apps = [
             'userextended.Grade', 'userextended.Subject', 'userextended.Pupil',
@@ -89,6 +96,20 @@ def objectEdit(request, app, model, mode, filter_id = None, id = 0):
     template = render['object_name'] = model.lower()
     Object = getattr(getattr(__import__('odaybook'), app).models, model)
     Form = getattr(getattr(__import__('odaybook'), app).forms, model + 'Form')
+
+    if app_model == 'userextended.School':
+        if request.user.type == 'Teacher':
+           ext['id'] = request.user.school.id
+    elif app_model == 'curatorship.Connection':
+        if request.user.type == 'Teacher':
+            ext['grade__school'] = request.user.school
+        elif request.user.type == 'Superuser':
+            ext['grade__school'] = get_object_or_404(School, id = filter_id)
+    else:
+        if request.user.type == 'Teacher':
+            ext['school'] = request.user.school
+        elif request.user.type == 'Superuser':
+            ext['school'] = get_object_or_404(School, id = filter_id)
 
     url = '/administrator/uni/%s.%s/' % (app, model)
     if filter_id: url += str(filter_id) + '/'
@@ -118,7 +139,7 @@ def objectEdit(request, app, model, mode, filter_id = None, id = 0):
                 return HttpResponseRedirect(url)
             else:
                 render['form'] = form
-                return render_to_response('~/userextended/%s.html' % template, render, context_instance = RequestContext(request))
+                return render_to_response('~userextended/%s.html' % template, render, context_instance = RequestContext(request))
         else:
             form = Form(data = request.POST, **ext)
             if form.is_valid():
@@ -160,9 +181,10 @@ def baseUserObjectEdit(request, mode, filter_id = None, id = 0):
                     pass
                 else:
                     if clerk.has_role('Teacher', school):
-                        teacher = clerk.get_role_obj('Teacher', school)
+                        teacher = clerk.get_role_obj('Teacher', school)[0]
                     else:
                         teacher = clerk.create_role(Teacher)
+                        teacher.school = school
                     teacher.edu_admin = True
                     teacher.save()
 

@@ -23,12 +23,12 @@ class ConnectionStep3Wizard(forms.ModelForm):
         super(ConnectionStep3Wizard, self).__init__(*args, **kwargs)
         self.fields['connection'].initial = '0'
 
-class ConnectionGlobalForm(forms.ModelForm):
+class ConnectionForm(forms.ModelForm):
     class Meta:
         model = Connection
         fields = ('teacher', 'subject', 'grade', 'connection')
     def __init__(self, grade__school, *args, **kwargs):
-        super(ConnectionGlobalForm, self).__init__(*args, **kwargs)
+        super(ConnectionForm, self).__init__(*args, **kwargs)
         self.fields['teacher'].queryset = self.fields['teacher'].queryset.filter(school = grade__school)
         self.fields['subject'].queryset = self.fields['subject'].queryset.filter(school = grade__school)
         self.fields['grade'].queryset = self.fields['grade'].queryset.filter(school = grade__school)

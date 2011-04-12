@@ -17,7 +17,7 @@ def index(request):
     return render_to_response('~curatorship/index.html', context_instance = RequestContext(request))
 
 @login_required
-@user_passes_test(lambda u: u.prefix=='t')
+@user_passes_test(lambda u: u.type == 'Teacher')
 def connectionsList(request):
     render = {}
     teacher = Teacher.objects.get(id = request.user.id)
@@ -25,7 +25,7 @@ def connectionsList(request):
     return render_to_response('~curatorship/connectionsList.html', render, context_instance = RequestContext(request))
 
 @login_required
-@user_passes_test(lambda u: u.prefix=='t')
+@user_passes_test(lambda u: u.type == 'Teacher')
 def connectionWizard(request, step):
     render = {}
     step = int(step)
@@ -77,7 +77,7 @@ def connectionWizard(request, step):
                 return render_to_response('~curatorship/connectionWizard.html', render, context_instance = RequestContext(request))
             
 @login_required
-@user_passes_test(lambda u: u.prefix=='t')
+@user_passes_test(lambda u: u.type == 'Teacher')
 def connectionEdit(request, connection_id, mode):
     if mode == 'delete':
         connection = get_object_or_404(Connection, id = connection_id)
@@ -87,7 +87,7 @@ def connectionEdit(request, connection_id, mode):
         return HttpResponseRedirect('/curatorship/connections/')
 
 @login_required
-@user_passes_test(lambda u: u.prefix=='t')
+@user_passes_test(lambda u: u.type == 'Teacher')
 def pupilPasswords(request):
     render = {}
     if request.method == 'GET':
@@ -106,14 +106,14 @@ def pupilPasswords(request):
         return render_to_response('~curatorship/pupilPasswords.html', render, context_instance = RequestContext(request))
 
 @login_required
-@user_passes_test(lambda u: u.prefix=='t')
+@user_passes_test(lambda u: u.type == 'Teacher')
 def pupilList(request):
     render = {}
     render['pupils'] = Pupil.objects.filter(grade = request.user.grade)
     return render_to_response('~curatorship/pupilList.html', render, context_instance = RequestContext(request))
 
 @login_required
-@user_passes_test(lambda u: u.prefix=='t')
+@user_passes_test(lambda u: u.type == 'Teacher')
 def pupilEdit(request, mode, id = 0):
     render = {}
     if request.method == 'GET':
@@ -150,7 +150,7 @@ def pupilEdit(request, mode, id = 0):
                 return render_to_response('~curatorship/pupil.html', render, context_instance = RequestContext(request))
 
 @login_required
-@user_passes_test(lambda u: u.prefix=='t')
+@user_passes_test(lambda u: u.type == 'Teacher')
 def graphiks(request):
     render = {}
     if request.method == 'GET':

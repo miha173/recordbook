@@ -1,10 +1,10 @@
-{% if user.c.connection_set.all %}
-    {% if ACTIVE_URL == '' or ACTIVE_URL == 'marks' %}<big class="gay">Уроки</big>{% else %}<a href="/marks/">Оценки</a>{% endif %}
+{% if user.connection_set.all %}
+    {% if ACTIVE_URL == '' or ACTIVE_URL == 'marks' %}<big class="gay">Оценки</big>{% else %}<a href="/marks/">Оценки</a>{% endif %}
 {% endif %}
-{% if user.c.grade %}
+{% if user.grade %}
     {% if ACTIVE_URL == 'curatorship' %}<big class="yellow">Классное руководство</big>{% else %}<a href="/curatorship/">Классное руководство</a>{% endif %}
 {% endif %}
-{% if user.c.edu_admin %}
+{% if user.edu_admin %}
     {# FIXME #}
     {% if ACTIVE_URL == 'accounts' %}<big class="green">Управление</big>{% else %}<a href="/accounts/uni/userextended.School/">Управление</a>{% endif %}
     {% if ACTIVE_URL == 'uni' %}<big class="red">Отчёты</big>{% else %}<a href="#">Отчёты</a>{% endif %}
