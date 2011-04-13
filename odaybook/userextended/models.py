@@ -407,7 +407,7 @@ class BaseUser(BaseClerk):
     username = models.CharField(max_length=30, null = True)
     first_name = models.CharField(max_length=30, null = True, default = '')
     last_name = models.CharField(max_length=30, null = True, default = '')
-    email = models.EmailField(null = True)
+    email = models.EmailField(null = True, blank = True)
 
     # FIXME:
     is_staff = models.BooleanField('staff status', default=False, help_text= ("Designates whether the user can log into this admin site."))
@@ -415,6 +415,8 @@ class BaseUser(BaseClerk):
     is_superuser = models.BooleanField('superuser status', default=False, help_text=("Designates that this user has all permissions without explicitly assigning them."))
     last_login = models.DateTimeField(('last login'), default=datetime.now)
     date_joined = models.DateTimeField(('date joined'), default=datetime.now)
+    password = models.CharField('password', max_length=128)
+
     def is_authenticated(self):
         return True
 
@@ -473,7 +475,7 @@ class BaseUser(BaseClerk):
         '''
         self.clerk = clerk
         self._append_to_clerk = True
-        for prop in ['last_name', 'first_name', 'middle_name', 'username', 'email', 'current_role']:
+        for prop in ['last_name', 'first_name', 'middle_name', 'username', 'email', 'current_role', 'password']:
             setattr(self, prop, getattr(clerk, prop))
 
     def set_roles(self, clerk):
@@ -487,7 +489,7 @@ class BaseUser(BaseClerk):
         '''
             Устанавливает базового клерка. Копирует из него основные поля кроме ролей!
         '''
-        for prop in ['last_name', 'first_name', 'middle_name', 'username', 'email', 'current_role']:
+        for prop in ['last_name', 'first_name', 'middle_name', 'username', 'email', 'current_role', 'password']:
             setattr(self.clerk, prop, getattr(self, prop))
 
     def send_roles_to_clerk(self):
@@ -512,7 +514,10 @@ class Scholar(models.Model):
         abstract = True
 
 class Teacher(Scholar, BaseUser):
-    # Завуч/директор 
+
+    objects = ClerkManager(['last_name', 'first_name', 'middle_name'])
+
+    # Завуч/директор
     edu_admin = models.BooleanField(u"Учебный администратор", default = False)
     # Технический администратор
     tech_admin = models.BooleanField(u"Технический администратор", default = False)
@@ -534,6 +539,10 @@ class Teacher(Scholar, BaseUser):
         from odaybook.curatorship.models import Connection
         return list(set([conn.grade for conn in Connection.objects.filter(teacher = self)]))
 
+    def get_grades_for_marks(self):
+        from odaybook.attendance.models import UsalTimetable
+        return list(set([grade for grade in self.get_grades() if UsalTimetable.objects.filter(grade = grade, subject = self.current_subject)]))
+
     class Meta:
         unique_together = ('grade', )
 
@@ -542,9 +551,12 @@ class Parent(BaseUser):
     current_pupil = models.ForeignKey('Pupil', related_name = 'userextended_pupil_related')
 
 class Pupil(BaseUser, Scholar):
+
+    objects = ClerkManager(['last_name', 'first_name', 'middle_name'])
+
     grade = models.ForeignKey(Grade, verbose_name = u"Класс", null=True)
     sex = models.CharField(max_length = 1, choices = (('1', u'Юноша'), ('2', u'Девушка')), verbose_name = u'Пол')
-    group = models.CharField(max_length = 1, choices = (('1', u'1 группа'), ('2', u'2 группа')), verbose_name = u'Группа')
+    group = models.CharField(max_length = 1, choices = (('1', u'1 группа'), ('2', u'2 группа')), verbose_name = u'Группа', default = '1')
     # FIXME: Специальная учебная группа (из тз)
     special = models.BooleanField(verbose_name = u'Специальная группа')
     health_group = models.CharField(null = True, blank = False, default = '1', choices=(('1', '1'),
@@ -554,14 +566,14 @@ class Pupil(BaseUser, Scholar):
                                                                                         ),
                                     max_length = 1, verbose_name = u'Группа здоровья')
     health_note = models.CharField(null = True, blank = True, default='', max_length = 255, verbose_name = u'Примечание')
-    order = models.CharField(null = True, blank = False, max_length = 100, verbose_name = u'Социальная группа', choices = (
+    order = models.CharField(null = True, max_length = 100, verbose_name = u'Социальная группа', choices = (
+        ('0', u'полноценная семья'),
         ('1', u'мать-одиночка'),
         ('2', u'малообеспеченные'),
         ('3', u'неблагополучная семья'),
         ('4', u'беженцы'),
         ('5', u'ребенок-инвалид'),
-        ('6', u'полноценная семья'),
-    ))
+    ), default = '0')
     # TODO: примечение (см. ТЗ)
     parent_1 = models.CharField(max_length = 255, verbose_name = u'Родитель 1', blank = True, null = True)
     parent_2 = models.CharField(max_length = 255, verbose_name = u'Родитель 2', blank = True, null = True)
@@ -611,6 +623,9 @@ class Pupil(BaseUser, Scholar):
     def get_subjects(self):
         return [connection.subject for connection in self.get_connections()]
 
+    class Meta:
+        ordering = ['last_name', 'first_name', 'middle_name']
+
 class Staff(BaseUser, Scholar):
     '''
     Модель персонала
@@ -618,7 +633,7 @@ class Staff(BaseUser, Scholar):
     objects = ClerkManager(['last_name', 'first_name', 'middle_name'])
     
     # Завуч/директор 
-    edu_admin = models.BooleanField(u"Учебный администратор", default = False)
+    edu_admin = models.BooleanField(u"Администратор", default = False)
     # Технический администратор
     tech_admin = models.BooleanField(u"Технический администратор", default = False)
 

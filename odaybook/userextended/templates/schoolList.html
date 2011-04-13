@@ -97,6 +97,11 @@
 					Настройки
 				{% endif %}
                 {% endcomment %}
+				{% if school.show.timetables %}
+					<a href="/attendance/timetable/select/{{ school.id }}">Расписания</a>
+				{% else %}
+					Расписания
+				{% endif %}
 			</td>
 		</tr>
 		<tr>
@@ -122,22 +127,16 @@
 		        {% endif %}
 			</td>
 		</tr>
+    {% comment %}
 		<tr>
 			<td>
-				{% if school.show.timetables %}
-					<a href="/attendance/timetable/select/{{ school.id }}">Расписания</a>
-				{% else %}
-					Расписания
-				{% endif %}
 			</td>
 			<td>
-                {% comment %}
 				{% if school.show.resultdates %}
 					<a href="/administrator/uni/marks.ResultDate/{{ school.id }}/">Итоговые периоды</a>
 				{% else %}
 					Итоговые периоды
 				{% endif %}
-                {% endcomment %}
 			</td>
 			<td>
 		        {% if school.show.ringtimetable %}
@@ -147,6 +146,7 @@
 		        {% endif %}
 			</td>
 		</tr>
+    {% endcomment %}
 		<tr>
 			<td colspan="3"><hr /></td>
 		</tr>

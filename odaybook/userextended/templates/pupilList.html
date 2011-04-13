@@ -16,16 +16,16 @@
 <table class="table">
 	<thead>
 		<th>Ученик</th>
-		<th>Логин</th>
+		{#<th>Логин</th>#}
 		<th>Класс</th>
 		<th>Действия</th>
 	</thead>
 	{% for object in objects.object_list %}
 		<tr class="{% cycle 'gray' '' %}">
 			<td>{{ object.fio }}</td>
-			<td>{{ object.username }}</td>
+			{#<td>{{ object.username }}</td>#}
 			<td>{{ object.grade }}</td>
-			<td>{% include "helpers/buttons/edit.html" %} <a href="/administrator/uni/achievement/{{ object.id }}/">Достижения.</a></td>
+			<td>{% include "helpers/buttons/edit.html" %}</td>
 	{% endfor %}
 </table>
 {% include "helpers/paginator.html" %}

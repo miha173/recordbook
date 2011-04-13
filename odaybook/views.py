@@ -43,6 +43,8 @@ def index(request):
         ]
         
         render['lessons'] = UsalRingTimetable.objects.filter(workday = datetime.now().isoweekday(), school = request.user.school)
+#    elif request.user.type == 'Teacher':
+#        return HttpResponseRedirect('/marks/')
     return render_to_response('root/index.html', render, context_instance=RequestContext(request))
 
 

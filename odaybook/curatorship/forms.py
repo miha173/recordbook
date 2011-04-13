@@ -37,8 +37,9 @@ class PupilForm(forms.ModelForm):
     class Meta:
         model = Pupil
         fields = [
-#                'last_name', 'first_name', 'middle_name',
-                'sex', 'group', 'special',
+                'last_name', 'first_name', 'middle_name', 'email', 'phone',
+                'sex', 'grade', 'group', 'special', 'order', 'health_group', 'health_note',
+                'parent_phone_1', 'parent_phone_2',
         ]
 
 class GraphiksForm(forms.Form):

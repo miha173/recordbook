@@ -81,10 +81,16 @@ lesson_id = 0;
 				</tr>
 			</thead>
 			<tbody>
-				{% for gr in user.get_grades %}
+				{% for gr in user.get_grades_for_marks %}
 					<tr><td>
 						<ul
-							<li>{% if gr == user.current_grade %}{{ gr }}{% else %}<a href="#">{{ gr }}</a>{% endif %}</li>
+							<li>
+                                {% if gr == user.current_grade %}
+                                    {{ gr }}
+                                {% else %}
+                                    <a href="?set_current_grade={{ gr.id }}">{{ gr }}</a>
+                                {% endif %}
+                            </li>
 						</ul>
 					</td></tr>
 				{% endfor %}

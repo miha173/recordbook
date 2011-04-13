@@ -7,6 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.conf import settings
+from django.core.urlresolvers import resolve, reverse
 
 from models import School, Clerk, Superviser, Teacher, Pupil, Parent, BaseUser, Superuser
 from forms import ClerkForm
@@ -259,6 +260,55 @@ def baseUserObjectEdit(request, mode, filter_id = None, id = 0):
                 render['form'] = form
                 return render_to_response('~userextended/clerk.html', render, context_instance = RequestContext(request))
 
+@login_required
 def set_role(request, role_id):
     request.user.set_current_role(role_id, request.GET.get('type', ''))
     return HttpResponseRedirect('/')
+
+@login_required
+@user_passes_test(lambda u: reduce(lambda x, y: x or y, map(lambda a: a in ['Superuser', 'EduAdmin'], u.types)))
+def clerkAppendRole(request):
+    render = {}
+    render['step'] = request.GET.get('step', '1')
+    render['username'] = request.POST.get('username', '')
+    render['school'] = request.GET.get('school', '1')
+
+    if request.GET.get('step', '1') == '1':
+        if request.method == 'POST':
+            try:
+                clerk = Clerk.objects.get(username = request.POST.get('username'))
+            except Clerk.DoesNotExist:
+                render['error'] = u'Пользователя с таким ID не существует.'
+                return render_to_response('~userextended/clerkAppendRole.html', render, context_instance = RequestContext(request))
+            if 'Pupil' in clerk.get_roles_list():
+                render['error'] = u'Этот пользователь ученик.'
+                return render_to_response('~userextended/clerkAppendRole.html', render, context_instance = RequestContext(request))
+            school = get_object_or_404(School, id = request.GET.get('school', '0'))
+            if clerk.has_role('Teacher', school):
+                render['error'] = u'Этот пользователь уже приписан к данной школе.'
+                return render_to_response('~userextended/clerkAppendRole.html', render, context_instance = RequestContext(request))
+
+            render['clerk'] = clerk
+
+    elif request.GET.get('step', '1') == '2':
+        if request.method == 'POST':
+            try:
+                clerk = Clerk.objects.get(username = request.POST.get('username'))
+            except Clerk.DoesNotExist:
+                render['error'] = u'Пользователя с таким ID не существует.'
+                return render_to_response('~userextended/clerkAppendRole.html', render, context_instance = RequestContext(request))
+            if 'Pupil' in clerk.get_roles_list():
+                render['error'] = u'Этот пользователь ученик.'
+                return render_to_response('~userextended/clerkAppendRole.html', render, context_instance = RequestContext(request))
+            school = get_object_or_404(School, id = request.GET.get('school', '0'))
+            if clerk.has_role('Teacher', school):
+                render['error'] = u'Этот пользователь уже приписан к данной школе.'
+                return render_to_response('~userextended/clerkAppendRole.html', render, context_instance = RequestContext(request))
+
+            teacher = clerk.create_role(Teacher)
+            teacher.school = school
+            teacher.save()
+
+            return HttpResponseRedirect('/administrator/uni/userextended.Teacher/%d/edit/%d/' % (school.id, teacher.id))
+
+    return render_to_response('~userextended/clerkAppendRole.html', render, context_instance = RequestContext(request))

@@ -1,9 +1,8 @@
-{% extends 'curatorship/page.html' %}
+{% extends 'curatorship_page.html' %}
 
 {% block content %}
-<h2>Ученик</h2>
-{{ form.errors }}
-<form method="post" action=".">{% csrf_token %}
+<form method="post" action="." enctype="multipart/form-data">{% csrf_token %}
+<table class="table"><tr><td>
 	<fieldset>
 		<legend>Общая информация</legend>
 		<table>
@@ -41,9 +40,18 @@
 			</tr>
 		</table>
 	</fieldset>
+	</td></tr><tr><td>
 	<fieldset>
 		<legend>Учёба</legend>
 		<table>
+			<tr>
+				<td class="label"><label for="id_grade">Класс:</label></td>
+				<td>{{ form.grade }}</td>
+				<td>
+					{% if form.grade.errors %}<div class="error_text">{{ form.grade.errors }}</div>{% endif %}
+					{% if form.grade.help_text %}<div class="help_text">{{ form.grade.help_text }}</div>{% endif %}
+				</td>
+			</tr>
 			<tr>
 				<td class="label"><label for="id_group">Группа:</label></td>
 				<td>{{ form.group }}</td>
@@ -54,6 +62,37 @@
 			</tr>
 		</table>
 	</fieldset>
+	</td></tr><tr><td>
+	<fieldset>
+		<legend>Родители</legend>
+		<table>
+			<tr>
+				<td class="label"><label for="id_special">Телефон отца:</label></td>
+				<td>{{ form.parent_phone_1 }}</td>
+				<td>
+					{% if form.parent_phone_1.errors %}<div class="error_text">{{ form.parent_phone_1.errors }}</div>{% endif %}
+					{% if form.parent_phone_1.help_text %}<div class="help_text">{{ form.parent_phone_1.help_text }}</div>{% endif %}
+			</td>
+			</tr>
+			<tr>
+				<td class="label"><label for="id_cart">Телефон матери: </label></td>
+				<td>{{ form.parent_phone_2 }}
+				<td>
+					{% if form.parent_phone_2.errors %}<div class="error_text">{{ form.parent_phone_2.errors }}</div>{% endif %}
+					{% if form.parent_phone_2.help_text %}<div class="help_text">{{ form.parent_phone_2.help_text }}</div>{% endif %}
+				</td>
+			</tr>
+			<tr>
+				<td class="label"><label for="id_cart">Электропочта: </label></td>
+				<td>{{ form.email }}
+				<td>
+					{% if form.email.errors %}<div class="error_text">{{ form.email.errors }}</div>{% endif %}
+					{% if form.email.help_text %}<div class="help_text">{{ form.email.help_text }}</div>{% endif %}
+				</td>
+			</tr>
+		</table>
+	</fieldset>
+</td></tr><tr><td>
 	<fieldset>
 		<legend>Другая информация</legend>
 		<table>
@@ -61,12 +100,48 @@
 				<td class="label"><label for="id_special">Спец. группа:</label></td>
 				<td>{{ form.special }}</td>
 				<td>
-					{% if form.grades.errors %}<div class="error_text">{{ form.grades.errors }}</div>{% endif %}
+					{% if form.special.errors %}<div class="error_text">{{ form.special.errors }}</div>{% endif %}
 					{% if form.special.help_text %}<div class="help_text">{{ form.cpecial.help_text }}</div>{% endif %}
 			</td>
 			</tr>
+			<tr>
+				<td class="label"><label for="id_special">{{ form.order.label }}:</label></td>
+				<td>{{ form.order }}</td>
+				<td>
+					{% if form.order.errors %}<div class="error_text">{{ form.order.errors }}</div>{% endif %}
+					{% if form.order.help_text %}<div class="help_text">{{ form.order.help_text }}</div>{% endif %}
+			</td>
+			</tr>
+			<tr>
+				<td class="label"><label for="id_special">{{ form.health_group.label }}:</label></td>
+				<td>{{ form.health_group }}</td>
+				<td>
+					{% if form.health_group.errors %}<div class="error_text">{{ form.health_group.errors }}</div>{% endif %}
+					{% if form.health_group.help_text %}<div class="help_text">{{ form.health_group.help_text }}</div>{% endif %}
+			</td>
+			</tr>
+			<tr>
+				<td class="label"><label for="id_special">{{ form.health_note.label }}:</label></td>
+				<td>{{ form.health_note }}</td>
+				<td>
+					{% if form.health_note.errors %}<div class="error_text">{{ form.health_note.errors }}</div>{% endif %}
+					{% if form.health_note.help_text %}<div class="help_text">{{ form.health_note.help_text }}</div>{% endif %}
+			</td>
+			</tr>
+			{% if form.cart %}
+				<tr>
+					<td class="label"><label for="id_cart">Номер карты: </label></td>
+					<td>{{ form.cart }}
+					<td>
+						{% if form.cart.errors %}<div class="error_text">{{ form.cart.errors }}</div>{% endif %}
+						{% if form.cart.help_text %}<div class="help_text">{{ form.cart.help_text }}</div>{% endif %}
+					</td>
+				</tr>
+			{% endif %}
 		</table>
 	</fieldset>
-	<input type="submit">
+</td></tr>
+<tr><td><input type="submit"></td></tr>
+</table>
 </form>
 {% endblock %}

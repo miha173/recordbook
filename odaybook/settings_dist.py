@@ -136,6 +136,8 @@ BASIC_WWW_AUTHENTICATION = True
 
 DATE_FORMAT = "d.m.y"
 
+DATETIME_FORMAT = 'd b Y H:i'
+
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',

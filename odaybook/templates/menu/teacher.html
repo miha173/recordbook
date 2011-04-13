@@ -1,5 +1,5 @@
 {% if user.connection_set.all %}
-    {% if ACTIVE_URL == '' or ACTIVE_URL == 'marks' %}<big class="gay">Оценки</big>{% else %}<a href="/marks/">Оценки</a>{% endif %}
+    {% if ACTIVE_URL == 'marks' %}<big class="gay">Оценки</big>{% else %}<a href="/marks/">Оценки</a>{% endif %}
 {% endif %}
 {% if user.grade %}
     {% if ACTIVE_URL == 'curatorship' %}<big class="yellow">Классное руководство</big>{% else %}<a href="/curatorship/">Классное руководство</a>{% endif %}

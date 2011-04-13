@@ -61,7 +61,7 @@
 		<tr class="{% cycle 'gray' '' %}">
 			<td>{{ object.username }}</td>
 			<td>{{ object.fio }}</td>
-            <td>{{ object.email }}</td>
+            <td>{{ object.email|default:'' }}</td>
             <td>
                 <ul>
                     {% for role in object.get_roles_list %}

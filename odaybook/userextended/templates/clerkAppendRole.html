@@ -1,0 +1,44 @@
+{% extends 'page.html' %}
+
+{% block padding %}
+{% comment %}
+    <a href="/accounts/baseuser/">Аккаунты</a>
+    <span>&rarr;</span>
+    <h1>Редактирование</h1>
+{% endcomment %}
+    {% if step == '1' %}
+        <h1>Проверка пользователя</h1>
+    {% endif %}
+{% endblock %}
+
+
+{% block content %}
+    {% if step == '1' %}
+        {% if error %}
+            <p>Ошибка: {{ error|lower }}</p>
+        {% endif %}
+        {% if clerk %}
+            <form action="?step=2&school={{ school }}" method="POST">
+                <input type="hidden" name="username" value="{{ username }}" />
+                <p>Результат запроса: {{ clerk.fio }}</p>
+                <p>
+                    <input type="submit" value="Добавить пользователя" />
+                </p>
+            </form>
+        {% else %}
+            <form action="?step=1&school={{ school }}" method="POST">
+                <table>
+                    <tr>
+                        <td>Введите имя пользователя</td>
+                        <td><input type="text" name="username" value="{{ username }}" /> </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <input type="submit" value="Проверить" />
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        {% endif %}
+    {% endif %}
+{% endblock %}

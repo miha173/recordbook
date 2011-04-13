@@ -4,11 +4,11 @@
 <a href="/administrator/uni/userextended.School/#sch{{ school.id }}">{{ school }}</a>
     <span>&rarr;</span>
     <h1>Учителя</h1>
-    <table><tr style="vertical-align: baseline;"><td>
-		<a href="add/">Добавить учителя</a>
-	</td><td style="padding-left: 20px;">
-		{% include 'helpers/search_form.html' %}
-	</td></tr></table>
+    <table><tr style="vertical-align: baseline;">
+        <td><a href="add/">Создать учителя</a></td>
+        <td><a href="/administrator/appendrole/?school={{ school.id }}">Добавить учителя</a></td>
+        <td style="padding-left: 20px;">{% include 'helpers/search_form.html' %}</td>
+    </tr></table>
 {% endblock %}
 
 

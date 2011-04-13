@@ -93,6 +93,13 @@ def index(request):
         render['results'] = results
     elif request.user.type == 'Teacher':
         import demjson
+
+        if request.GET.get('set_current_grade', False):
+            grade = get_object_or_404(Grade, id = request.GET.get('set_current_grade'))
+            if grade not in request.user.grades.all():
+                raise Http404(u'Нет такого класса')
+            request.user.current_grade = grade
+            request.user.save()
         
         render['lesson_form'] = LessonForm()
         if request.GET.get('set_lesson', False):
@@ -131,6 +138,9 @@ def index(request):
             if request.user.get_grades():
                 request.user.current_grade = request.user.get_grades()[0]
                 request.user.save()
+            else:
+                # FIXME: message
+                return HttpResponseRedirect('/')
         request.user.current_grade.get_pupils_for_teacher(request.user)
         
         try:
@@ -138,7 +148,7 @@ def index(request):
             date_start = date(day = day, month = month, year = year)
         except ValueError:
             date_start = date.today()
-        
+
         lessons_range = []
         render['monthes'] = monthes = {}
         for i in xrange(1, 13): monthes[i] = ('', 0)
@@ -152,7 +162,8 @@ def index(request):
         conn = conn[0]
         if conn.connection in ['1', '2']:
             kwargs['group'] = conn.connection
-        
+
+        kwargs4lesson = {}
         for i in xrange(14, -1, -1):
             d = date_start - timedelta(days = i)
             kwargs['workday'] = str(d.weekday()+1)
@@ -165,6 +176,8 @@ def index(request):
                         t.save()
                         t.grade.add(request.user.current_grade)
                         t.save()
+
+        if len(kwargs4lesson) == 0: raise Http404(u'Нет расписания')
 
         del kwargs4lesson['date']
         kwargs4lesson['date__gte'] = date_start - timedelta(days = 15)
