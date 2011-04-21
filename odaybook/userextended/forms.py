@@ -5,7 +5,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render_to_response
 from django.forms.util import ErrorList
 
-from models import Subject, Teacher, Pupil, Grade, School, Staff, Option, Achievement, Permission, Clerk
+from models import Subject, Teacher, Pupil, Grade, School, Staff, Option, Achievement, Clerk, PupilConnection
 from odaybook.marks.models import Lesson, ResultDate
 
 class SubjectForm(forms.ModelForm):
@@ -19,7 +19,7 @@ class SubjectForm(forms.ModelForm):
         return result
     class Meta:
         model = Subject
-        fields = ['name']
+        fields = ['name', 'groups']
 
 class SchoolForm(forms.ModelForm):
     class Meta:
@@ -77,7 +77,7 @@ class PupilForm(forms.ModelForm):
         model = Pupil
         fields = [
                 'last_name', 'first_name', 'middle_name', 'email', 'phone',
-                'sex', 'grade', 'group', 'special', 'order', 'health_group', 'health_note',
+                'sex', 'grade', 'special', 'order', 'health_group', 'health_note',
                 'parent_phone_1', 'parent_phone_2',
         ]
     def save(self, *args, **kwargs):
@@ -107,12 +107,22 @@ class TeacherForm(forms.ModelForm):
         self.fields['grades'].queryset = Grade.objects.filter(school = school)
         self.fields['subjects'].queryset = Subject.objects.filter(school = school)
         self.fields['grade'].queryset = Grade.objects.filter(school = school)
+        self.school = school
     class Meta:
         model = Teacher
         fields = [
                 'last_name', 'first_name', 'middle_name', 'edu_admin',
                 'grade', 'grades', 'subjects',
         ]
+    def save(self, *args, **kwargs):
+        if self.school:
+            result = super(TeacherForm, self).save(commit = False)
+            result.school = self.school
+            result.save()
+            self.save_m2m()
+            return result
+        else:
+            return super(TeacherForm, self).save(*args, **kwargs)
         
     grades = forms.ModelMultipleChoiceField(queryset = Grade.objects.all(), required = False, widget = forms.CheckboxSelectMultiple())
     subjects = forms.ModelMultipleChoiceField(queryset = Subject.objects.all(), required = False, widget = forms.CheckboxSelectMultiple())
@@ -130,3 +140,28 @@ class AchievementForm(forms.ModelForm):
         model = Achievement
         fields = ['title', 'description', 'date']
 
+class PupilConnectionForm(forms.ModelForm):
+    def __init__(self, subject, pupil = None, *args, **kwargs):
+        if PupilConnection.objects.filter(pupil = pupil, subject = subject):
+            kwargs['instance'] = PupilConnection.objects.get(pupil = pupil, subject = subject)
+        super(PupilConnectionForm, self).__init__(*args, **kwargs)
+        self.pupil = pupil
+        self.subject = subject
+        choices = zip(*(range(1, int(subject.groups)+1), )*2)
+        choices.insert(0, ('0', u'Вне групп'))
+        self.fields['value'] = forms.ChoiceField(
+                choices = choices,
+                label = subject.name,
+        )
+        self.fields['value'].empty_label = '-'*25
+    def save(self, *args, **kwargs):
+        result = super(PupilConnectionForm, self).save(commit = False)
+        if 'pupil' in kwargs:
+            result.pupil = kwargs['pupil']
+        else:
+            result.pupil = self.pupil
+        result.subject = self.subject
+        result.save()
+    class Meta:
+        model = PupilConnection
+        fields = ['value']

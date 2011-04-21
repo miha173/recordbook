@@ -60,14 +60,6 @@
 					{% if form.grade.help_text %}<div class="help_text">{{ form.grade.help_text }}</div>{% endif %}
 				</td>
 			</tr>
-			<tr>
-				<td class="label"><label for="id_group">Группа:</label></td>
-				<td>{{ form.group }}</td>
-				<td>
-					{% if form.group.errors %}<div class="error_text">{{ form.group.errors }}</div>{% endif %}
-					{% if form.group.help_text %}<div class="help_text">{{ form.group.help_text }}</div>{% endif %}
-				</td>
-			</tr>
 		</table>
 	</fieldset>
 	</td></tr><tr><td>
@@ -148,7 +140,25 @@
 			{% endif %}
 		</table>
 	</fieldset>
+    {% if groups %}
+</td></tr><tr><td>
+	<fieldset>
+		<legend>Группы</legend>
+		<table>
+            {% for group in groups %}
+			<tr>
+				<td class="label"><label for="{{ group.value.id }}">{{ group.value.label }}</label></td>
+				<td>{{ group.value }}</td>
+				<td>
+					{% if group.value.errors %}<div class="error_text">{{ group.value.errors }}</div>{% endif %}
+					{% if group.value.help_text %}<div class="help_text">{{ group.value.help_text }}</div>{% endif %}
+			    </td>
+			</tr>
+            {% endfor %}
+		</table>
+	</fieldset>
 </td></tr>
+    {% endif %}
 <tr><td><input type="submit"></td></tr>
 </table>
 </form>

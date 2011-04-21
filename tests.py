@@ -11,12 +11,12 @@ from odaybook.userextended.models import Pupil, Teacher, Clerk
 clerk_id = 1
 
 #clerk = Clerk(last_name = u'Комков', first_name = u'Саша', email = 'sashakomkov@gmail.com')
-#clerk.save()
+#clerk.save()grou
 #print clerk.id
 
 clerk = Clerk.objects.get(id = clerk_id)
 
-pupil = Pupil(sex = '1', group = '1')
+pupil = Pupil(sex = '1')
 pupil.set_clerk(clerk)
 pupil.save()
 pupil.set_roles(clerk)

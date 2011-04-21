@@ -8,9 +8,10 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import ObjectDoesNotExist
 
-from odaybook.userextended.models import Teacher, Subject, Grade, Pupil
+from odaybook.userextended.models import Teacher, Subject, Grade, Pupil, School
 from models import Connection
-from forms import ConnectionStep1Wizard, ConnectionStep2Wizard, ConnectionStep3Wizard, PupilForm, GraphiksForm
+from forms import ConnectionStep1Wizard, ConnectionStep2Wizard, ConnectionStep3Wizard, PupilForm, GraphiksForm, \
+                  ParentRequestForm, ParentForm
 from odaybook.marks.models import Lesson, Mark, Result
 
 def index(request):
@@ -175,6 +176,43 @@ def graphiks(request):
     return render_to_response('~curatorship/graphiks.html', render, context_instance = RequestContext(request))
 
 
+def send_parent_request(request):
+    render = {}
+
+    school = grade = None
+    step = 1
+
+    if request.GET.get('school', False):
+        render['school'] = school = get_object_or_404(School, id = request.GET.get('school'))
+        step = 2
+    if request.GET.get('grade', False):
+        render['grade'] = grade = get_object_or_404(Grade, id = request.GET.get('grade'))
+        step = 3
+    if request.GET.get('pupil', False):
+        render['pupil'] = pupil = get_object_or_404(Pupil, id = request.GET.get('pupil'), grade = grade)
+        step = 4
+
+
+
+    if step == 1: render['objects'] = School.objects.all()
+
+    if step == 3:
+        if request.method == 'POST':
+            render['form'] = form = ParentRequestForm(grade, data = request.POST)
+            if form.is_valid():
+                step = 4
+                render['pupil'] = pupil = form.pupil
+            else:
+                pass
+        else:
+            render['form'] = ParentRequestForm(grade)
+
+    if step == 4:
+        pass
+
+    render['step'] = step
+
+    return render_to_response('~curatorship/send_append_request.html', render, context_instance = RequestContext(request))
 
 
 

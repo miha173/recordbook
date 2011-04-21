@@ -18,4 +18,6 @@ urlpatterns = patterns("odaybook.curatorship.views",
                        (r'pupil_passwords/', 'pupilPasswords'),
                        
                        (r'^graphiks/$', 'graphiks'),
+
+                       (r'^send-append-request/$', 'send_parent_request'),
                        )

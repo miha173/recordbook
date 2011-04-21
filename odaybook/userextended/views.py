@@ -9,8 +9,8 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.conf import settings
 from django.core.urlresolvers import resolve, reverse
 
-from models import School, Clerk, Superviser, Teacher, Pupil, Parent, BaseUser, Superuser
-from forms import ClerkForm
+from models import School, Clerk, Superviser, Teacher, Pupil, Parent, BaseUser, Superuser, Subject
+from forms import ClerkForm, PupilConnectionForm
 import odaybook.userextended.forms
 import odaybook.attendance.forms
 import odaybook.curatorship.forms
@@ -120,6 +120,9 @@ def objectEdit(request, app, model, mode, filter_id = None, id = 0):
     if request.method == 'GET':
         if mode == 'edit':
             render['form'] = Form(instance = get_object_or_404(Object, id = id, **ext), **ext)
+            if model == 'Pupil':
+                pupil = get_object_or_404(Object, id = id, **ext)
+                render['groups'] = [PupilConnectionForm(sbj, pupil, prefix = sbj.id) for sbj in pupil.grade.get_subjects() if sbj.groups]
         elif mode == 'delete':
             try:
                 get_object_or_404(Object, id = id, **ext).delete()
@@ -131,20 +134,33 @@ def objectEdit(request, app, model, mode, filter_id = None, id = 0):
                 return HttpResponseRedirect(url)
         else:
             render['form'] = Form(**ext)
+            if model == 'Pupil':
+                render['groups'] = [PupilConnectionForm(sbj, prefix = sbj.id) for sbj in Subject.objects.filter(school = ext['school']) if sbj.groups]
         return render_to_response('~userextended/%s.html' % template, render, context_instance = RequestContext(request))
     if request.method == 'POST':
         if mode == 'edit':
             form = Form(data = request.POST, files = request.FILES, instance = get_object_or_404(Object, id = id, **ext), **ext)
-            if form.is_valid():
+            form_factory_valid = True
+            if model == 'Pupil':
+                pupil = get_object_or_404(Object, id = id, **ext)
+                render['groups'] = [PupilConnectionForm(sbj, pupil, data = request.POST, prefix = sbj.id) for sbj in pupil.grade.get_subjects() if sbj.groups]
+                form_factory_valid = all([f.is_valid() for f in render['groups']])
+            if form.is_valid() and form_factory_valid:
                 form.save()
+                for f in render['groups']: f.save()
                 return HttpResponseRedirect(url)
             else:
                 render['form'] = form
                 return render_to_response('~userextended/%s.html' % template, render, context_instance = RequestContext(request))
         else:
+            form_factory_valid = True
+            if model == 'Pupil':
+                render['groups'] = [PupilConnectionForm(sbj, data = request.POST, prefix = sbj.id) for sbj in Subject.objects.filter(school = ext['school']) if sbj.groups]
+                form_factory_valid = all([f.is_valid() for f in render['groups']])
             form = Form(data = request.POST, **ext)
-            if form.is_valid():
-                form.save()
+            if form.is_valid() and form_factory_valid:
+                result = form.save()
+                for f in render['groups']: f.save(pupil = result)
                 return HttpResponseRedirect(url)
             else:
                 render['form'] = form

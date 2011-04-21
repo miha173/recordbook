@@ -155,6 +155,7 @@ class Subject(RestModel):
     u'Учебная дисциплина'
     name = models.CharField(u"Наименование", max_length = 100)
     school = models.ForeignKey(School, verbose_name = "Школа")
+    groups = models.CharField(max_length = 1, blank = True, null = True, verbose_name = u'Количество групп')
 
     serialize_fields = ['id', 'name', 'school_id']
     serialize_name = 'subject'
@@ -556,8 +557,6 @@ class Pupil(BaseUser, Scholar):
 
     grade = models.ForeignKey(Grade, verbose_name = u"Класс", null=True)
     sex = models.CharField(max_length = 1, choices = (('1', u'Юноша'), ('2', u'Девушка')), verbose_name = u'Пол')
-    group = models.CharField(max_length = 1, choices = (('1', u'1 группа'), ('2', u'2 группа')), verbose_name = u'Группа', default = '1')
-    # FIXME: Специальная учебная группа (из тз)
     special = models.BooleanField(verbose_name = u'Специальная группа')
     health_group = models.CharField(null = True, blank = False, default = '1', choices=(('1', '1'),
                                                                                         ('2', '2'),
@@ -662,5 +661,10 @@ class Permission(models.Model):
         elif self.user_type == 's': Model = Staff
         return Model.objects.get(id = self.user_id)
 
-
+class PupilConnection(models.Model):
+    pupil = models.ForeignKey(Pupil)
+    subject = models.ForeignKey(Subject)
+    value = models.CharField(null = True, blank = True, max_length = 1)
+    class Meta:
+        unique_together = (('pupil', 'subject'), )
 

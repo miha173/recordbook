@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Система электронных дневников</title>
+    <style type="text/css">
+        body{
+            font-family: Arial, serif;
+        }
+        th{
+            font-weight: normal;
+            text-align: left;
+        }
+        table ul, table li{
+            display: inline;
+        }
+        ul.errorlist{
+            font-weight: bold;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    {% if step == 1 %}
+        <b>Выберите школу из списка:</b> <br />
+        <ul>
+            {% for obj in objects %}
+                <li><a href="?school={{ obj.id }}">{{ obj }}</a></li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% if step == 2 %}
+        <b>Выберите класс:</b> <br />
+        <ul>
+            {% for obj in objects %}
+                <li><a href="?school={{ school.id }}&grade={{ obj.id }}">{{ obj }}</a></li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% if step == 3 %}
+        <b>Введите информацию о своём ребёнке</b>
+        
+        <form method="post" action="?school={{ school.id }}&grade={{ grade.id }}">{% csrf_token %}
+            <table>
+                {{ form }}
+                <tr>
+                    <td colspan="2"><input type="submit" value="Отправить" /></td>
+                </tr>
+            </table>
+        </form>
+    {% endif %}
+
+    {% if step == 4 %}
+        <b>Сейчас вам будет необходимо пройти авторизацию или зарегистрироваться.</b>
+
+        <form method="post" action="?school={{ school.id }}&grade={{ grade.id }}">{% csrf_token %}
+            <table>
+                {{ form }}
+                <tr>
+                    <td colspan="2"><input type="submit" value="Отправить" /></td>
+                </tr>
+            </table>
+        </form>
+    {% endif %}
+</body>
+</html>
