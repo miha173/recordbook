@@ -1,5 +1,7 @@
 # -*- coding: UTF-8 -*-
 
+import demjson
+
 from django.template import RequestContext
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.loader import render_to_string
@@ -7,6 +9,7 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.conf import settings
+from django.db.models import get_model
 from django.core.urlresolvers import resolve, reverse
 
 from models import School, Clerk, Superviser, Teacher, Pupil, Parent, BaseUser, Superuser, Subject
@@ -58,7 +61,7 @@ def objectList(request, app, model, filter_id = None):
         raise Http404('Object %s not allowed for usertype %s' % (app + '.' + model, request.user.type))
     if model == 'Clerk': render['schools'] = School.objects.all()
     template = render['object_name'] = model.lower()
-    Object = getattr(getattr(__import__('odaybook'), app).models, model)
+    Object = get_model(app, model)
 
     if request.GET.get('search_str'):
         objects = Object.objects.search(request.GET.get('search_str'))
@@ -95,7 +98,7 @@ def objectEdit(request, app, model, mode, filter_id = None, id = 0):
     ]
     if app + '.' + model not in allowed_apps: raise Http404('Object not allowed')
     template = render['object_name'] = model.lower()
-    Object = getattr(getattr(__import__('odaybook'), app).models, model)
+    Object = get_model(app, model)
     Form = getattr(getattr(__import__('odaybook'), app).forms, model + 'Form')
 
     if app_model == 'userextended.School':
@@ -328,3 +331,7 @@ def clerkAppendRole(request):
             return HttpResponseRedirect('/administrator/uni/userextended.Teacher/%d/edit/%d/' % (school.id, teacher.id))
 
     return render_to_response('~userextended/clerkAppendRole.html', render, context_instance = RequestContext(request))
+
+def get_subject(request, id):
+    subject = get_object_or_404(Subject, id = id)
+    return HttpResponse(demjson.encode({'subject': subject.name, 'groups': subject.groups}))

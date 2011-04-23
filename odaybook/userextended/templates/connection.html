@@ -3,7 +3,7 @@
 {% block padding %}
     <a href="/administrator/uni/userextended.School/#sch{{ grade__school.id }}">{{ grade__school }}</a>
     <span>&rarr;</span>
-    <a href="/administrator/uni/connection/{{ grade__school.id }}/">Связки</a>
+    <a href="/administrator/uni/curatorship.Connection/{{ grade__school.id }}/">Связки</a>
     <span>&rarr;</span>
     <h1>Редактирование</h1>
 {% endblock %}
@@ -11,4 +11,18 @@
 
 {% block content %}
 	{% include 'helpers/uniForm.html' %}
+    <script type="text/javascript">
+        function update_subject_groups(){
+            $.getJSON("/accounts/ajax/get/subject/"+$('#id_subject').val()+"/", function(j){
+                var options = '<option value="0">Весь класс</option>';
+                for (var i = 1; i <= parseInt(j.groups); i++) {
+                    options += '<option value="' + i + '">' + i + '</option>';
+                }
+                $("#id_connection").html(options);
+                $('#id_connection option:first').attr('selected', 'selected');
+            })
+
+        }
+        $('#id_subject').change(update_subject_groups);
+    </script>
 {% endblock %}

@@ -17,7 +17,7 @@ def filtersimplechain(request, app, model, field, value):
     model = Model.objects.get(id = value)
 #    keywords = {str(field): str(value)}
     results = model.__getattribute__(field)
-    result = []
+    result = [{'value': '', 'display': '-'*9},]
     for item in results.all():
         result.append({'value':item.pk, 'display':unicode(item)})
     json = simplejson.dumps(result)
