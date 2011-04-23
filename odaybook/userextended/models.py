@@ -138,18 +138,20 @@ class Grade(RestModel):
     class Meta:
         ordering = ['number']
     
-    def get_pupils_for_teacher(self, teacher):
+    def get_pupils_for_teacher_and_subject(self, teacher, subject):
         from odaybook.curatorship.models import Connection
-        conn = Connection.objects.filter(teacher = teacher, grade = self)
+        conn = Connection.objects.filter(teacher = teacher, grade = self, subject = subject)
         if not conn: raise PlaningError(u'нет учеников')
         conn = conn[0]
-        if conn.connection == '0': self.pupils = Pupil.objects.filter(grade = self)
-        elif conn.connection == '1': self.pupils = Pupil.objects.filter(grade = self, group = '1')
-        elif conn.connection == '2': self.pupils = Pupil.objects.filter(grade = self, group = '2')
-        elif conn.connection == '3': self.pupils = Pupil.objects.filter(grade = self, sex = '1')
-        elif conn.connection == '4': self.pupils = Pupil.objects.filter(grade = self, sex = '2')
-        elif conn.connection == '5': self.pupils = Pupil.objects.filter(grade = self, special = True)
-        else: raise PlaningError
+        pupil_connections = PupilConnection.objects.filter(pupil__grade = self, subject = subject, value = conn.connection)
+        self.pupils = Pupil.objects.filter(id__in = [c.pupil.id for c in pupil_connections])
+#        if conn.connection == '0': self.pupils = Pupil.objects.filter(grade = self)
+#        elif conn.connection == '1': self.pupils = Pupil.objects.filter(grade = self, group = '1')
+#        elif conn.connection == '2': self.pupils = Pupil.objects.filter(grade = self, group = '2')
+#        elif conn.connection == '3': self.pupils = Pupil.objects.filter(grade = self, sex = '1')
+#        elif conn.connection == '4': self.pupils = Pupil.objects.filter(grade = self, sex = '2')
+#        elif conn.connection == '5': self.pupils = Pupil.objects.filter(grade = self, special = True)
+#        else: raise PlaningError
 
 class Subject(RestModel):
     u'Учебная дисциплина'
@@ -453,6 +455,7 @@ class BaseUser(BaseClerk):
             self._append_to_clerk = True
 
         if not pk:
+            self.password = self.clerk.password
             super(BaseUser, self).save(*args, **kwargs)
 
         if self._append_to_clerk:
@@ -499,6 +502,7 @@ class BaseUser(BaseClerk):
         '''
         for role in self.roles.all():
             self.clerk.roles.add(role)
+    
 
 @receiver(post_save, sender = Clerk)
 def BaseUser_update(sender, instance, **kwargs):

@@ -3,7 +3,8 @@
 {% block padding %}
 	{% if user.type == 'Superuser' %}
 	{% endif %}
-	
+
+    {% comment %}
     {% if user.type == 'Teacher' %}
 			{% for subject in subjects %}
 				{% ifequal subject.id user.current_subject.id %}
@@ -13,7 +14,8 @@
 				{% endifequal %}
 			{% endfor %}
 	{% endif %}
-	
+	{% endcomment %}
+        
 {% endblock %}
 
 {% block content %}

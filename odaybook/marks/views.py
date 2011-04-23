@@ -141,7 +141,7 @@ def index(request):
             else:
                 # FIXME: message
                 return HttpResponseRedirect('/')
-        request.user.current_grade.get_pupils_for_teacher(request.user)
+        request.user.current_grade.get_pupils_for_teacher_and_subject(request.user, request.user.current_subject)
         
         try:
             day, month, year = request.GET.get('date', '').split('.')

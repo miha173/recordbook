@@ -7,6 +7,7 @@ urlpatterns = patterns("odaybook.userextended.views",
                        (r'^$', 'index'),
                        (r'login', login, {'template_name': 'login.html'}),
                        (r'logout', logout, {'next_page': '/'}),
+                       # FIXME: 
                        (r'password_change', password_change, {'template_name': 'change_password.html',
                                                               'post_change_redirect': '/',
                                                               }),

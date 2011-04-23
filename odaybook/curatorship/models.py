@@ -7,7 +7,7 @@ from smart_selects.db_fields import ChainedForeignKey, GroupedForeignKey, Simple
 
 from odaybook.userextended.models import Parent, Pupil
 
-GROUPS = zip(*(range(1, 11), )*2)
+GROUPS = zip(*([str(i) for i in range(1, 11)], )*2)
 GROUPS.insert(0, ('0', u'Весь класс'))
 
 class Connection(RestModel):
