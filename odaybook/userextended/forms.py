@@ -165,3 +165,15 @@ class PupilConnectionForm(forms.ModelForm):
     class Meta:
         model = PupilConnection
         fields = ['value']
+
+class ClerkRegisterForm(forms.ModelForm):
+    class Meta:
+        model = Clerk
+        fields = ['last_name', 'first_name', 'middle_name', 'email']
+    def __init__(self, *args, **kwargs):
+        super(ClerkRegisterForm, self).__init__(*args, **kwargs)
+        self.fields['email'].required = True
+    def clean_email(self):
+        if Clerk.objects.filter(email = self.cleaned_data['email']):
+            raise forms.ValidationError(u'Пользователь с таким email уже зарегистрирован.')
+        return self.cleaned_data['email']

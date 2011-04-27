@@ -1,4 +1,6 @@
-# *-* coding: utf-8 *-*
+# -*- coding: utf-8 -*-
+
+import urllib
 
 from django import template
 
@@ -23,3 +25,7 @@ def number(value):
         return str + "," + f
     else:
         return str
+
+@register.filter
+def urllibencode(value):
+    return urllib.urlencode(value)

@@ -146,29 +146,29 @@ body#site #header {
     background:url(/media/images/design/exit.gif) 4px -52px no-repeat;
   }
 
-#header #exit ul#change_user_mode{
+#header #exit ul.menu{
     float: left;
 }
 #header #exit div.cmDiv{
     float: left;
 }
-#header #exit ul#change_user_mode li{
+#header #exit ul.menu li{
     float: left;
     display: inline;
     color:#fff;
 }
-#header #exit ul#change_user_mode li a{
+#header #exit ul.menu li a{
     border-bottom: dashed 1px;
     text-decoration: none;
     padding: 0;
     margin: 0;
     min-height:0px;
 }
-#header #exit ul#change_user_mode li a img{
+#header #exit ul.menu li a img{
     margin-bottom: -4px;
     margin-left: -3px;
 }
-#header #exit ul#change_user_mode ul{
+#header #exit ul.menu ul{
     display: none;
 }
 #header #exit ul.menu_on{
@@ -186,7 +186,7 @@ body#admin #header #exit ul.menu_on{
     display: block!important;
 }
 
-#header #exit #change_user_mode a{
+#header #exit .menu a{
     background: none;
 }
 

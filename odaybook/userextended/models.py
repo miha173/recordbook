@@ -145,13 +145,6 @@ class Grade(RestModel):
         conn = conn[0]
         pupil_connections = PupilConnection.objects.filter(pupil__grade = self, subject = subject, value = conn.connection)
         self.pupils = Pupil.objects.filter(id__in = [c.pupil.id for c in pupil_connections])
-#        if conn.connection == '0': self.pupils = Pupil.objects.filter(grade = self)
-#        elif conn.connection == '1': self.pupils = Pupil.objects.filter(grade = self, group = '1')
-#        elif conn.connection == '2': self.pupils = Pupil.objects.filter(grade = self, group = '2')
-#        elif conn.connection == '3': self.pupils = Pupil.objects.filter(grade = self, sex = '1')
-#        elif conn.connection == '4': self.pupils = Pupil.objects.filter(grade = self, sex = '2')
-#        elif conn.connection == '5': self.pupils = Pupil.objects.filter(grade = self, special = True)
-#        else: raise PlaningError
 
 class Subject(RestModel):
     u'Учебная дисциплина'
@@ -350,10 +343,7 @@ class BaseClerk(models.Model):
         return False
 
     def get_current_role_cyrillic(self):
-        if self.current_role:
-            return self.get_role_display(self.current_role.type)
-        else:
-            return self.get_role_display('Superuser')
+        return self.get_role_display(self.current_role.type)
 
     def set_current_role(self, id, type):
         # FIXME: exceptions
@@ -553,11 +543,11 @@ class Teacher(Scholar, BaseUser):
 
 class Parent(BaseUser):
     pupils = models.ManyToManyField('Pupil', related_name = 'userextended_pupils_related')
-    current_pupil = models.ForeignKey('Pupil', related_name = 'userextended_pupil_related')
+    current_pupil = models.ForeignKey('Pupil', related_name = 'userextended_pupil_related', null = True)
 
 class Pupil(BaseUser, Scholar):
 
-    objects = ClerkManager(['last_name', 'first_name', 'middle_name'])
+#    objects = ClerkManager(['last_name', 'first_name', 'middle_name'])
 
     grade = models.ForeignKey(Grade, verbose_name = u"Класс", null=True)
     sex = models.CharField(max_length = 1, choices = (('1', u'Юноша'), ('2', u'Девушка')), verbose_name = u'Пол')
@@ -590,10 +580,10 @@ class Pupil(BaseUser, Scholar):
     def get_curator(self):
         teacher = Teacher.objects.filter(grade = self.grade)
         if teacher:
-            return Teacher(grade = self.grade, last_name = '', first_name = '', middle_name = '')
-        else:
             return teacher[0]
-    
+        else:
+            return Teacher(grade = self.grade, last_name = '', first_name = '', middle_name = '')
+
     def get_marks_avg(self, delta = timedelta(weeks = 4)):
         from odaybook.marks.models import Mark
         temp = Mark.objects.filter(pupil = self, absent = False, lesson__date__gte = datetime.now()-delta).aggregate(Avg('mark'))['mark__avg']
@@ -614,10 +604,11 @@ class Pupil(BaseUser, Scholar):
         from odaybook.curatorship.models import Connection
         return [
                 connection for connection in Connection.objects.filter(grade = self.grade)
-                    if connection.connection == '0' or
-                       connection.connection == self.group or
-                       int(connection.connection)-2 == self.sex or
-                       int(connection.connection)-4 == int(self.special)
+                    if connection.connection == '0'
+#                       or
+#                       connection.connection == self.group or
+#                       int(connection.connection)-2 == self.sex or
+#                       int(connection.connection)-4 == int(self.special)
                 ]
 
     def get_teachers(self):

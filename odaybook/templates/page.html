@@ -44,7 +44,8 @@
                     <big>{{ user.fio }}</big>
                 </div>
                 <div id="exit">
-                <ul id="change_user_mode">
+                {% if user.roles.all.count > 1 %}
+                <ul id="change_user_mode" class="menu">
                     <li><a href="#" onclick="$('#change_user_mode').toggleClass('menu_on');return false">
                             {{ user.get_current_role_cyrillic }}
                         <img src="{{ MEDIA_URL }}images/arrow-down-medium.png" />
@@ -62,6 +63,27 @@
                         </ul>
                     </li>
                 </ul>
+                    {% endif %}
+                {% if user.pupils.all.count > 1 %}
+                <ul id="change_current_pupil" class="menu">
+                    <li><a href="#" onclick="$('#change_current_pupil').toggleClass('menu_on');return false">
+                            {{ user.current_pupil.if_ }}
+                        <img src="{{ MEDIA_URL }}images/arrow-down-medium.png" />
+                        </a>
+                        <ul>
+                            {% for pupil in user.pupils.all %}
+                                {% if user.current_pupil != pupil %}
+                                    <li>
+                                        <a href="/accounts/set_role/{{ role.4.id }}/?type={{ role.1 }}">
+                                            {{ pupil.if_ }}
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </li>
+                </ul>
+                {% endif %}
                     <a href="/accounts/password_change">Смена пароля</a>
                     <a href="/accounts/logout">Выход</a>
                 </div>
@@ -70,7 +92,7 @@
                 <div id="navigation">
                     {% if user.type == 'Superuser' %}{% include 'menu/superuser.html' %}{% endif %}
                     {% if user.type == 'Teacher' %}{% include 'menu/teacher.html' %}{% endif %}
-                    {% if user.type == 'Pupil' %}{% include 'menu/pupil.html' %}{% endif %}
+                    {% if user.type == 'Parent' %}{% include 'menu/parent.html' %}{% endif %}
                     {% if user.type == 'Superviser' %}{% include 'menu/superviser.html' %}{% endif %}
                 </div>
             </div>

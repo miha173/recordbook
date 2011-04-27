@@ -51,17 +51,5 @@
         </form>
     {% endif %}
 
-    {% if step == 4 %}
-        <b>Сейчас вам будет необходимо пройти авторизацию или зарегистрироваться.</b>
-
-        <form method="post" action="?school={{ school.id }}&grade={{ grade.id }}">{% csrf_token %}
-            <table>
-                {{ form }}
-                <tr>
-                    <td colspan="2"><input type="submit" value="Отправить" /></td>
-                </tr>
-            </table>
-        </form>
-    {% endif %}
 </body>
 </html>

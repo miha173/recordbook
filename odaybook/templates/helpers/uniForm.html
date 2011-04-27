@@ -1,4 +1,5 @@
-<form method="post" action=".">{% csrf_token %}
+{% load formater %}
+<form method="post" action="?{{ params|urllibencode }}">{% csrf_token %}
 	<table class="table form">
 		{% for field in form %}
 		<tr>

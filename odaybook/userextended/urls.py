@@ -33,6 +33,7 @@ urlpatterns = patterns("odaybook.userextended.views",
                        (r'^set_role/(?P<role_id>\d+)/$', 'set_role'),
 
                        (r'^appendrole/$', 'clerkAppendRole'),
+                       (r'^register-clerk/$', 'register_clerk'),
 
                        (r'^ajax/get/subject/(?P<id>\d+)/$', 'get_subject'),
                        )

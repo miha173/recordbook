@@ -8,12 +8,13 @@ from django.template.loader import render_to_string
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.models import User
 from django.conf import settings
 from django.db.models import get_model
 from django.core.urlresolvers import resolve, reverse
 
 from models import School, Clerk, Superviser, Teacher, Pupil, Parent, BaseUser, Superuser, Subject
-from forms import ClerkForm, PupilConnectionForm
+from forms import ClerkForm, PupilConnectionForm, ClerkRegisterForm
 import odaybook.userextended.forms
 import odaybook.attendance.forms
 import odaybook.curatorship.forms
@@ -336,3 +337,32 @@ def clerkAppendRole(request):
 def get_subject(request, id):
     subject = get_object_or_404(Subject, id = id)
     return HttpResponse(demjson.encode({'subject': subject.name, 'groups': subject.groups}))
+
+def register_clerk(request):
+    from django.contrib.auth import login, authenticate
+    render = {}
+
+    is_parent = auto_login = False
+    
+    if request.GET.get('auto_login', False):
+        render['params'] = {'auto_login': '1'}
+        auto_login = True
+    if request.GET.get('is_parent', False):
+        render['params']['is_parent'] = '1'
+        is_parent = True
+
+    if request.method == 'POST':
+        render['form'] = form = ClerkRegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            if auto_login:
+                if is_parent:
+                    user.create_role(Parent)
+                # FIXME: password
+                user = authenticate(username = user.username, password = '123456789')
+                login(request, user)
+                return HttpResponseRedirect(reverse('odaybook.curatorship.views.send_parent_request'))
+    else:
+        render['form'] = ClerkRegisterForm()
+
+    return render_to_response('~userextended/register_clerk.html', render, context_instance = RequestContext(request))

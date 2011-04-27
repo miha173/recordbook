@@ -11,6 +11,7 @@ class LazyUser(object):
         if not hasattr(request, '_cached_user'):
             user = get_user(request);
             userprofile = user
+            userprofile.type = 'Anonymous'
             if user.is_authenticated():
                 try:
                     userprofile = Clerk.objects.get(user_ptr = user)
@@ -25,7 +26,6 @@ class LazyUser(object):
                     userprofile = userprofile.get_current_role()
                 except Clerk.DoesNotExist:
                     userprofile = user
-                    userprofile.type = 'Anonymous'
             else:
                 if School.objects.filter(private_domain = request.META['HTTP_HOST']):
                     userprofile.private_salute = School.objects.filter(private_domain = request.META['HTTP_HOST'])[0].private_salute
