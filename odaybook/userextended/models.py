@@ -69,7 +69,7 @@ class School(RestModel):
         else:
             days = 5
         return xrange(1, days+1)
-    
+
     def save(self, *args, **kwargs):
         u'''
             Начальная инициализация школы. Добавление предметов
@@ -576,6 +576,8 @@ class Pupil(BaseUser, Scholar):
     
     serialize_fields = ['id', 'cart', 'account', 'last_name', 'first_name', 'middle_name', 'grade_id', 'group', 'school_id']
     serialize_name = 'pupil'
+
+    groups = {}
     
     def get_curator(self):
         teacher = Teacher.objects.filter(grade = self.grade)
@@ -599,23 +601,55 @@ class Pupil(BaseUser, Scholar):
             return "good"
         else:
             return "normal"
-    
+
+    def get_groups(self):
+        self.groups = {}
+        for subject in self.get_subjects():
+            try:
+                connection = PupilConnection.objects.get(pupil = self, subject = subject)
+            except PupilConnection.DoesNotExist:
+                connection = PupilConnection(value = '0', pupil = self, subject = subject)
+            connection.group = connection.value
+            self.groups[subject.id] = connection
+
+#    def get_teacher_connections(self):
+#        # FIXME
+#        from odaybook.curatorship.models import Connection
+#        return [
+#                connection for connection in Connection.objects.filter(grade = self.grade)
+#                    if connection.connection == '0' or connection.connection == self.group
+#                ]
+
     def get_connections(self):
         from odaybook.curatorship.models import Connection
-        return [
-                connection for connection in Connection.objects.filter(grade = self.grade)
-                    if connection.connection == '0'
-#                       or
-#                       connection.connection == self.group or
-#                       int(connection.connection)-2 == self.sex or
-#                       int(connection.connection)-4 == int(self.special)
-                ]
+        result = []
+        for connection in Connection.objects.filter(grade = self.grade):
+            pupilconnections = PupilConnection.objects.filter(pupil = self, subject = connection.subject)
+            if not pupilconnections or pupilconnections.filter(value = connection.connection) or (connection.connection == '0' and pupilconnections):
+                result.append(connection)
+        return result
+
+    def get_teacher(self, subject):
+        from odaybook.curatorship.models import Connection
+        if not len(self.groups): self.get_groups()
+        try:
+            return Connection.objects.get(
+                    subject = subject,
+                    grade = self.grade,
+                    connection = self.groups[subject.id].group
+                   ).teacher
+        except KeyError:
+            return None
+        except Connection.DoesNotExist:
+            return None
 
     def get_teachers(self):
+        # FIXME
         return set([connection.teacher for connection in self.get_connections()])
 
     def get_subjects(self):
-        return [connection.subject for connection in self.get_connections()]
+        # FIXME
+        return set([connection.subject for connection in self.get_connections()])
 
     class Meta:
         ordering = ['last_name', 'first_name', 'middle_name']

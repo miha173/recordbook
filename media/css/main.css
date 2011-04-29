@@ -653,7 +653,7 @@ body#admin #header #exit ul.menu_on{
 
 	/* Расписание */
 	table#shedule td {
-		padding:0 0 1.5em 0;
+		/*padding:0 0 1.5em 0;*/
 		vertical-align:top;
 	}
 	
@@ -706,10 +706,13 @@ body#admin #header #exit ul.menu_on{
 			font-size:80%;
 		}
 
+    table.no-hover tr:hover{
+        background: none!important;
+    }
 
 	/* Таблица на главной */
 	table#index td {
-		padding:0 0 1.5em 0;
+		/*padding:0 0 1.5em 0;*/
 		vertical-align:top;
 	}
 	

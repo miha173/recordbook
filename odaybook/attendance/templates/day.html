@@ -4,10 +4,10 @@
                             <big>{{ timetable.day_ru }}</big>
                             <table class="table">
                                 <tbody>
-                                	{% for lesson in timetable.lessons %}
+                                	{% for number, lesson in timetable.lessons.items %}
 	                                    <tr>
 	                                        <td class="padding-right">
-	                                            <div class="number">{{ forloop.counter }}</div>
+	                                            <div class="number">{{ number }}</div>
 	                                        </td>
 	                                        <td>
 	                                            <a href="/marks/{{ lesson.subject.id }}">{{ lesson.subject }}</a>

@@ -25,9 +25,9 @@
 	  	{% for lesson in lessons %}
   		  <tr class="{% cycle 'gray' '' %}">
   		    <td><div class="date">{{ lesson.date|date:"d.m" }}</div></td>
-  		    <td>{{ lesson.topic }}</td>
+  		    <td>{{ lesson.topic|default:"Тема не указана" }}</td>
   		    <td><div class="mark-{{ lesson.mark.get_type }}"><span title="{{ lesson.mark.comment }}">{{ lesson.mark }}</span></div></td>
-          <td>{{ lesson.task }}</td>
+          <td>{{ lesson.task|default:"Домашнее задание не указано" }}</td>
           <td>
             {% if lesson.file %}
               <a href="{{ MEDIA_URL }}{{ lesson.file }}">Скачать файл</a>

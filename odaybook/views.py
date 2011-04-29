@@ -15,7 +15,7 @@ from odaybook.userextended.models import Pupil, Teacher, Subject, School
 from odaybook.userextended.views import objectList
 from odaybook.curatorship.models import Connection
 from odaybook.attendance.models import UsalTimetable, UsalRingTimetable
-from odaybook.attendance.utils import TimetableDay
+from odaybook.attendance.utils import TimetableDayPupil
 from odaybook.marks.models import Mark
 
 @login_required
@@ -37,10 +37,10 @@ def index(request):
 
         render['classmates'] = Pupil.objects.filter(grade = pupil.grade)
         
-#        render['timetables'] = [
-#                                TimetableDay(grade = pupil.grade, group = pupil.group, workday = datetime.now().isoweekday()),
-#                                TimetableDay(grade = pupil.grade, group = pupil.group, workday = (datetime.now() + timedelta(days = 1)).isoweekday()),
-#        ]
+        render['timetables'] = [
+                                TimetableDayPupil(workday = datetime.now().isoweekday(), pupil = pupil),
+                                TimetableDayPupil(workday = (datetime.now() + timedelta(days = 1)).isoweekday(), pupil = pupil),
+        ]
         
 #        render['lessons'] = UsalRingTimetable.objects.filter(workday = datetime.now().isoweekday(), school = request.user.school)
 #    elif request.user.type == 'Teacher':

@@ -194,9 +194,9 @@ def index(request):
 @login_required
 def viewMarks(request, id):
     render = {}
-    pupil = request.user
-    subject = get_object_or_404(Subject, id = id, school = request.user.school)
-    subject.teacher = Connection.objects.get(Q(connection = 0) | Q(connection = pupil.group) | Q(connection = int(pupil.sex)+2), subject = subject, grade = pupil.grade).teacher
+    pupil = request.user.current_pupil
+    subject = get_object_or_404(Subject, id = id, school = pupil.school)
+    subject.teacher = pupil.get_teacher(subject)
 #    subject.teacher = Teacher.objects.filter(grades = request.user.grade, subjects = subject)[0]
     subject.avg = Mark.objects.filter(pupil = pupil, absent = False, lesson__date__gte = datetime.now() - timedelta(weeks = 4), lesson__subject = subject).aggregate(Avg('mark'))['mark__avg']
     if subject.avg<3:
@@ -213,7 +213,8 @@ def viewMarks(request, id):
             6: u'Вс',
             }
     subject.days = []
-    subject.days = [int(lesson.workday) for lesson in UsalTimetable.objects.filter(grade = pupil.grade, subject = subject, group = pupil.group).order_by('workday') if int(lesson.workday) not in subject.days]
+    a = pupil.groups
+    subject.days = [int(lesson.workday) for lesson in UsalTimetable.objects.filter(grade = pupil.grade, subject = subject, group = pupil.groups[subject.id]).order_by('workday') if int(lesson.workday) not in subject.days]
     subject.days = [days[day] for day in subject.days]
 #    render['marks'] = Mark.objects.filter(pupil = pupil, lesson__date__gte = datetime.now() - timedelta(weeks = 4), lesson__subject = subject)
     render['lessons'] = Lesson.objects.filter(grade = pupil.grade, date__gte = datetime.now() - timedelta(weeks = 4), subject = subject)
@@ -222,7 +223,7 @@ def viewMarks(request, id):
             lesson.mark = Mark.objects.get(pupil = pupil, lesson = lesson)
 
     render['subject'] = subject
-    return render_to_response('~marks/%s/marks.html' % request.user_type, render, context_instance = RequestContext(request))
+    return render_to_response('~marks/%s/marks.html' % request.user.type.lower(), render, context_instance = RequestContext(request))
 
 @login_required
 @user_passes_test(lambda u: u.prefix=='t')

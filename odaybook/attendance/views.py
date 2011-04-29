@@ -13,14 +13,14 @@ from odaybook import settings
 from odaybook.userextended.models import Grade, Subject, School
 
 from models import UsalTimetable, SpecicalTimetable, Holiday, UsalRingTimetable
-from utils import TimetableDay
+from utils import TimetableDayPupil
 
 @login_required
 def index(request):
     render = {}
-    if request.user.prefix == 'p':
-        render['timetables'] = [TimetableDay(grade = request.user.grade, group = request.user.group, workday = workday) for workday in request.user.school.get_workdays()]
-    return render_to_response('page.html', render, context_instance = RequestContext(request))
+    if request.user.type == 'Parent':
+        render['timetables'] = [TimetableDayPupil(workday = workday, pupil = request.user.current_pupil) for workday in request.user.current_pupil.school.get_workdays()]
+    return render_to_response('~attendance/page_pupil.html', render, context_instance = RequestContext(request))
 
 @login_required
 @user_passes_test(lambda u: reduce(lambda x, y: x or y, map(lambda a: a in ['Superuser', 'EduAdmin'], u.types)))
