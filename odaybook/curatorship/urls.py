@@ -20,4 +20,7 @@ urlpatterns = patterns("odaybook.curatorship.views",
                        (r'^graphiks/$', 'graphiks'),
 
                        (r'^send-append-request/$', 'send_parent_request'),
+
+                       (r'^requests/approve/$', 'requests', {'mode': 'approve'}),
+                       (r'^requests/disapprove/$', 'requests', {'mode': 'disapprove'}),
                        )

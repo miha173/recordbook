@@ -1,0 +1,110 @@
+<html>
+    <head>
+        <title>Система электронных дневников</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <link rel="shortcut icon" href="{{ MEDIA_URL }}images/design/favicon.ico">
+        <link href="{{ MEDIA_URL }}css/main.css" rel="stylesheet" type="text/css">
+    </head>
+    <body>
+        <!-- Все -->
+        <div id="all">
+            <!-- Верхняя полоса -->
+            <div id="headline">
+              <a href="http://school-record-book.ru">Система электронных дневников</a> 
+				{% if user.school.url %}
+	                <a href="{{ user.school.url }}" id="right">{{ user.school }}</a>
+				{% endif %}
+            </div>
+            <!-- / Верхняя полоса --><!-- Шапка -->
+            <div id="header">
+                <div id="user">
+                    <big>{{ user.fio }}</big>
+                </div>
+                <div id="exit">
+                {% if user.roles.all.count > 1 %}
+                <ul id="change_user_mode" class="menu">
+                    <li><a href="#" onclick="$('#change_user_mode').toggleClass('menu_on');return false">
+                            {{ user.get_current_role_cyrillic }}
+                        <img src="{{ MEDIA_URL }}images/arrow-down-medium.png" />
+                        </a>
+                        <ul>
+                            {% for role in user.get_base_roles_list %}
+                                {% if user.get_current_role_cyrillic != role.0 %}
+                                    <li>
+                                        <a href="/accounts/set_role/{{ role.4.id }}/?type={{ role.1 }}">
+                                            {{ role.0 }}
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </li>
+                </ul>
+                    {% endif %}
+                {% if user.pupils.all.count > 1 %}
+                <ul id="change_current_pupil" class="menu">
+                    <li><a href="#" onclick="$('#change_current_pupil').toggleClass('menu_on');return false">
+                            {{ user.current_pupil.if_ }}
+                        <img src="{{ MEDIA_URL }}images/arrow-down-medium.png" />
+                        </a>
+                        <ul>
+                            {% for pupil in user.pupils.all %}
+                                {% if user.current_pupil != pupil %}
+                                    <li>
+                                        <a href="/accounts/set_role/{{ role.4.id }}/?type={{ role.1 }}">
+                                            {{ pupil.if_ }}
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </li>
+                </ul>
+                {% endif %}
+                    <a href="/accounts/password_change">Смена пароля</a>
+                    <a href="/accounts/logout">Выход</a>
+                </div>
+                <div class="clear">
+                </div>
+                <div id="navigation">
+                </div>
+            </div>
+            <!-- / Шапка --><!-- Тень -->
+            <div id="shadow">
+            </div>
+
+<!-- Заголовки и подразделы -->
+<div id="sub-navigation">
+<div id="padding">
+	{% block padding %}{% endblock %}
+</div>
+</div>
+<!-- / Заголовки и подразделы -->
+
+            <!-- / Тень --><!-- Основное содержание -->
+            <div id="content">
+                {% for message in messages %}
+                            <p><span class="{{ message.tags}}">{{ message }}</span>{% if not forloop.last %};{% endif %}</p>
+                {% endfor %}
+            </div>
+            <!-- / Основное содержание -->
+            <!-- © -->
+            <div id="copyright">
+                <div class="column">
+                    <p>
+	                    &copy;&nbsp;2009&#150;{{ current_year }}&nbsp;<a href="http://aleks-komkov.ru/">Комков&nbsp;Александр</a>
+                    </p>
+                </div>
+                <div class="column">
+                    <p>
+                    </p>
+                </div>
+            </div>
+            <!-- / © -->
+        </div>
+        <!-- / Все -->
+    </body>
+</html>
+
+
+

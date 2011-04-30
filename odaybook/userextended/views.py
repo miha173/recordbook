@@ -9,6 +9,7 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
+from django.contrib import messages
 from django.conf import settings
 from django.db.models import get_model
 from django.core.urlresolvers import resolve, reverse
@@ -343,6 +344,7 @@ def register_clerk(request):
     render = {}
 
     is_parent = auto_login = False
+    render['params'] = {}
     
     if request.GET.get('auto_login', False):
         render['params'] = {'auto_login': '1'}
@@ -350,6 +352,8 @@ def register_clerk(request):
     if request.GET.get('is_parent', False):
         render['params']['is_parent'] = '1'
         is_parent = True
+    else:
+        raise Http404
 
     if request.method == 'POST':
         render['form'] = form = ClerkRegisterForm(request.POST)
@@ -362,6 +366,7 @@ def register_clerk(request):
                 user = authenticate(username = user.username, password = '123456789')
                 login(request, user)
                 return HttpResponseRedirect(reverse('odaybook.curatorship.views.send_parent_request'))
+#                return HttpResponseRedirect('/curatorship/send-append-request/')
     else:
         render['form'] = ClerkRegisterForm()
 

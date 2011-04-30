@@ -90,7 +90,35 @@
     <p>Рыба &mdash; здесь будет статистика.</p>
 {% endif %}
 {% if user.type == 'Teacher' %}
-    <p>Здесь будут всякие запросы и общие сведения</p>
+<table id="index" class="no-hover">
+    <tr><td>
+        {% for request in requests %}
+            <div class="message" id="request-{{ request.id }}">
+                <p>
+                    <i>{{ request.parent.fio }}</i> отправил запрос на прикрепление <i>{{ request.pupil.fi }}</i>.
+                    <a href="#" class="approve" onclick="return approve_request({{ request.id }})">одобрить</a>
+                    <a href="#" class="disapprove" onclick="return disapprove_request({{ request.id }})">запретить</a>
+                </p>
+            </div>
+        {% empty %}
+            У вас нет запросов на прикрепление ребёнка.
+        {% endfor %}
+    </td></tr>
+</table>
+<script type="text/javascript">
+    function approve_request(id){
+        $.get('/curatorship/requests/approve/', {id: id}, function(data){
+            $('#request-' + id).fadeOut(500);
+        });
+        return false;
+    }
+    function disapprove_request(id){
+        $.get('/curatorship/requests/disapprove/', {id: id}, function(data){
+            $('#request-' + id).fadeOut(500);
+        });
+        return false;
+    }
+</script>
 {% endif %}
 
 {% endblock %}

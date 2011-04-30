@@ -815,7 +815,19 @@ body#admin #header #exit ul.menu_on{
 		table#index div.message p {
 			padding:0.5em 10px 0 10px;
 			font-size:80%;
+            margin: 0px;
 		}
+
+table#index div.message a.approve, table#index div.message a.disapprove{
+    text-decoration: none;border-bottom: 1px dashed;margin: 0 5px;
+}
+
+table#index div.message a.approve{
+    color: green;
+}
+table#index div.message a.disapprove{
+    color: red;
+}
 
 	
 	

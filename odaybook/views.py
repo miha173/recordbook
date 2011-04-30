@@ -13,7 +13,7 @@ from gate import Gate
 
 from odaybook.userextended.models import Pupil, Teacher, Subject, School
 from odaybook.userextended.views import objectList
-from odaybook.curatorship.models import Connection
+from odaybook.curatorship.models import Connection, Request
 from odaybook.attendance.models import UsalTimetable, UsalRingTimetable
 from odaybook.attendance.utils import TimetableDayPupil
 from odaybook.marks.models import Mark
@@ -43,8 +43,8 @@ def index(request):
         ]
         
 #        render['lessons'] = UsalRingTimetable.objects.filter(workday = datetime.now().isoweekday(), school = request.user.school)
-#    elif request.user.type == 'Teacher':
-#        return HttpResponseRedirect('/marks/')
+    elif 'Curator' in request.user.types:
+        render['requests'] = Request.objects.filter(pupil__grade = request.user.grade, activated = False)
     return render_to_response('root/index.html', render, context_instance=RequestContext(request))
 
 

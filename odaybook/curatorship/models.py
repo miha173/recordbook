@@ -1,4 +1,7 @@
 # -*- coding: UTF-8 -*-
+
+import datetime
+
 from django.db import models
 from odaybook.userextended.models import Teacher, Subject, Grade
 from odaybook.rest.models import RestModel
@@ -25,10 +28,23 @@ class Request(models.Model):
     pupil = models.ForeignKey(Pupil)
     activated = models.BooleanField()
     created_timestamp = models.DateTimeField(auto_now_add=True)
-    activated_timestamp = models.DateTimeField(auto_now_add=True)
+    activated_timestamp = models.DateTimeField(null = True, blank = True)
 
-    def activate(self):
-        pass
+    def approve(self):
+        self.parent.pupils.add(self.pupil)
+        if self.parent.pupils.all().count():
+            self.parent.current_pupil = self.pupil
+        self.parent.save()
+        self.activated = True
+        self.activated_timestamp = datetime.datetime.now()
+        # TODO: send mail
+        self.save()
+
+    def disapprove(self):
+        self.activated = True
+        self.activated_timestamp = datetime.datetime.now()
+        # TODO: send mail
+        self.save()
 
     
     

@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import ObjectDoesNotExist
 
 from odaybook.userextended.models import Teacher, Subject, Grade, Pupil, School, Parent
-from models import Connection
+from models import Connection, Request
 from forms import ConnectionStep1Wizard, ConnectionStep2Wizard, ConnectionStep3Wizard, PupilForm, GraphiksForm, \
                   ParentRequestForm, ParentForm
 from odaybook.marks.models import Lesson, Mark, Result
@@ -176,7 +176,7 @@ def graphiks(request):
     return render_to_response('~curatorship/graphiks.html', render, context_instance = RequestContext(request))
 
 
-@login_required()
+@login_required
 def send_parent_request(request):
     render = {}
 
@@ -205,12 +205,7 @@ def send_parent_request(request):
             render['form'] = form = ParentRequestForm(grade, data = request.POST)
             if form.is_valid():
                 step = 4
-                request.user.pupils
-                render['pupil'] = pupil = form.pupil
-                request.user.pupils.add(pupil)
-                request.user.current_pupil = pupil
-                request.user.save()
-                return HttpResponseRedirect('/')
+                Request(parent = request.user, pupil = form.pupil).save()
             else:
                 pass
         else:
@@ -223,6 +218,14 @@ def send_parent_request(request):
 
     return render_to_response('~curatorship/send_append_request.html', render, context_instance = RequestContext(request))
 
+@login_required
+def requests(request, mode):
+    request = get_object_or_404(Request, id = request.GET.get('id', 0), pupil__grade = request.user.grade, activated = False)
+    if mode == 'approve':
+        request.approve()
+    else:
+        request.disapprove()
+    return HttpResponse('')
 
 
 
