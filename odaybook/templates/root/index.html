@@ -69,9 +69,9 @@
 							{% endcomment %}
                         </td>
                         <td>
+                            {% if lessons %}
 <table id="shedule">
 <tr><td>
-  {% if lessons %}
     <div id="bells">
       <big style="padding:0;margin:0px;">Расписание звонков</big>
       {# <small style="margin:0px;padding-bottom: 5px;">{{ ringtimetable_workday }}</small>#}
@@ -79,8 +79,8 @@
         <p>{{ lesson.number }} {{ lesson.start|time:"H:i" }}—{{ lesson.end|time:"H:i" }}</p>
       {% endfor %}
     </div>
-  {% endif %}
 </td></tr></table>
+                            {% endif %}
 
                         </td>
                     </tr>

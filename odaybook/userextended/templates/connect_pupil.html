@@ -1,0 +1,62 @@
+{% extends 'page.html' %}
+
+{% block padding %}
+    <a href="/administrator/uni/userextended.School/#sch{{ school.id }}">{{ school }}</a>
+    <span>&rarr;</span>
+    <a href="/administrator/uni/userextended.Pupil/{{ school.id }}/">Ученики</a>
+    <span>&rarr;</span>
+    <h1>Редактирование</h1>
+{% endblock %}
+
+
+{% block content %}
+    <table class="no-hover"><tr><td>
+	{% if not pupil %}
+        {% if not_found %}
+            <b>Ученик не найден</b>
+        {% endif %}
+        <form action="." method="GET">
+        <fieldset>
+            <legend>Введите логин ученика</legend>
+            <table>
+                <tr>
+                    <td>
+                        <input type="text" name="username" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="submit" value="Искать" /></td>
+                </tr>
+            </table>
+        </fieldset>
+        </form>
+    {% else %}
+        <form action="." method="POST">
+        <input type="hidden" name="username" value="{{ pupil.username }}" />
+        <fieldset>
+            <legend>Подтвердите информацию</legend>
+            <table>
+                <tr>
+                    <td>Имя: </td>
+                    <td>{{ pupil.fio }}</td>
+                </tr>
+                <tr>
+                    <td>Класс: </td>
+                    <td>
+                        <select name="grade">
+                            {% for grade in grades %}
+                                <option value="{{ grade.id }}">{{ grade }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2"><input type="submit" value="Добавить" /></td>
+                </tr>
+            </table>
+        </fieldset>
+        </form>
+
+    {% endif %}
+    </td></tr></table>
+{% endblock %}

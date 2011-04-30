@@ -12,6 +12,7 @@ urlpatterns = patterns("odaybook.userextended.views",
                                                               'post_change_redirect': '/',
                                                               }),
 
+                       # FIXME: а нужно?
                        (r'^uni/(?P<app>\w+).(?P<model>\w+)/$', 'objectList'),
                        (r'^uni/(?P<app>\w+).(?P<model>\w+)/add/$', 'objectEdit', {'mode': 'add'}),
                        (r'^uni/(?P<app>\w+).(?P<model>\w+)/edit/(?P<id>\d+)/$', 'objectEdit', {'mode': 'edit'}),
@@ -36,4 +37,7 @@ urlpatterns = patterns("odaybook.userextended.views",
                        (r'^register-clerk/$', 'register_clerk'),
 
                        (r'^ajax/get/subject/(?P<id>\d+)/$', 'get_subject'),
+                       
+                       (r'^uni/userextended.Pupil/(?P<filter_id>\d+)/exclude/(?P<id>\d+)/$', 'exclude_pupil'),
+                       (r'^uni/userextended.Pupil/(?P<school>\d+)/connect/$', 'connect_pupil'),
                        )

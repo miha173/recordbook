@@ -14,7 +14,7 @@ from django.conf import settings
 from django.db.models import get_model
 from django.core.urlresolvers import resolve, reverse
 
-from models import School, Clerk, Superviser, Teacher, Pupil, Parent, BaseUser, Superuser, Subject
+from models import School, Clerk, Superviser, Teacher, Pupil, Parent, BaseUser, Superuser, Subject, Grade
 from forms import ClerkForm, PupilConnectionForm, ClerkRegisterForm
 import odaybook.userextended.forms
 import odaybook.attendance.forms
@@ -371,3 +371,38 @@ def register_clerk(request):
         render['form'] = ClerkRegisterForm()
 
     return render_to_response('~userextended/register_clerk.html', render, context_instance = RequestContext(request))
+
+@login_required
+@user_passes_test(lambda u: reduce(lambda x, y: x or y, map(lambda a: a in ['Superuser', 'EduAdmin'], u.types)))
+def exclude_pupil(request, filter_id, id):
+    if request.user.type == 'EduAdmin':
+        if request.user.school.id != int(id): raise Http404
+    pupil = get_object_or_404(Pupil, id = id, school__id = filter_id)
+    pupil.school = pupil.grade = None
+    pupil.save()
+    return HttpResponseRedirect('/administrator/uni/userextended.Pupil/%d/' % int(filter_id))
+
+@login_required
+@user_passes_test(lambda u: reduce(lambda x, y: x or y, map(lambda a: a in ['Superuser', 'EduAdmin'], u.types)))
+def connect_pupil(request, school):
+    render = {}
+
+    render['school'] = school = get_object_or_404(School, id = school)
+    if request.user.type == 'EduAdmin' and request.user.school.id != school.id: raise Http404
+    render['grades'] = Grade.objects.filter(school = school)
+
+    if request.REQUEST.get('username', False):
+        try:
+            render['pupil'] = pupil = Pupil.objects.get(username = request.REQUEST.get('username'), school = None)
+        except Pupil.DoesNotExist:
+            render['not_found'] = True
+
+    if request.method == 'POST':
+        grade = get_object_or_404(Grade, id = request.POST.get('grade'), school = school)
+        pupil.school = school
+        pupil.grade = grade
+        pupil.save()
+        # FIXME: message
+        return HttpResponseRedirect('/administrator/uni/userextended.Pupil/%d/' % school.id)
+
+    return render_to_response('~userextended/connect_pupil.html', render, context_instance = RequestContext(request))
