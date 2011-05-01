@@ -11,7 +11,7 @@ from django.db.models.aggregates import Avg
 
 from gate import Gate
 
-from odaybook.userextended.models import Pupil, Teacher, Subject, School
+from odaybook.userextended.models import Pupil, Teacher, Subject, School, Notify
 from odaybook.userextended.views import objectList
 from odaybook.curatorship.models import Connection, Request
 from odaybook.attendance.models import UsalTimetable, UsalRingTimetable
@@ -45,6 +45,10 @@ def index(request):
 #        render['lessons'] = UsalRingTimetable.objects.filter(workday = datetime.now().isoweekday(), school = request.user.school)
     elif 'Curator' in request.user.types:
         render['requests'] = Request.objects.filter(pupil__grade = request.user.grade, activated = False)
+    if 'EduAdmin' in request.user.types:
+        render['notifies'] = Notify.objects.filter(for_eduadmin = True)
+    if request.user.type == 'Superuser':
+        render['notifies'] = Notify.objects.filter(for_superviser = True)
     return render_to_response('root/index.html', render, context_instance=RequestContext(request))
 
 

@@ -40,7 +40,7 @@ class Mark(RestModel):
     lesson = models.ForeignKey(Lesson, verbose_name = u'Занятие')
     mark = models.IntegerField(u'Отметка', blank = True, null = True)
     absent = models.BooleanField(u'Отсутствовал')
-    date = models.DateField(u'Дата выставления', auto_now_add = True)
+    date = models.DateTimeField(u'Дата выставления', auto_now_add = True)
     comment = models.TextField(u'Комментарий к отметке', blank = True)
 
     serialize_fields = ['id', 'pupil_id', 'lesson_id', 'mark', 'absent', 'date']
@@ -61,6 +61,11 @@ class Mark(RestModel):
             return u'H'
         else:
             return unicode(self.mark)
+
+    def save(self, *args, **kwargs):
+        from odaybook.userextended.models import Notify
+        super(Mark, self).save(*args, **kwargs)
+        Notify.objects.filter(user = self.lesson.teacher, type = '1').delete()
     
     class Meta:
         ordering = ['-date']

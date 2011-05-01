@@ -87,23 +87,78 @@
                 </table>
 {% endif %}
 {% if user.type == 'Superuser' %}
-    <p>Рыба &mdash; здесь будет статистика.</p>
+<table id="index" class="no-hover">
+    <tr>
+        {% if notifies %}
+        <td>
+            <b>Уведомления</b>
+            {% for notify in notifies %}
+            <div class="message">
+                <p>
+                    {% if notify.type == '1' %}
+                        {% if notify.get_timedelta %}
+                            {{ notify.user.fio }} {{ notify.get_timedelta.days }} дней не заполнял дневник.
+                        {% else %}
+                            {{ notify.user.fio }} никогда не заполнял дневник.
+                        {% endif %}
+                    {% endif %}
+                    {% if notify.type == '2' %}
+                        {{ notify.user.fio }} не входил в систему {{ notify.get_timedelta.days }} дней.
+                    {% endif %}
+                    {% if notify.type == '3' %}
+                        {{ notify.user.fio }} не реагировал на заявки привязок {{ notify.get_timedelta.days }} дней.
+                    {% endif %}
+                </p>
+            </div>
+            {% endfor %}
+        </td>
+        {% endif %}
+    </tr>
+</table>
 {% endif %}
 {% if user.type == 'Teacher' %}
 <table id="index" class="no-hover">
-    <tr><td>
-        {% for request in requests %}
-            <div class="message" id="request-{{ request.id }}">
+    <tr>
+        {% if user.grade %}
+        <td>
+            {% for request in requests %}
+                <div class="message" id="request-{{ request.id }}">
+                    <p>
+                        <i>{{ request.parent.fio }}</i> отправил запрос на прикрепление <i>{{ request.pupil.fi }}</i>.
+                        <a href="#" class="approve" onclick="return approve_request({{ request.id }})">одобрить</a>
+                        <a href="#" class="disapprove" onclick="return disapprove_request({{ request.id }})">запретить</a>
+                    </p>
+                </div>
+            {% empty %}
+                У вас нет запросов на прикрепление ребёнка.
+            {% endfor %}
+        </td>
+        {% endif %}
+        {% if notifies %}
+        <td>
+            <b>Уведомления</b>
+            {% for notify in notifies %}
+            <div class="message">
                 <p>
-                    <i>{{ request.parent.fio }}</i> отправил запрос на прикрепление <i>{{ request.pupil.fi }}</i>.
-                    <a href="#" class="approve" onclick="return approve_request({{ request.id }})">одобрить</a>
-                    <a href="#" class="disapprove" onclick="return disapprove_request({{ request.id }})">запретить</a>
+                    {% if notify.type == '1' %}
+                        {% if notify.get_timedelta %}
+                            {{ notify.user.fio }} {{ notify.get_timedelta.days }} дней не заполнял дневник.
+                        {% else %}
+                            {{ notify.user.fio }} никогда не заполнял дневник.
+                        {% endif %}
+                    {% endif %}
+                    {% if notify.type == '2' %}
+                        {{ notify.user.fio }} не входил в систему {{ notify.get_timedelta.days }} дней.
+                    {% endif %}
+                    {% if notify.type == '3' %}
+                        {{ notify.user.fio }} не реагировал на заявки привязок {{ notify.get_timedelta.days }} дней.
+                    {% endif %}
                 </p>
             </div>
-        {% empty %}
-            У вас нет запросов на прикрепление ребёнка.
-        {% endfor %}
-    </td></tr>
+            {% endfor %}
+        </td>
+        {% endif %}
+    </tr>
 </table>
 <script type="text/javascript">
     function approve_request(id){

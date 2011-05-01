@@ -1,12 +1,14 @@
 # -*- coding: UTF-8 -*-
 
+import datetime
+
 from django.contrib.auth import get_user
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.contrib import messages
 from django.template import RequestContext
 
-from models import Pupil, Teacher, Staff, School, Option, BaseUser, Clerk, Parent, Superviser
+from models import Pupil, Teacher, Staff, School, Option, BaseUser, Clerk, Parent, Superviser, Notify
 
 class LazyUser(object):
     def __get__(self, request, obj_type=None):
@@ -26,6 +28,10 @@ class LazyUser(object):
                             raise
 
                     userprofile = userprofile.get_current_role()
+                    userprofile.last_login = datetime.datetime.now()
+                    if userprofile.type == 'Teacher':
+                        Notify.objects.filter(type = '2', user = userprofile).delete()
+                    userprofile.save()
                 except Clerk.DoesNotExist:
                     userprofile = user
             else:

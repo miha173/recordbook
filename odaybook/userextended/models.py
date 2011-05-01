@@ -143,8 +143,11 @@ class Grade(RestModel):
         conn = Connection.objects.filter(teacher = teacher, grade = self, subject = subject)
         if not conn: raise PlaningError(u'нет учеников')
         conn = conn[0]
-        pupil_connections = PupilConnection.objects.filter(pupil__grade = self, subject = subject, value = conn.connection)
-        self.pupils = Pupil.objects.filter(id__in = [c.pupil.id for c in pupil_connections])
+        if conn.connection == '0':
+            self.pupils = Pupil.objects.filter(grade = self)
+        else:
+            pupil_connections = PupilConnection.objects.filter(pupil__grade = self, subject = subject, value = conn.connection)
+            self.pupils = Pupil.objects.filter(id__in = [c.pupil.id for c in pupil_connections])
 
 class Subject(RestModel):
     u'Учебная дисциплина'
@@ -469,7 +472,7 @@ class BaseUser(BaseClerk):
         '''
         self.clerk = clerk
         self._append_to_clerk = True
-        for prop in ['last_name', 'first_name', 'middle_name', 'username', 'email', 'current_role', 'password']:
+        for prop in ['last_name', 'first_name', 'middle_name', 'username', 'email', 'current_role', 'password', 'last_login']:
             setattr(self, prop, getattr(clerk, prop))
 
     def set_roles(self, clerk):
@@ -483,7 +486,7 @@ class BaseUser(BaseClerk):
         '''
             Устанавливает базового клерка. Копирует из него основные поля кроме ролей!
         '''
-        for prop in ['last_name', 'first_name', 'middle_name', 'username', 'email', 'current_role', 'password']:
+        for prop in ['last_name', 'first_name', 'middle_name', 'username', 'email', 'current_role', 'password', 'last_login']:
             setattr(self.clerk, prop, getattr(self, prop))
 
     def send_roles_to_clerk(self):
@@ -492,7 +495,6 @@ class BaseUser(BaseClerk):
         '''
         for role in self.roles.all():
             self.clerk.roles.add(role)
-    
 
 @receiver(post_save, sender = Clerk)
 def BaseUser_update(sender, instance, **kwargs):
@@ -697,3 +699,19 @@ class PupilConnection(models.Model):
     class Meta:
         unique_together = (('pupil', 'subject'), )
 
+class Notify(models.Model):
+    timestamp = models.DateTimeField(auto_now_add = True)
+    user = models.ForeignKey(Teacher, null = True)
+    type = models.CharField(max_length = 1, choices = ( ('1', u'Дневник не заполняется'),
+                                                        ('2', u'Система не используется'),
+                                                        ('3', u'Привязки не одобряются'),
+                                                        ),
+                            null = True)
+    for_eduadmin = models.BooleanField(default = True)
+    for_superviser = models.BooleanField(default = False)
+    notify_start = models.DateTimeField(null = True)
+    def get_timedelta(self):
+        if self.notify_start:
+            return datetime.now() - self.notify_start
+        else:
+            return None
