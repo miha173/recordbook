@@ -8,7 +8,8 @@ import datetime
 PROJECT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 sys.path.insert(0, PROJECT_DIR)
 sys.path.insert(0, os.path.join(PROJECT_DIR, 'libs'))
-sys.path.insert(0, os.path.join(PROJECT_DIR, '.env'))
+sys.path.insert(0, os.path.join(PROJECT_DIR, '.env/lib/python2.6'))
+sys.path.insert(0, os.path.join(PROJECT_DIR, '.env/lib/python2.6/site-packages'))
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'odaybook.settings'
 
