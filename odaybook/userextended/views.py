@@ -105,7 +105,8 @@ def objectEdit(request, app, model, mode, filter_id = None, id = 0):
 
     if app_model == 'userextended.School':
         if request.user.type == 'Teacher':
-           ext['id'] = request.user.school.id
+           if int(id) != request.user.school.id:
+               raise Http404(u'Не та школа')
     elif app_model == 'curatorship.Connection':
         if request.user.type == 'Teacher':
             ext['grade__school'] = request.user.school
