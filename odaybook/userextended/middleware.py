@@ -45,8 +45,9 @@ class AuthenticationMiddleware(object):
         request.__class__.user = LazyUser()
         return None
     def process_response(self, request, response):
-        if request.user.is_authenticated():
-            if hasattr(request.user, 'type') and request.user.type == 'Parent' and not request.user.pupils.all():
-                messages.error(request, u'К вашему профилю не добавлено ни одного ребёнка.')
-                return render_to_response("message.html", context_instance = RequestContext(request))
+        # FIXME
+#        if request.user.is_authenticated():
+#            if hasattr(request.user, 'type') and request.user.type == 'Parent' and not request.user.pupils.all():
+#                messages.error(request, u'К вашему профилю не добавлено ни одного ребёнка.')
+#                return render_to_response("message.html", context_instance = RequestContext(request))
         return response

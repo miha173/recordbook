@@ -108,11 +108,12 @@ class TeacherForm(forms.ModelForm):
         self.fields['subjects'].queryset = Subject.objects.filter(school = school)
         self.fields['grade'].queryset = Grade.objects.filter(school = school)
         self.school = school
+        self.fields['email'].required = True
     class Meta:
         model = Teacher
         fields = [
                 'last_name', 'first_name', 'middle_name', 'edu_admin',
-                'grade', 'grades', 'subjects',
+                'grade', 'grades', 'subjects', 'email',
         ]
     def save(self, *args, **kwargs):
         if self.school:

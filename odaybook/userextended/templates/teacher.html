@@ -38,6 +38,14 @@
 					{% if form.middle_name.help_text %}<div class="help_text">{{ form.middle_name.help_text }}</div>{% endif %}
 				</td>
 			</tr>
+			<tr>
+				<td class="label"><label for="id_email">{{ form.email.label }}: </label></td>
+				<td>{{ form.email }}</td>
+				<td>
+					{% if form.email.errors %}<div class="error_text">{{ form.email.errors }}</div>{% endif %}
+					{% if form.email.help_text %}<div class="help_text">{{ form.email.help_text }}</div>{% endif %}
+				</td>
+			</tr>
 		</table>
 	</fieldset>
 	</td></tr><tr><td>

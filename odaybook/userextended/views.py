@@ -152,7 +152,8 @@ def objectEdit(request, app, model, mode, filter_id = None, id = 0):
                 form_factory_valid = all([f.is_valid() for f in render['groups']])
             if form.is_valid() and form_factory_valid:
                 form.save()
-                for f in render['groups']: f.save()
+                if model == 'Pupil':
+                    for f in render['groups']: f.save()
                 return HttpResponseRedirect(url)
             else:
                 render['form'] = form
