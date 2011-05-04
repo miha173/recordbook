@@ -38,10 +38,10 @@ class LazyUser(object):
                     userprofile.save()
                 except Clerk.DoesNotExist:
                     userprofile = user
+                logger.info(u'Закончена загрузка view для пользователя типа %s с id=%d' % (userprofile.type, userprofile.id))
             else:
                 if School.objects.filter(private_domain = request.META['HTTP_HOST']):
                     userprofile.private_salute = School.objects.filter(private_domain = request.META['HTTP_HOST'])[0].private_salute
-            logger.info(u'Закончена загрузка view для пользователя типа %s с id=%d' % (userprofile.type, userprofile.id))
             request._cached_user = userprofile
         return request._cached_user
 
