@@ -285,7 +285,7 @@ def baseUserObjectEdit(request, mode, filter_id = None, id = 0):
 
 @login_required
 def set_role(request, role_id):
-    request.user.set_current_role(role_id, request.GET.get('type', ''))
+    request.user.set_current_role(role_id)
     return HttpResponseRedirect('/')
 
 @login_required

@@ -164,6 +164,9 @@ body#site #header {
     margin: 0;
     min-height:0px;
 }
+#header #exit ul.menu li a:hover{
+    background: none!important;
+}
 #header #exit ul.menu li a img{
     margin-bottom: -4px;
     margin-left: -3px;

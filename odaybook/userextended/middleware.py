@@ -9,10 +9,14 @@ from django.contrib import messages
 from django.template import RequestContext
 
 from models import Pupil, Teacher, Staff, School, Option, BaseUser, Clerk, Parent, Superviser, Notify
+import logging
+
+logger = logging.getLogger(__name__)
 
 class LazyUser(object):
     def __get__(self, request, obj_type=None):
         if not hasattr(request, '_cached_user'):
+            logger.info(u'Начата загрузка view для пользователя')
             user = get_user(request);
             userprofile = user
             userprofile.type = 'Anonymous'
@@ -37,6 +41,7 @@ class LazyUser(object):
             else:
                 if School.objects.filter(private_domain = request.META['HTTP_HOST']):
                     userprofile.private_salute = School.objects.filter(private_domain = request.META['HTTP_HOST'])[0].private_salute
+            logger.info(u'Закончена загрузка view для пользователя типа %s с id=%d' % (userprofile.type, userprofile.id))
             request._cached_user = userprofile
         return request._cached_user
 

@@ -13,7 +13,9 @@ from django.dispatch import receiver
 
 from odaybook.rest.models import RestModel, RestModelManager
 from odaybook.utils import PlaningError
+import logging
 
+logger = logging.getLogger(__name__)
 
 class School(RestModel):
     u'Модель для школы'
@@ -207,6 +209,9 @@ class BaseClerk(models.Model):
         if not self._sync_timestamp_set:
             self.sync_timestamp = int(time.time())
             self._sync_timestamp_set = True
+        if hasattr(self, 'type'): t = self.type
+        else: t = 'Clerk'
+        logger.info(u'Сохранён Baseclerk#%d с synctimestamp=%d, synctimeset=%d, type=%s' % (self.id, self.sync_timestamp, self._sync_timestamp_set, t))
         super(BaseClerk, self).save(*args, **kwargs)
 
     def __unicode__(self):
@@ -348,7 +353,7 @@ class BaseClerk(models.Model):
     def get_current_role_cyrillic(self):
         return self.get_role_display(self.current_role.type)
 
-    def set_current_role(self, id, type):
+    def set_current_role(self, id):
         # FIXME: exceptions
         try:
             baseuser = BaseUser.objects.get(id = id)
@@ -357,7 +362,9 @@ class BaseClerk(models.Model):
         if baseuser not in self.roles.all():
             raise
         self.current_role = baseuser
+        self.sync_timestamp /= 2
         self.save()
+        logger.info(u'Установлен current_role %s#%d для baseuser#%d' % (baseuser.type, baseuser.id, self.id))
 
     class Meta:
         abstract = True
@@ -440,7 +447,7 @@ class BaseUser(BaseClerk):
             clerk = Clerk(last_name = self.last_name,
                           first_name = self.first_name,
                           middle_name = self.middle_name,
-                          email = self.middle_name,
+                          email = self.email,
             )
             clerk.save()
             self.username = clerk.username
@@ -460,11 +467,12 @@ class BaseUser(BaseClerk):
             self.sync_timestamp = int(time.time())
             self._sync_timestamp_set = True
 
-        self.clerk._sync_timestamp_set = True
-        self.clerk.sync_timestamp = self.sync_timestamp
-        self.send_to_clerk()
-        self.send_roles_to_clerk()
-        self.clerk.save()
+        if self.sync_timestamp != self.clerk.sync_timestamp:
+            self.clerk._sync_timestamp_set = True
+            self.clerk.sync_timestamp = self.sync_timestamp
+            self.send_to_clerk()
+            self.send_roles_to_clerk()
+            self.clerk.save()
 
     def set_clerk(self, clerk):
         '''
@@ -488,6 +496,7 @@ class BaseUser(BaseClerk):
         '''
         for prop in ['last_name', 'first_name', 'middle_name', 'username', 'email', 'current_role', 'password', 'last_login']:
             setattr(self.clerk, prop, getattr(self, prop))
+        logger.info(u'От %s#%d скопированы данные в clerk#%d' % (self.type, self.id, self.clerk.id))
 
     def send_roles_to_clerk(self):
         '''
@@ -498,11 +507,13 @@ class BaseUser(BaseClerk):
 
 @receiver(post_save, sender = Clerk)
 def BaseUser_update(sender, instance, **kwargs):
+    logger.info(u'Сигнал для копирования в clerk начал работать')
     for role in instance.get_roles():
         if role.sync_timestamp != instance.sync_timestamp:
             role.set_clerk(instance)
             role.set_roles(instance)
             role.save()
+    logger.info(u'Сигнал для копирования в clerk отработал')
 
 
 class Scholar(models.Model):

@@ -9,6 +9,13 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '.en
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'odaybook.settings'
 
+import logging
+
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s %(message)s',
+                    filename='/tmp/recordbook.log');
+
+
 import django.core.handlers.wsgi
 
 _application = django.core.handlers.wsgi.WSGIHandler()
