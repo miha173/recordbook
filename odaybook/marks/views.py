@@ -226,7 +226,7 @@ def viewMarks(request, id):
     return render_to_response('~marks/%s/marks.html' % request.user.type.lower(), render, context_instance = RequestContext(request))
 
 @login_required
-@user_passes_test(lambda u: u.prefix=='t')
+@user_passes_test(lambda u: u.type == 'Teacher')
 def set_current_subject(request, subject_id):
     request.user.current_subject = Subject.objects.get(id = subject_id)
     request.user.save()
