@@ -74,7 +74,7 @@
                             {% for pupil in user.pupils.all %}
                                 {% if user.current_pupil != pupil %}
                                     <li>
-                                        <a href="/accounts/set_role/{{ role.4.id }}/?type={{ role.1 }}">
+                                        <a href="/accounts/set_current_pupil/{{ pupil.id }}/">
                                             {{ pupil.if_ }}
                                         </a>
                                     </li>

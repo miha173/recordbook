@@ -6,7 +6,7 @@ import sys
 os.environ['DJANGO_SETTINGS_MODULE'] = 'odaybook.settings'
 sys.path.insert(0, '/home/entropius/GTD/job/recordbook/sochi/libs')
 
-from odaybook.userextended.models import Pupil, Teacher, Clerk
+from odaybook.userextended.models import Pupil, Teacher, Clerk, Superuser
 
 clerk_id = 1
 
@@ -14,12 +14,14 @@ clerk_id = 1
 #clerk.save()grou
 #print clerk.id
 
-clerk = Clerk.objects.get(id = clerk_id)
+import logging
 
-pupil = Pupil(sex = '1')
-pupil.set_clerk(clerk)
-pupil.save()
-pupil.set_roles(clerk)
-pupil.save()
-print pupil
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s %(message)s',
+                    filename='/tmp/recordbook.log');
+
+user = Superuser.objects.get(id = 1)
+
+user.clerk.set_password('12')
+user.clerk.save()
 

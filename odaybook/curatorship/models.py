@@ -32,7 +32,7 @@ class Request(models.Model):
 
     def approve(self):
         self.parent.pupils.add(self.pupil)
-        if self.parent.pupils.all().count():
+        if not self.parent.pupils.all().count():
             self.parent.current_pupil = self.pupil
         self.parent.save()
         self.activated = True

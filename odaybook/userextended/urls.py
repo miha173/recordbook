@@ -34,6 +34,7 @@ urlpatterns = patterns("odaybook.userextended.views",
                        (r'^baseuser/dismiss/(?P<id>\d+)/$', 'baseUserObjectEdit', {'mode': 'dismiss'}),
 
                        (r'^set_role/(?P<role_id>\d+)/$', 'set_role'),
+                       (r'^set_current_pupil/(?P<id>\d+)/$', 'set_current_pupil'),
 
                        (r'^appendrole/$', 'clerkAppendRole'),
                        (r'^register-clerk/$', 'register_clerk'),

@@ -408,3 +408,14 @@ def connect_pupil(request, school):
         return HttpResponseRedirect('/administrator/uni/userextended.Pupil/%d/' % school.id)
 
     return render_to_response('~userextended/connect_pupil.html', render, context_instance = RequestContext(request))
+
+@login_required
+@user_passes_test(lambda u: u.type == 'Parent')
+def set_current_pupil(request, id):
+    pupil = get_object_or_404(Pupil, id = id)
+    if pupil in request.user.pupils.all():
+        request.user.current_pupil = pupil
+        request.user.save()
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+    else:
+        raise Http404(u'Ученик не найден')

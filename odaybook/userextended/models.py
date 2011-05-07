@@ -212,8 +212,8 @@ class BaseClerk(models.Model):
             self._sync_timestamp_set = True
         if hasattr(self, 'type'): t = self.type
         else: t = 'Clerk'
-        logger.info(u'Сохранён Baseclerk#%d с synctimestamp=%d, synctimeset=%d, type=%s' % (self.id, self.sync_timestamp, self._sync_timestamp_set, t))
         super(BaseClerk, self).save(*args, **kwargs)
+        logger.info(u'Сохранён Baseclerk#%d с synctimestamp=%d, synctimeset=%d, type=%s' % (self.id, self.sync_timestamp, self._sync_timestamp_set, t))
 
     def __unicode__(self):
         return ' '.join((self.last_name, self.first_name, self.middle_name))
