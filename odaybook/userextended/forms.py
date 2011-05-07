@@ -1,7 +1,8 @@
 # -*- coding: UTF-8 -*-
 
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm as DjangoPasswordChangeForm, \
+    SetPasswordForm as DjangoSetPasswordForm
 from django.shortcuts import render_to_response
 from django.forms.util import ErrorList
 
@@ -178,3 +179,18 @@ class ClerkRegisterForm(forms.ModelForm):
         if Clerk.objects.filter(email = self.cleaned_data['email']):
             raise forms.ValidationError(u'Пользователь с таким email уже зарегистрирован.')
         return self.cleaned_data['email']
+
+class PasswordChangeForm(DjangoPasswordChangeForm):
+    def save(self, commit=True):
+        self.user.clerk.set_password(self.cleaned_data['new_password1'])
+        if commit:
+            self.user.clerk.save()
+        return self.user.clerk
+    def clean_old_password(self):
+        """
+        Validates that the old_password field is correct.
+        """
+        old_password = self.cleaned_data["old_password"]
+        if not self.user.clerk.check_password(old_password):
+            raise forms.ValidationError(u'Ваш старый пароль введён некорректно. Попробуйте ещё раз.')
+        return old_password

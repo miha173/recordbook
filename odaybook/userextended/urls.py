@@ -2,6 +2,7 @@
 
 from django.conf.urls.defaults import *
 from django.contrib.auth.views import login, logout, password_change
+from forms import PasswordChangeForm
 
 urlpatterns = patterns("odaybook.userextended.views",
                        (r'^$', 'index'),
@@ -10,6 +11,7 @@ urlpatterns = patterns("odaybook.userextended.views",
                        # FIXME: 
                        (r'password_change', password_change, {'template_name': 'change_password.html',
                                                               'post_change_redirect': '/',
+                                                              'password_change_form': PasswordChangeForm,
                                                               }),
 
                        # FIXME: а нужно?

@@ -3,6 +3,7 @@
 from datetime import timedelta, datetime
 import pytils
 import time
+import random
 
 from django.db import models
 from django.db.models import Q
@@ -207,7 +208,7 @@ class BaseClerk(models.Model):
 
     def save(self, *args, **kwargs):
         if not self._sync_timestamp_set:
-            self.sync_timestamp = int(time.time())
+            self.sync_timestamp = int(time.time()/100000*random.randint(10000, 100000))
             self._sync_timestamp_set = True
         if hasattr(self, 'type'): t = self.type
         else: t = 'Clerk'
@@ -388,6 +389,8 @@ class Clerk(User, RestModel, BaseClerk):
             super(Clerk, self).save(*args, **kwargs)
         super(Clerk, self).save(*args, **kwargs)
 
+        self._sync_timestamp_set = False
+
     def add_role(self, role):
         self.roles.add(role)
         self.save()
@@ -463,9 +466,9 @@ class BaseUser(BaseClerk):
 
         super(BaseUser, self).save(*args, **kwargs)
 
-        if not self._sync_timestamp_set:
-            self.sync_timestamp = int(time.time())
-            self._sync_timestamp_set = True
+#        if not self._sync_timestamp_set:
+#            self.sync_timestamp = int(time.time())
+#            self._sync_timestamp_set = True
 
         if self.sync_timestamp != self.clerk.sync_timestamp:
             self.clerk._sync_timestamp_set = True
@@ -480,7 +483,7 @@ class BaseUser(BaseClerk):
         '''
         self.clerk = clerk
         self._append_to_clerk = True
-        for prop in ['last_name', 'first_name', 'middle_name', 'username', 'email', 'current_role', 'password', 'last_login']:
+        for prop in ['last_name', 'first_name', 'middle_name', 'username', 'email', 'current_role', 'password']:
             setattr(self, prop, getattr(clerk, prop))
 
     def set_roles(self, clerk):
@@ -494,7 +497,7 @@ class BaseUser(BaseClerk):
         '''
             Устанавливает базового клерка. Копирует из него основные поля кроме ролей!
         '''
-        for prop in ['last_name', 'first_name', 'middle_name', 'username', 'email', 'current_role', 'password', 'last_login']:
+        for prop in ['last_name', 'first_name', 'middle_name', 'username', 'email', 'current_role', 'password']:
             setattr(self.clerk, prop, getattr(self, prop))
         logger.info(u'От %s#%d скопированы данные в clerk#%d' % (self.type, self.id, self.clerk.id))
 
@@ -507,13 +510,14 @@ class BaseUser(BaseClerk):
 
 @receiver(post_save, sender = Clerk)
 def BaseUser_update(sender, instance, **kwargs):
-    logger.info(u'Сигнал для копирования в clerk начал работать')
+    logger.info(u'Сигнал для копирования из clerk начал работать')
     for role in instance.get_roles():
         if role.sync_timestamp != instance.sync_timestamp:
             role.set_clerk(instance)
             role.set_roles(instance)
+            role.sync_timestamp = instance.sync_timestamp
             role.save()
-    logger.info(u'Сигнал для копирования в clerk отработал')
+    logger.info(u'Сигнал для копирования из clerk отработал')
 
 
 class Scholar(models.Model):
