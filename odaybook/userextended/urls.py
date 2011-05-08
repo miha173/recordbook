@@ -1,18 +1,23 @@
 # -*- coding: UTF-8 -*-
 
 from django.conf.urls.defaults import *
-from django.contrib.auth.views import login, logout, password_change
+from django.contrib.auth.views import login, logout, password_change, \
+    password_reset, password_reset_done, password_reset_confirm, password_reset_complete
 from forms import PasswordChangeForm
 
 urlpatterns = patterns("odaybook.userextended.views",
                        (r'^$', 'index'),
                        (r'login', login, {'template_name': 'login.html'}),
                        (r'logout', logout, {'next_page': '/'}),
-                       # FIXME: 
                        (r'password_change', password_change, {'template_name': 'change_password.html',
                                                               'post_change_redirect': '/',
                                                               'password_change_form': PasswordChangeForm,
                                                               }),
+                       (r'password_reset/$', password_reset, {'template_name': 'password_reset.html',}),
+                       (r'password_reset_done/$', password_reset_done, {'template_name': 'password_reset_done.html'}),
+                       (r'password_reset_confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$', password_reset_confirm, {'template_name': 'password_reset_confirm.html',}),
+
+                       (r'password_reset_complete/$', password_reset_complete, {'template_name': 'password_reset_complete.html',}),
 
                        # FIXME: а нужно?
                        (r'^uni/(?P<app>\w+).(?P<model>\w+)/$', 'objectList'),
@@ -32,6 +37,8 @@ urlpatterns = patterns("odaybook.userextended.views",
                        (r'^baseuser/delete/(?P<id>\d+)/$', 'baseUserObjectEdit', {'mode': 'delete'}),
                        (r'^baseuser/set/(?P<id>\d+)/$', 'baseUserObjectEdit', {'mode': 'set_right'}),
                        (r'^baseuser/dismiss/(?P<id>\d+)/$', 'baseUserObjectEdit', {'mode': 'dismiss'}),
+                       
+                       (r'^uni/userextended.Grade/(?P<filter_id>\d+)/import/$', 'import_grade'),
 
                        (r'^set_role/(?P<role_id>\d+)/$', 'set_role'),
                        (r'^set_current_pupil/(?P<id>\d+)/$', 'set_current_pupil'),

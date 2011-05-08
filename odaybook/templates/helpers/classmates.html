@@ -1,3 +1,5 @@
+{% load formater %}
+
 {% if not user.hide_other_persons %}
   <table class="table sort" id="index">
       <thead>
@@ -25,7 +27,7 @@
                   </td>
                   <td>
                       <div class="mark-{{ pupil.get_marks_avg_type }}">
-                          {{ pupil.get_marks_avg|floatformat:"-2" }}
+                          {{ pupil.get_marks_avg|floatformat:"-2"|number_format }}
                       </div>
                   </td>
               </tr>

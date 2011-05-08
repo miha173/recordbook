@@ -41,10 +41,6 @@ lesson_id = 0;
 {% endblock %}
 
 {% block padding %}
-	{% if user.type == 'Superuser' %}
-		<a href="/administrator/uni/school/add/"><h1>Добавить школу</h1></a>
-	{% endif %}
-	
 	{% if user.type == 'Teacher'%}
 			<div id="sub-navigation">
 			<div id="padding">
@@ -72,7 +68,7 @@ lesson_id = 0;
 		</form>
 	</div>
 
-<table class="table mtable" style="margin-left: 0px;">
+<table class="table mtable" style="margin-left: 0px;" id="marks">
 	<tr><td style="vertical-align: top;">
 		<table class="table">
 			<thead>

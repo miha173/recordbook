@@ -60,14 +60,15 @@ class ParentRequestForm(forms.Form):
         if not self.errors:
             pupil_get_kwargs = {'grade': self.grade}
             pupil_get_kwargs.update(self.cleaned_data)
-            if Pupil.objects.filter(**pupil_get_kwargs):
+            if Pupil.objects.filter(**pupil_get_kwargs).exclude(id__in = [p.id for p in self.parent.pupils.all()]):
                 self.pupil = Pupil.objects.get(**pupil_get_kwargs)
             else:
-                raise forms.ValidationError(u'Ученик не найден')
+                raise forms.ValidationError(u'Ученик не найден или уже прикреплён к вам')
 
-    def __init__(self, grade, *args, **kwargs):
+    def __init__(self, grade, parent = None, *args, **kwargs):
         super(ParentRequestForm, self).__init__(*args, **kwargs)
         self.grade = grade
+        self.parent = parent
 
 class ParentForm(forms.ModelForm):
     class Meta:

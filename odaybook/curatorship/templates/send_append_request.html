@@ -1,48 +1,29 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Система электронных дневников</title>
-    <style type="text/css">
-        body{
-            font-family: Arial, serif;
-        }
-        th{
-            font-weight: normal;
-            text-align: left;
-        }
-        table ul, table li{
-            display: inline;
-        }
-        ul.errorlist{
-            font-weight: bold;
-            color: red;
-        }
-    </style>
-</head>
-<body>
+{% extends 'page.html' %}
+
+{% block content %}
     {% if step == 1 %}
-        <b>Выберите школу из списка:</b> <br />
-        <ul>
+        <p><b>Выберите школу из списка:</b></p>
+        <table class="no-hover">
             {% for obj in objects %}
-                <li><a href="?school={{ obj.id }}">{{ obj }}</a></li>
+                <tr><td><a href="?school={{ obj.id }}">{{ obj }}</a></td></tr>
             {% endfor %}
-        </ul>
+        </table>
     {% endif %}
 
     {% if step == 2 %}
-        <b>Выберите класс:</b> <br />
-        <ul>
+        <p><b>Выберите класс:</b></p>
+        <table class="no-hover">
             {% for obj in objects %}
-                <li><a href="?school={{ school.id }}&grade={{ obj.id }}">{{ obj }}</a></li>
+                <tr><td><a href="?school={{ school.id }}&grade={{ obj.id }}">{{ obj }}</a></td></tr>
             {% endfor %}
-        </ul>
+        </table>
     {% endif %}
 
     {% if step == 3 %}
-        <b>Введите информацию о своём ребёнке</b>
+        <p>Введите информацию о своём ребёнке</p>
         
         <form method="post" action="?school={{ school.id }}&grade={{ grade.id }}">{% csrf_token %}
-            <table>
+            <table class="no-hover">
                 {{ form }}
                 <tr>
                     <td colspan="2"><input type="submit" value="Отправить" /></td>
@@ -51,9 +32,7 @@
         </form>
     {% endif %}
     {% if step == 4 %}
-        <b>Ожидайте подтверждения классным руководителем</b>
+        <p>Ожидайте подтверждения классным руководителем. Вы получите уведомление по электронной почте.</p>
 
     {% endif %}
-
-</body>
-</html>
+{% endblock %}

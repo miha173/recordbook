@@ -19,9 +19,6 @@ from odaybook.attendance.models import UsalTimetable
 from models import Lesson, Mark, ResultDate, Result
 from forms import LessonForm, MarkForm, ResultForm, DeliveryForm, StatForm, MarksAdminForm
 
-class tempMark:
-    def __unicode__(self): return self.mark
-    
 
 @login_required
 def index(request):
@@ -49,26 +46,14 @@ def index(request):
             sum = 0
             sum_n = 0
             for day in dates:
-                if Mark.objects.filter(pupil = request.user.current_pupil, lesson__date = day, lesson__subject = subject).count()==1:
-                    mark = Mark.objects.get(pupil = request.user.current_pupil, lesson__date = day, lesson__subject = subject)
-                    m.append(mark)
-                    if not mark.absent:
-                        sum += mark.mark
-                        sum_n += 1
-                elif Mark.objects.filter(pupil = request.user.current_pupil, lesson__date = day, lesson__subject = subject).count()==2:
-                    temp = []
+                if Mark.objects.filter(pupil = request.user.current_pupil, lesson__date = day, lesson__subject = subject).count():
+                    t = []
                     for mark in Mark.objects.filter(pupil = request.user.current_pupil, lesson__date = day, lesson__subject = subject):
-                        temp.append(mark)
+                        t.append(mark)
                         if not mark.absent:
                             sum += mark.mark
                             sum_n += 1
-                    if temp[0].mark and temp[1].mark:
-                        mark = tempMark()
-                        mark.mark = "%d/%d" % (temp[0].mark, temp[1].mark)
-                        mark.get_type = temp[0].get_type()
-                        m.append(mark)
-                    else:
-                        m.append(temp[0])
+                    m.append(t)
                 else:
                     m.append('')
             subj.append(m)
@@ -76,6 +61,7 @@ def index(request):
                 subj.append(float(sum)/sum_n)
             else:
                 subj.append(0)
+            # FIXME
             subj.append(Teacher.objects.filter(grades = request.user.current_pupil.grade, subjects = subject)[0])
 #            subj.append(Teacher.objects.get(grades = request.user.grade, subjects = subject))
 #            subj.append(Connection.objects.get(Q(connection = 0) | Q(connection = request.user.group) | Q(connection = int(request.user.sex)+2), subject = subject, grade = request.user.grade).teacher)
@@ -197,7 +183,6 @@ def viewMarks(request, id):
     pupil = request.user.current_pupil
     subject = get_object_or_404(Subject, id = id, school = pupil.school)
     subject.teacher = pupil.get_teacher(subject)
-#    subject.teacher = Teacher.objects.filter(grades = request.user.grade, subjects = subject)[0]
     subject.avg = Mark.objects.filter(pupil = pupil, absent = False, lesson__date__gte = datetime.now() - timedelta(weeks = 4), lesson__subject = subject).aggregate(Avg('mark'))['mark__avg']
     if subject.avg<3:
         subject.avg_type = "bad"
@@ -212,12 +197,20 @@ def viewMarks(request, id):
             5: u'Пт',
             6: u'Вс',
             }
+    # FIXME
     subject.days = []
-    a = pupil.groups
     subject.days = [int(lesson.workday) for lesson in UsalTimetable.objects.filter(grade = pupil.grade, subject = subject, group = pupil.groups[subject.id]).order_by('workday') if int(lesson.workday) not in subject.days]
     subject.days = [days[day] for day in subject.days]
-#    render['marks'] = Mark.objects.filter(pupil = pupil, lesson__date__gte = datetime.now() - timedelta(weeks = 4), lesson__subject = subject)
-    render['lessons'] = Lesson.objects.filter(grade = pupil.grade, date__gte = datetime.now() - timedelta(weeks = 4), subject = subject)
+    start = date.today() - timedelta(weeks = 4)
+    end = date.today() + timedelta(days = 1)
+    if request.method == 'GET':
+        render['form'] = form = StatForm()
+    else:
+        render['form'] = form = StatForm(request.POST)
+        if form.is_valid():
+            start = form.cleaned_data['start']
+            end = form.cleaned_data['end']
+    render['lessons'] = Lesson.objects.filter(grade = pupil.grade, date__gte = start, date__lte = end, subject = subject)
     for lesson in render['lessons']:
         if Mark.objects.filter(pupil = pupil, lesson = lesson):
             lesson.mark = Mark.objects.get(pupil = pupil, lesson = lesson)

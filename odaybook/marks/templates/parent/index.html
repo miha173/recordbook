@@ -1,5 +1,12 @@
 {% extends 'page.html' %}
 
+{% load formater %}
+
+{% block  js_ready %}
+    $("#id_start").datepicker($.datepicker.regional["ru"]);
+    $("#id_end").datepicker($.datepicker.regional["ru"]);
+{% endblock %}
+
 {% block sort_headers %}{1: {sorter: false}, 2: {sorter: false}, 3: {sorter: false}, 4: {sorter: false}, 5: {sorter: false}, 6: {sorter: false}, 7: {sorter: false}, 10: {sorter: false}, }{% endblock %}
 
 {% block content %}
@@ -22,9 +29,11 @@
 		<tr class="{% cycle 'gray' '' %}">
 			<td><a href="/marks/{{ subject.0.id }}/">{{ subject.0 }}</a></td>
 			{% for mark in subject.1 %}
-				<td><div class="mark-{{ mark.get_type }}">{{ mark }}</div></td>
+				<td>
+                    {% for m in mark %}<div class="mark-{{ m.get_type }}" style="display:inline">{{ m }}</div>{% if not forloop.last %},&nbsp;{% endif %}{% endfor %}
+                </td>
 			{% endfor %}
-			<td><div class="mark-{{ subject.4 }}">{{ subject.2|floatformat:"-2" }}</div></td>
+			<td><div class="mark-{{ subject.4 }}">{{ subject.2|floatformat:"-2"|number_format }}</div></td>
     		<td><div class="teacher"><a href="/teachers/{{ subject.3.id }}/">{{ subject.3.fio }}</a></div></td>
 		</tr>
 	{% endfor %}

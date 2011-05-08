@@ -6,7 +6,8 @@ import pytils
 from odaybook.attendance.models import UsalTimetable, UsalRingTimetable
 
 class TimetableDay(object):
-    def __init__(self, workday):
+    def __init__(self, workday, day_date = None):
+        show_date = False
         workday = int(workday)
         self.day_n = workday
         self.day_ru = self.numDay2ruday(workday)
@@ -22,7 +23,10 @@ class TimetableDay(object):
         elif today == workday + 1:
             self.date = u'Вчера'
         else:
-            self.date = pytils.dt.ru_strftime(u"%d %B", inflected=True, date=date.today() + timedelta(days = (workday - today)))
+            if date:
+                self.date = pytils.dt.ru_strftime(u"%d %B", inflected=True, date=day_date)
+            else:
+                self.date = pytils.dt.ru_strftime(u"%d %B", inflected=True, date=date.today() + timedelta(days = (workday - today)))
         self.timestamp = (date.today() + timedelta(days = (workday - today))).isoformat()
         self.rings = {}
 #        for ring in UsalRingTimetable.objects.filter(school = grade.school, workday = workday):
@@ -43,9 +47,9 @@ class TimetableDay(object):
         return days[int(workday)]
 
 class TimetableDayPupil(TimetableDay):
-    def __init__(self, workday, pupil):
+    def __init__(self, workday, pupil, *args, **kwargs):
         from odaybook.userextended.models import PupilConnection
-        super(TimetableDayPupil, self).__init__(workday)
+        super(TimetableDayPupil, self).__init__(workday, *args, **kwargs)
         self.pupil = pupil
         self.lessons = {}
         for lesson in UsalTimetable.objects.filter(grade = pupil.grade, workday = workday):

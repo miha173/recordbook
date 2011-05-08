@@ -175,6 +175,8 @@ class ClerkRegisterForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ClerkRegisterForm, self).__init__(*args, **kwargs)
         self.fields['email'].required = True
+        self.fields['last_name'].required = True
+        self.fields['first_name'].required = True
     def clean_email(self):
         if Clerk.objects.filter(email = self.cleaned_data['email']):
             raise forms.ValidationError(u'Пользователь с таким email уже зарегистрирован.')
@@ -194,3 +196,6 @@ class PasswordChangeForm(DjangoPasswordChangeForm):
         if not self.user.clerk.check_password(old_password):
             raise forms.ValidationError(u'Ваш старый пароль введён некорректно. Попробуйте ещё раз.')
         return old_password
+
+class ImportForm(forms.Form):
+    file = forms.FileField()

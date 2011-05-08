@@ -177,6 +177,7 @@ def graphiks(request):
 
 
 @login_required
+@user_passes_test(lambda u: u.type == 'Parent')
 def send_parent_request(request):
     render = {}
 
@@ -193,8 +194,6 @@ def send_parent_request(request):
         render['pupil'] = pupil = get_object_or_404(Pupil, id = request.GET.get('pupil'), grade = grade)
         step = 4
 
-
-
     if step == 1: render['objects'] = School.objects.all()
 
     if step == 2:
@@ -202,7 +201,7 @@ def send_parent_request(request):
 
     if step == 3:
         if request.method == 'POST':
-            render['form'] = form = ParentRequestForm(grade, data = request.POST)
+            render['form'] = form = ParentRequestForm(grade, parent = request.user, data = request.POST)
             if form.is_valid():
                 step = 4
                 Request(parent = request.user, pupil = form.pupil).save()

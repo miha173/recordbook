@@ -12,6 +12,7 @@
 		<script type="text/javascript" src="{{ MEDIA_URL }}js/jquery.tablesorter.min.js"></script>
         <script type="text/javascript" src="{{ MEDIA_URL }}js/all.js"></script>
         <script type="text/javascript" src="{{ MEDIA_URL }}js/paginator3000.js"></script>
+	    <script src="{{ MEDIA_URL }}js/jquery.ui.datepicker-ru.js"></script>
 
 		<script type="text/javascript">
 			$(document).ready(function(){
@@ -40,53 +41,55 @@
             </div>
             <!-- / Верхняя полоса --><!-- Шапка -->
             <div id="header">
-                <div id="user">
-                    <big>{{ user.fio }}</big>
-                </div>
-                <div id="exit">
-                {% if user.roles.all.count > 1 %}
-                <ul id="change_user_mode" class="menu">
-                    <li><a href="#" onclick="$('#change_user_mode').toggleClass('menu_on');return false">
-                            {{ user.get_current_role_cyrillic }}
-                        <img src="{{ MEDIA_URL }}images/arrow-down-medium.png" />
-                        </a>
-                        <ul>
-                            {% for role in user.get_base_roles_list %}
-                                {% if user.get_current_role_cyrillic != role.0 %}
-                                    <li>
-                                        <a href="/accounts/set_role/{{ role.4.id }}/?type={{ role.1 }}">
-                                            {{ role.0 }}
-                                        </a>
-                                    </li>
-                                {% endif %}
-                            {% endfor %}
-                        </ul>
-                    </li>
-                </ul>
+                {% if not user.is_anonymous %}
+                    <div id="user">
+                        <big>{{ user.fio }}</big>
+                    </div>
+                    <div id="exit">
+                    {% if user.roles.all.count > 1 %}
+                    <ul id="change_user_mode" class="menu">
+                        <li><a href="#" onclick="$('#change_user_mode').toggleClass('menu_on');return false">
+                                {{ user.get_current_role_cyrillic }}
+                            <img src="{{ MEDIA_URL }}images/arrow-down-medium.png" />
+                            </a>
+                            <ul>
+                                {% for role in user.get_base_roles_list %}
+                                    {% if user.get_current_role_cyrillic != role.0 %}
+                                        <li>
+                                            <a href="/accounts/set_role/{{ role.4.id }}/?type={{ role.1 }}">
+                                                {{ role.0 }}
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    </ul>
+                        {% endif %}
+                    {% if user.pupils.all.count > 1 %}
+                    <ul id="change_current_pupil" class="menu">
+                        <li><a href="#" onclick="$('#change_current_pupil').toggleClass('menu_on');return false">
+                                {{ user.current_pupil.if_ }}
+                            <img src="{{ MEDIA_URL }}images/arrow-down-medium.png" />
+                            </a>
+                            <ul>
+                                {% for pupil in user.pupils.all %}
+                                    {% if user.current_pupil != pupil %}
+                                        <li>
+                                            <a href="/accounts/set_current_pupil/{{ pupil.id }}/">
+                                                {{ pupil.if_ }}
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    </ul>
                     {% endif %}
-                {% if user.pupils.all.count > 1 %}
-                <ul id="change_current_pupil" class="menu">
-                    <li><a href="#" onclick="$('#change_current_pupil').toggleClass('menu_on');return false">
-                            {{ user.current_pupil.if_ }}
-                        <img src="{{ MEDIA_URL }}images/arrow-down-medium.png" />
-                        </a>
-                        <ul>
-                            {% for pupil in user.pupils.all %}
-                                {% if user.current_pupil != pupil %}
-                                    <li>
-                                        <a href="/accounts/set_current_pupil/{{ pupil.id }}/">
-                                            {{ pupil.if_ }}
-                                        </a>
-                                    </li>
-                                {% endif %}
-                            {% endfor %}
-                        </ul>
-                    </li>
-                </ul>
+                        <a href="/accounts/password_change/">Смена пароля</a>
+                        <a href="/accounts/logout">Выход</a>
+                    </div>
                 {% endif %}
-                    <a href="/accounts/password_change/">Смена пароля</a>
-                    <a href="/accounts/logout">Выход</a>
-                </div>
                 <div class="clear">
                 </div>
                 <div id="navigation">

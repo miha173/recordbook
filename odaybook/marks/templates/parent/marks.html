@@ -2,14 +2,18 @@
 
 {% block sort_headers %}{1: {sorter: false}}{% endblock %}
 
+{% block  js_ready %}
+    $("#id_start").datepicker($.datepicker.regional["ru"]);
+    $("#id_end").datepicker($.datepicker.regional["ru"]);
+{% endblock %}
+
 {% block padding %}
 	<h1>{{ subject }}</h1> 
-	{#<div class="classroom"><div><div>23</div></div></div>#}
 	<div class="calendar">{{ subject.days|join:", " }}</div>
 	<div class="teacher"><a href="/teachers/{{ subject.teacher.id }}">{{ subject.teacher.fio }}</a></div>
 {% endblock %}
 
-{% block content %}
+{% block content %}{% include 'helpers/uniForm.html' %}
 	<table class="table sort">
 	  <thead>
 	  <tr>

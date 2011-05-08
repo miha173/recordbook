@@ -31,8 +31,9 @@ class Request(models.Model):
     activated_timestamp = models.DateTimeField(null = True, blank = True)
 
     def approve(self):
+        exists = self.parent.pupils.all()
         self.parent.pupils.add(self.pupil)
-        if not self.parent.pupils.all().count():
+        if not exists:
             self.parent.current_pupil = self.pupil
         self.parent.save()
         self.activated = True

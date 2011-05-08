@@ -1,0 +1,36 @@
+{% extends 'page.html' %}
+
+{% block padding %}
+    <a href="/administrator/uni/userextended.School/#sch{{ school.id }}">{{ school }}</a>
+    <span>&rarr;</span>
+    <a href="/administrator/uni/userextended.Grade/{{ school.id }}/">Классы</a>
+    <span>&rarr;</span>
+    <h1>Импорт</h1>
+{% endblock %}
+
+{% block content %}
+    {{ form.errors }}
+    {% if errors %}
+        <p>При обработке файла возникли ошибки: </p>
+        <ul style="padding-left: 40px;">
+            {% for error in errors %}
+                {% if error.column %}
+                    <li>строка: {{ error.line }}; колонка: {{ error.column }}; ошибка: {{ error.error }}; </li>
+                {% else %}
+                    <li>строка: {{ error.line }}; ошибка: {{ error.error }}; </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <p>Импортируйте csv-файл. В первой колонке должен быть порядковый номер класса,
+        далее его полное имя, после его краткое имя (если есть).
+    </p>
+    <form method="POST" action="." enctype="multipart/form-data">
+        <table>
+            <tr>
+                <td>{{ form.file }}</td>
+                <td><input type="submit" value="Импортировать" /></td>
+            </tr>
+        </table>
+    </form>
+{% endblock %}

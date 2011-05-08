@@ -60,8 +60,8 @@ class StatForm(forms.Form):
         super(StatForm, self).__init__(*args, **kwargs)
         self.fields['start'].widget.format = '%d.%m.%Y'
         self.fields['end'].widget.format = '%d.%m.%Y'
-    start = forms.DateField(('%d.%m.%Y',), label = u'Дата начала периода', initial = date.today() - timedelta(weeks = 2))
-    end = forms.DateField(('%d.%m.%Y',), label = u'Дата окончания периода', initial = date.today())
+    start = forms.DateField(('%d.%m.%Y','%d.%m.%y'), label = u'Дата начала периода', initial = date.today() - timedelta(weeks = 2))
+    end = forms.DateField(('%d.%m.%Y','%d.%m.%y'), label = u'Дата окончания периода', initial = date.today())
 
 def MarkValidator(school):
     def _validator(mark): 

@@ -1,6 +1,6 @@
                         <td{% if timetable.today %} id="today"{% endif %}>
                             {#<small><a href="/marks/get_homework/{{ timetable.timestamp }}/">{{ timetable.date }}</a></small>#}
-                            <small>{{ timetable.date }}</small>
+                            {% if timetable.show_date %}<small>{{ timetable.date }}</small>{% endif %}
                             <big>{{ timetable.day_ru }}</big>
                             <table class="table">
                                 <tbody>

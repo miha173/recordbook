@@ -5,11 +5,11 @@
   <meta http-equiv="content-type" content="text/html;charset=UTF-8" /> 
   <script src="http://ajax.googleapis.com/ajax/libs/prototype/1.6.1.0/prototype.js" type="text/javascript"></script> 
 <script src="http://ajax.googleapis.com/ajax/libs/scriptaculous/1.8.3/scriptaculous.js" type="text/javascript"></script> 
-  <script src="http://asset3.laterthis.com/javascripts/all.js?1297499725" type="text/javascript"></script> 
+  <script src="http://asset3.laterthis.com/javascripts/all.js" type="text/javascript"></script>
   <title>Авторизируйтесь</title> 
   <link href="{{ MEDIA_URL }}css/login/style.css?1297499725" media="screen" rel="stylesheet" type="text/css" /> 
-  <!--[if IE 7]><link href="{{ MEDIA_URL }}css/login/ie7.css?1297499725" media="screen" rel="stylesheet" type="text/css" /><![endif]--> 
-  <!--[if IE 6]><link href="{{ MEDIA_URL }}css/login/ie6.css?1297499725" media="screen" rel="stylesheet" type="text/css" /><![endif]--> 
+  <!--[if IE 7]><link href="{{ MEDIA_URL }}css/login/ie7.css" media="screen" rel="stylesheet" type="text/css" /><![endif]-->
+  <!--[if IE 6]><link href="{{ MEDIA_URL }}css/login/ie6.css" media="screen" rel="stylesheet" type="text/css" /><![endif]-->
   <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" /> 
 </head> 
 <body> 
@@ -36,11 +36,11 @@
     </div> 
     
     <p><input class="button" name="commit" type="submit" value="Войти" /> 
-    {#<a href="/password_resets/new" class="new_password">Can't login?</a></p> #}
-  </form>  
+    <a href="/accounts/password_reset/" class="new_password">Забыли пароль?</a></p>
+  </form>
     
     <p id="signup">
-    	Для получения, восстановления логина или пароля, а также по вопросам технической поддержки вы можете обратиться по телефону <b>(495) 968-50-88</b> или по email: <a href="mailto:support@e-sch.ru">support@e-sch.ru</a>
+    	<i>Родителю:</i> <a href="/accounts/register-clerk/?auto_login=1&is_parent=1">пройдите регистрацию</a>
     </p> 
 </div> 
   </div> 

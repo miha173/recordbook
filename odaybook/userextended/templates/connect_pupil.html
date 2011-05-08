@@ -8,8 +8,68 @@
     <h1>Редактирование</h1>
 {% endblock %}
 
+{% block js_ready %}
+    pupil_id = 0;
+	$('#dialog').dialog({
+		autoOpen: false,
+		width: 420,
+        height: 140,
+		modal: true,
+		buttons: {
+			"Зачислить": function() {
+                if (pupil_id){
+                    $('#pupil').val(pupil_id);
+                    $('#grade_form').submit();
+//				$.get('?set_lesson=1&lesson=' + lesson_id, $('#lesson_form').serializeArray());
+//				$('#id_topic').val('');
+//				$('#id_task').val('');
+//				$(this).dialog("close");
+//				$('lesson_form').css('display', 'none');
+                }
+			},
+		},
+//		open: function(event, ui) {
+//			$.get('/marks/?get_lesson_info=1', {lesson: lesson_id}, function(data){
+//				$('#id_topic').val(data.topic);
+//				$('#id_task').val(data.task);
+//				$('#lesson_form').css('display', 'block');
+//			}, 'json');
+//			/*$('#dialog').children('p').append(lesson_id + '; ');*/
+//		}
+	});
+	$('.dialog_link').click(function(){
+		pupil_id = $(this).attr('pupil');
+		$('#dialog').dialog('open');
+		return false;
+	});
+
+{% endblock %}
 
 {% block content %}
+	<div id="dialog" title="Клас для зачисления">
+		<form action="." method="post" id="grade_form">
+            <input type="hidden" name="pupil" id="pupil" />
+            <select name="grade">
+                {% for grade in grades %}<option value="{{ grade.id }}">{{ grade }}</option>{% endfor %}
+            </select>
+		</form>
+	</div>
+    <p>
+        {% if pupils %}
+            Выберите ученика к зачислению.
+        {%  else %}
+            Нет учеников к зачислению.
+        {% endif %}
+    </p>
+    <table>
+        <tr>
+            {% for pupil in pupils %}
+                <td>{{ pupil }}</td>
+                <td><a href="#" pupil="{{ pupil.id }}" class="dialog_link">зачислить</a></td>
+            {% endfor %}
+        </tr>
+    </table>
+    {%  comment  %}
     <table class="no-hover"><tr><td>
 	{% if not pupil %}
         {% if not_found %}
@@ -59,4 +119,5 @@
 
     {% endif %}
     </td></tr></table>
+    {%  endcomment %}
 {% endblock %}

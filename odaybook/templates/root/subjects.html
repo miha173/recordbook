@@ -1,5 +1,7 @@
 {% extends 'page.html' %}
 
+{% load formater %}
+
 {% block padding %}
 {#<h1>I четверть</h1> <a href="#">II четверть</a> <a href="#">III четверть</a> <span>IV четверть</span>#}
 {% endblock %}
@@ -25,7 +27,7 @@
 	    <td><a href="/marks/{{ subject.id }}/">{{ subject }}</a></td>
 	    {#<td><div class="classroom"><div><div>205</div></div></div></td>#}
 	    <td><div class="calendar">{{ subject.days|join:", " }}</div></td>
-	    <td><div class="mark-normal">{{ subject.avg|default:0|floatformat:"-1" }}</div></td>
+	    <td><div class="mark-normal">{{ subject.avg|default:0|floatformat:"-1"|number_format }}</div></td>
 	    <td><div class="teacher"><a href="/teachers/{{ subject.teacher.id }}/">{{ subject.teacher.fio }}</a></div></td>
 	  </tr>
   	{% endfor %}

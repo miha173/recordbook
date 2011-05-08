@@ -1,6 +1,8 @@
 # -*- coding: UTF-8 -*-
 
 import demjson
+import csv
+import re
 
 from django.template import RequestContext
 from django.shortcuts import render_to_response, get_object_or_404
@@ -15,7 +17,7 @@ from django.db.models import get_model
 from django.core.urlresolvers import resolve, reverse
 
 from models import School, Clerk, Superviser, Teacher, Pupil, Parent, BaseUser, Superuser, Subject, Grade
-from forms import ClerkForm, PupilConnectionForm, ClerkRegisterForm
+from forms import ClerkForm, PupilConnectionForm, ClerkRegisterForm, ImportForm
 import odaybook.userextended.forms
 import odaybook.attendance.forms
 import odaybook.curatorship.forms
@@ -393,19 +395,17 @@ def connect_pupil(request, school):
     if request.user.type == 'EduAdmin' and request.user.school.id != school.id: raise Http404
     render['grades'] = Grade.objects.filter(school = school)
 
-    if request.REQUEST.get('username', False):
-        try:
-            render['pupil'] = pupil = Pupil.objects.get(username = request.REQUEST.get('username'), school = None)
-        except Pupil.DoesNotExist:
-            render['not_found'] = True
-
-    if request.method == 'POST':
+    if request.method == 'GET':
+        render['pupils'] = Pupil.objects.filter(school = None)
+    else:
+        pupil = Pupil.objects.get(id = request.POST.get('pupil'), school = None)
         grade = get_object_or_404(Grade, id = request.POST.get('grade'), school = school)
         pupil.school = school
         pupil.grade = grade
         pupil.save()
         # FIXME: message
         return HttpResponseRedirect('/administrator/uni/userextended.Pupil/%d/' % school.id)
+
 
     return render_to_response('~userextended/connect_pupil.html', render, context_instance = RequestContext(request))
 
@@ -419,3 +419,41 @@ def set_current_pupil(request, id):
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
     else:
         raise Http404(u'Ученик не найден')
+
+@login_required
+@user_passes_test(lambda u: reduce(lambda x, y: x or y, map(lambda a: a in ['Superuser', 'EduAdmin'], u.types)))
+def import_grade(request, filter_id):
+    render = {}
+    if request.user.type == 'EduAdmin':
+        if request.user.school.id != int(filter_id): raise Http404
+    render['school'] = school = get_object_or_404(School, id = filter_id)
+
+    if request.method == 'GET':
+        render['form'] = form = ImportForm()
+    else:
+        render['form'] = form = ImportForm(request.POST, request.FILES)
+        if form.is_valid():
+            render['errors'] = errors = []
+            grades = []
+            rows = csv.reader(form.cleaned_data['file'], delimiter = ';')
+            i = 0
+            for row in rows:
+                i += 1
+                if len(row)<3:
+                    errors.append({'line': i, 'column': 0, 'error': u'недостаточное количество столбцов'})
+                    continue
+                try:
+                    int(row[0])
+                except ValueError:
+                    errors.append({'line': i, 'column': 1, 'error': u'это не число'})
+                    continue
+                try:
+                    row[1], row[2] = row[1].decode('cp1251'), row[2].decode('cp1251')
+                except:
+                    errors.append({'line': i, 'column': 0, 'error': u'некорректное значение (невозможно определить кодировку)'})
+                    continue
+                grades.append(Grade(number = row[0], long_name = row[1], small_name = row[2], school = school))
+            if len(errors) == 0:
+                for grade in grades: grade.save()
+                return HttpResponseRedirect('..')
+    return render_to_response('~userextended/gradeImport.html', render, context_instance = RequestContext(request))

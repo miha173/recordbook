@@ -39,7 +39,7 @@ def index(request):
         
         render['timetables'] = [
                                 TimetableDayPupil(workday = datetime.now().isoweekday(), pupil = pupil),
-                                TimetableDayPupil(workday = (datetime.now() + timedelta(days = 1)).isoweekday(), pupil = pupil),
+                                TimetableDayPupil(workday = (datetime.now() + timedelta(days = 1)).isoweekday(), pupil = pupil, day_date = datetime.now()),
         ]
         
 #        render['lessons'] = UsalRingTimetable.objects.filter(workday = datetime.now().isoweekday(), school = request.user.school)

@@ -467,6 +467,9 @@ body#admin #header #exit ul.menu_on{
 	#content table_marks td {width: 26px; padding-right: 10px!important}
 	#content table thead tr:hover {background:#fff;}
 	#content table td {padding:0.8em 20px 0.8em 10px;}
+    #content table#marks td {padding:0.8em 10px;width:46px!important;}
+    #content table#marks th {width:46px!important;}
+	#content table#marks tr {height:51px!important}
 	#content table td.padding-right {padding-right:0;}
 
 	#content table#index {

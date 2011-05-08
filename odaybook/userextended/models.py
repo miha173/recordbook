@@ -171,7 +171,7 @@ class Subject(RestModel):
     class Meta:
         ordering = ['name']
 
-class ClerkManager(RestModelManager, UserManager):
+class SearchManager(models.Manager):
     def __init__(self, search_fields):
         self.search_fields = search_fields
         models.Manager.__init__(self)
@@ -180,11 +180,14 @@ class ClerkManager(RestModelManager, UserManager):
         search_query = reduce(lambda x, y: x | y, search_query_list)
         return self.filter(search_query)
 
+class ClerkManager(RestModelManager, UserManager, SearchManager):
+    pass
+
 class BaseClerk(models.Model):
     # FIXME: прозрачное удаление, добавление ролей etc
     # FIXME: REST
 #    objects = ClerkManager(['last_name', 'first_name', 'middle_name'])
-    middle_name = models.CharField(u"Отчество", max_length = 30, blank = True)
+    middle_name = models.CharField(u"Отчество", max_length = 30)
     cart = models.CharField(u'Карта', max_length = 10, null = True, blank = True)
     phone = models.CharField(max_length = 20, verbose_name = u'Номер телефона', null = True, blank = True)
     roles = models.ManyToManyField('BaseUser', null = True, blank = True, related_name = '%(app_label)s_%(class)s_related_roles_related')
@@ -372,7 +375,7 @@ class BaseClerk(models.Model):
 
 class Clerk(User, RestModel, BaseClerk):
 
-    objects = UserManager()
+    objects = ClerkManager(['last_name', 'first_name', 'middle_name', 'username'])
 
     def save(self, init = False, safe = False, *args, **kwargs):
 
@@ -519,6 +522,16 @@ def BaseUser_update(sender, instance, **kwargs):
             role.save()
     logger.info(u'Сигнал для копирования из clerk отработал')
 
+@receiver(post_save, sender = User)
+def Clerk_update(sender, instance, **kwargs):
+    logger.info(u'Сигнал для копирования в clerk начал работать')
+    try:
+        clerk = Clerk.objects.get(id = instance.id)
+    except Clerk.DoesNotExist:
+        return
+    clerk.password = instance.password
+    clerk.save()
+    logger.info(u'Сигнал для копирования в clerk отработал')
 
 class Scholar(models.Model):
     school = models.ForeignKey(School, null = True, blank = True)
@@ -564,7 +577,7 @@ class Parent(BaseUser):
 
 class Pupil(BaseUser, Scholar):
 
-#    objects = ClerkManager(['last_name', 'first_name', 'middle_name'])
+    objects = SearchManager(['last_name', 'first_name', 'middle_name', 'username', 'grade__number', 'grade__long_name', 'grade__small_name'])
 
     grade = models.ForeignKey(Grade, verbose_name = u"Класс", null=True)
     sex = models.CharField(max_length = 1, choices = (('1', u'Юноша'), ('2', u'Девушка')), verbose_name = u'Пол')

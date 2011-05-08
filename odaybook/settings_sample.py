@@ -14,9 +14,3 @@ from settings_dist import *
 #}
 
 INSTALLED_APPS +=('django_extensions', )
-
-
-DEFAULT_FROM_EMAIL = 'info@school-record-book.ru'
-EMAIL_HOST = 'mail.bz8.ru'
-EMAIL_HOST_USER = 'komkov_00'
-EMAIL_HOST_PASSWORD = 'lhmKpR1Kwt0'
