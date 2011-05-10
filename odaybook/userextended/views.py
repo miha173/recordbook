@@ -458,3 +458,158 @@ def import_grade(request, filter_id):
                 # FIXME: message
                 return HttpResponseRedirect('..')
     return render_to_response('~userextended/gradeImport.html', render, context_instance = RequestContext(request))
+
+def get_grade(grade_string):
+    import re
+    if re.search('\d+', grade_string):
+        number = int(re.search('\d+', grade_string).group(0))
+        long_name = grade_string.replace(str(number), '').strip()
+        return {'number': number, 'long_name': long_name}
+    else:
+        return None
+    
+@login_required
+@user_passes_test(lambda u: reduce(lambda x, y: x or y, map(lambda a: a in ['Superuser', 'EduAdmin'], u.types)))
+def import_teacher(request, filter_id):
+    render = {}
+    if request.user.type == 'EduAdmin':
+        if request.user.school.id != int(filter_id): raise Http404
+    render['school'] = school = get_object_or_404(School, id = filter_id)
+
+    if request.method == 'GET':
+        render['form'] = form = ImportForm()
+    else:
+        render['form'] = form = ImportForm(request.POST, request.FILES)
+        if form.is_valid():
+            render['errors'] = errors = []
+            teachers = []
+            rows = csv.reader(form.cleaned_data['file'], delimiter = ';')
+            i = 0
+            for row in rows:
+                i += 1
+                if len(row)<7:
+                    errors.append({'line': i, 'column': 0, 'error': u'неверное количество столбцов'})
+                    continue
+                try:
+                    row = ";".join(row)
+                    row = row.decode('cp1251')
+                except:
+                    errors.append({'line': i, 'column': 0, 'error': u'некорректное значение (невозможно определить кодировку)'})
+                    continue
+                row = row.split(';')
+                if len(row[0])<2 or len(row[1])<2 or len(row[2])<2:
+                    errors.append({'line': i, 'column': 0, 'error': u'сликшом короткое ФИО'})
+                    continue
+                # TODO: email regexp
+                teacher = Teacher(school = school, last_name = row[0], first_name = row[1], middle_name = row[2], email = row[3])
+                teacher._subjects = []
+                t = [j.strip() for j in row[4].split(',')]
+                for sbj in t:
+                    try: teacher._subjects.append(Subject.objects.get(name = sbj, school = school))
+                    except Subject.DoesNotExist: errors.append({'line': i, 'column': 5, 'error': u'предмет "%s" не найден' % sbj})
+                teacher._grades = []
+                t = [j.strip() for j in row[5].split(',')]
+                for grade in t:
+                    if not get_grade(grade):
+                        errors.append({'line': i, 'column': 5, 'error': u'класс "%s" не найден' % grade})
+                        continue
+                    try: teacher._grades.append(Grade.objects.get(school = school, **get_grade(grade)))
+                    except Grade.DoesNotExist: errors.append({'line': i, 'column': 5, 'error': u'класс "%s" не найден' % grade})
+                if row[6]:
+                    if not get_grade(row[6]):
+                        errors.append({'line': i, 'column': 6, 'error': u'класс "%s" не найден' % row[6]})
+                        continue
+                    try:
+                        teacher.grade = Grade.objects.get(school = school, **get_grade(row[6]))
+                    except Grade.DoesNotExist:
+                        errors.append({'line': i, 'column': 6, 'error': u'класс "%s" не найден' % row[6]})
+                        continue
+                teachers.append(teacher)
+
+            if len(errors) == 0:
+                for teacher in teachers: 
+                    teacher.save()
+                    [teacher.subjects.add(sbj) for sbj in teacher._subjects]
+                    [teacher.grades.add(sbj) for sbj in teacher._grades]
+                    teacher.save()
+                # FIXME: message
+                return HttpResponseRedirect('..')
+    return render_to_response('~userextended/teacherImport.html', render, context_instance = RequestContext(request))
+
+@login_required
+@user_passes_test(lambda u: reduce(lambda x, y: x or y, map(lambda a: a in ['Superuser', 'EduAdmin'], u.types)))
+def import_pupil(request, filter_id):
+    render = {}
+    if request.user.type == 'EduAdmin':
+        if request.user.school.id != int(filter_id): raise Http404
+    render['school'] = school = get_object_or_404(School, id = filter_id)
+
+    if request.method == 'GET':
+        render['form'] = form = ImportForm()
+    else:
+        render['form'] = form = ImportForm(request.POST, request.FILES)
+        if form.is_valid():
+            render['errors'] = errors = []
+            pupils = []
+            rows = csv.reader(form.cleaned_data['file'], delimiter = ';')
+            i = 0
+            for row in rows:
+                i += 1
+                if len(row)<12:
+                    errors.append({'line': i, 'column': 0, 'error': u'неверное количество столбцов'})
+                    continue
+                try:
+                    row = ";".join(row)
+                    row = row.decode('cp1251')
+                except:
+                    errors.append({'line': i, 'column': 0, 'error': u'некорректное значение (невозможно определить кодировку)'})
+                    continue
+                row = row.split(';')
+                if len(row[0])<2 or len(row[1])<2 or len(row[2])<2:
+                    errors.append({'line': i, 'column': 0, 'error': u'сликшом короткое ФИО'})
+                    continue
+                # TODO: email regexp
+                pupil = Pupil(
+                        school = school,
+                        last_name = row[0],
+                        first_name = row[1],
+                        middle_name = row[2],
+                        email = row[7],
+                        parent_phone_1 = row[5],
+                        parent_phone_2 = row[6],
+                        order = row[8],
+                        health_group = row[9],
+                        health_note = row[10],
+                        )
+                if row[4]:
+                    if not get_grade(row[4]):
+                        errors.append({'line': i, 'column': 4, 'error': u'класс "%s" не найден' % row[4]})
+                        continue
+                    try:
+                        pupil.grade = Grade.objects.get(school = school, **get_grade(row[4]))
+                    except Grade.DoesNotExist:
+                        errors.append({'line': i, 'column': 4, 'error': u'класс "%s" не найден' % row[4]})
+                        continue
+                else:
+                    errors.append({'line': i, 'column': 4, 'error': u'неуказан класс'})
+                if row[3].lower() in [u'м', u'ж', '']:
+                    pupil.sex = '1'
+                    if row[3].lower == u'ж': pupil.sex = '2'
+                else:
+                    errors.append({'line': i, 'column': 3, 'error': u'существо неизвестного пола'})
+                    continue
+                row[8] = row[8].lower()
+                if row[8] in [u'да', u'нет', '']:
+                    pupil.special = False
+                    if row[8] == u'да': row[8] = True
+                else:
+                    errors.append({'line': i, 'column': 8, 'error': u'укажите учитывать ли как специальную группу'})
+                    continue
+                pupils.append(pupil)
+
+            if len(errors) == 0:
+                for pupil in pupils:
+                    pupil.save()
+                # FIXME: message
+                return HttpResponseRedirect('..')
+    return render_to_response('~userextended/pupilImport.html', render, context_instance = RequestContext(request))
