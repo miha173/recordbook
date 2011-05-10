@@ -172,7 +172,7 @@ class Subject(RestModel):
         ordering = ['name']
 
 class SearchManager(models.Manager):
-    def __init__(self, search_fields):
+    def __init__(self, search_fields = []):
         self.search_fields = search_fields
         models.Manager.__init__(self)
     def search(self, str):
@@ -540,7 +540,7 @@ class Scholar(models.Model):
 
 class Teacher(Scholar, BaseUser):
 
-    objects = ClerkManager(['last_name', 'first_name', 'middle_name'])
+    objects = SearchManager(['last_name', 'first_name', 'middle_name'])
 
     # Завуч/директор
     edu_admin = models.BooleanField(u"Учебный администратор", default = False)
@@ -688,7 +688,7 @@ class Staff(BaseUser, Scholar):
     '''
     Модель персонала
     '''
-    objects = ClerkManager(['last_name', 'first_name', 'middle_name'])
+#    objects = SearchManager(['last_name', 'first_name', 'middle_name'])
     
     # Завуч/директор 
     edu_admin = models.BooleanField(u"Администратор", default = False)

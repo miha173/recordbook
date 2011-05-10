@@ -455,5 +455,6 @@ def import_grade(request, filter_id):
                 grades.append(Grade(number = row[0], long_name = row[1], small_name = row[2], school = school))
             if len(errors) == 0:
                 for grade in grades: grade.save()
+                # FIXME: message
                 return HttpResponseRedirect('..')
     return render_to_response('~userextended/gradeImport.html', render, context_instance = RequestContext(request))
