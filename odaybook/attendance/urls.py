@@ -7,6 +7,7 @@ urlpatterns = patterns("odaybook.attendance.views",
                        
                        (r'^timetable/select/$', 'timetableSelect'),
                        (r'^timetable/select/(?P<school>\d+)/$', 'timetableSelect'),
+                       (r'^timetable/select/(?P<school>\d+)/import/$', 'importTimetable'),
                        (r'^timetable/select/(?P<school>\d+)/set/(?P<id>\d+)/$', 'timetableSet'),
                        (r'^timetable/set/(?P<id>\d+)/$', 'timetableSet'),
                        
