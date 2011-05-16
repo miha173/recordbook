@@ -380,15 +380,27 @@ class Clerk(User, RestModel, BaseClerk):
     def save(self, init = False, safe = False, *args, **kwargs):
 
         if not self.pk or init:
-            # TODO: email
             if not self.username:
                 from random import randint
                 username = str(randint(10**6, 9999999))
                 while User.objects.filter(username = username):
                     username = str(randint(10**6, 9999999))
                 self.username = username
+            password = None
             if not self.password:
-                self.set_password("123456789")
+                password = User.objects.make_random_password(10, '1234567890')
+                self.set_password(password)
+            if self.email:
+                from django.core.mail import EmailMessage
+                from django.template.loader import render_to_string
+                from django.conf import settings
+                email  = EmailMessage(
+                        u'Вы зарегистрировались в системе электронных дневников',
+                        render_to_string('~userextended/registration_mail.html', {'user': self, 'password': password}),
+                        settings.DEFAULT_FROM_EMAIL,
+                        [self.email])
+                email.content_subtype = 'html'
+                email.send()
             super(Clerk, self).save(*args, **kwargs)
         super(Clerk, self).save(*args, **kwargs)
 
@@ -406,6 +418,23 @@ class Clerk(User, RestModel, BaseClerk):
 
     def get_current_role(self):
         return eval(self.current_role.type).objects.get(id = self.current_role.id)
+
+    def reset_password(self):
+        if self.email:
+            from django.core.mail import EmailMessage
+            from django.template.loader import render_to_string
+            from django.conf import settings
+            password = User.objects.make_random_password(10, '123456789')
+            self.set_password(password)
+            email  = EmailMessage(
+                    u'Вы сбросили пароль в системе электронных дневников',
+                    render_to_string('~userextended/password_reset_force_mail.html', {'user': self, 'password': password}),
+                    settings.DEFAULT_FROM_EMAIL,
+                    [self.email])
+            email.content_subtype = 'html'
+            email.send()
+        self.save()
+        return password
 
     class Meta:
         ordering = ['last_name', 'first_name', 'middle_name']
@@ -738,6 +767,18 @@ class Notify(models.Model):
     for_eduadmin = models.BooleanField(default = True)
     for_superviser = models.BooleanField(default = False)
     notify_start = models.DateTimeField(null = True)
+    def save(self, *args, **kwargs):
+        if self.user.email and self.type!='2':
+            from django.core.mail import EmailMessage
+            from django.template.loader import render_to_string
+            from django.conf import settings
+            email  = EmailMessage(
+                    u'Уведомление в системе электронных дневников',
+                    render_to_string('~userextended/notify_%s_mail.html' % self.type, {'user': self.user}),
+                    settings.DEFAULT_FROM_EMAIL,
+                    [self.email])
+            email.content_subtype = 'html'
+            email.send()
     def get_timedelta(self):
         if self.notify_start:
             return datetime.now() - self.notify_start

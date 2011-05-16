@@ -37,6 +37,7 @@ urlpatterns = patterns("odaybook.userextended.views",
                        (r'^baseuser/delete/(?P<id>\d+)/$', 'baseUserObjectEdit', {'mode': 'delete'}),
                        (r'^baseuser/set/(?P<id>\d+)/$', 'baseUserObjectEdit', {'mode': 'set_right'}),
                        (r'^baseuser/dismiss/(?P<id>\d+)/$', 'baseUserObjectEdit', {'mode': 'dismiss'}),
+                       (r'^baseuser/reset_password/(?P<id>\d+)/$', 'baseUserObjectEdit', {'mode': 'reset_password'}),
                        
                        (r'^uni/userextended.Grade/(?P<filter_id>\d+)/import/$', 'import_grade'),
                        (r'^uni/userextended.Teacher/(?P<filter_id>\d+)/import/$', 'import_teacher'),

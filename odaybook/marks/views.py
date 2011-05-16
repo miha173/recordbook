@@ -11,6 +11,7 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.db.models import Q
 from django.db.models.aggregates import Avg
+from django.contrib import messages
 
 from odaybook.userextended.models import Pupil, Teacher, Subject, Grade, School
 from odaybook.curatorship.models import Connection
@@ -125,7 +126,7 @@ def index(request):
                 request.user.current_grade = request.user.get_grades()[0]
                 request.user.save()
             else:
-                # FIXME: message
+                messages.error(request, u'К ван не привязано классов')
                 return HttpResponseRedirect('/')
         request.user.current_grade.get_pupils_for_teacher_and_subject(request.user, request.user.current_subject)
         

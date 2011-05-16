@@ -25,10 +25,32 @@
 					$('.sort tr').removeClass('gray');
 					$(".sort tr:nth-child(odd)").addClass("gray");
 				});
+                {% if messages %}
+                $( "#messages-box" ).dialog({
+                    modal: true,
+                    buttons: {
+                        Ok: function() {
+                            $( this ).dialog( "close" );
+                        }
+                    },
+                    height: 150,
+                });
+                {% endif %}
 				{% block js_ready %}{% endblock %}
 			});
 		</script>
     </head>
+    
+<div id="messages-box" title="Важное сообщение">
+    {% for message in messages %}
+        <p>
+            <span class="ui-icon ui-icon-circle-check" style="float:left;"></span>
+            {{ message|safe }}
+            {% if not forloop.last %};{% endif %}
+        </p>
+    {% endfor %}
+</div>
+
     <body id="{% if user.type == 'Superuser' %}admin{% endif %}">
         <!-- Все -->
         <div id="all">

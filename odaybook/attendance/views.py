@@ -8,6 +8,7 @@ from django.template.loader import render_to_string
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib import messages
 
 from odaybook import settings
 from odaybook.userextended.models import Grade, Subject, School
@@ -205,6 +206,6 @@ def importTimetable(request, school):
             if len(errors) == 0:
                 for obj in objects:
                     obj.save()
-                # FIXME: message
+                messages.success(request, u'Расписание импортировано')
                 return HttpResponseRedirect('..')
     return render_to_response('~attendance/timetableImport.html', render, context_instance = RequestContext(request))

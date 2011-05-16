@@ -39,14 +39,6 @@
         <input type="button" value="Выбрать" onclick="$.get('set/' + user_id + '/', {set_right: 'EduAdmin', 'school_id': $('#school_id').val()}, function(data){window.location.reload()})" />
     </div>
         
-        {# FIXME: messages в специальный блок #}
-{% if messages %}
-<ul class="messages">
-    {% for message in messages %}
-    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
 <table class="table">
 	<thead>
         {# FIXME: сортировка #}
@@ -93,7 +85,7 @@
                 <a href="#" onclick="$('#dialog').dialog('open'); user_id = {{ object.id }};return false;">администратор школы</a><br />
             </td>
             <td>
-                {% include "helpers/buttons/edit.html" %}
+                <a href="reset_password/{{ object.id }}/" onclick="if (!confirm('Вы уверены?')){return false}">сбросить пароль</a>, {% include "helpers/buttons/edit.html" %}
             </td>
 		</tr>
 	{% endfor %}

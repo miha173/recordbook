@@ -195,8 +195,7 @@ def baseUserObjectEdit(request, mode, filter_id = None, id = 0):
 
             if right in ['Superviser', 'Superuser']:
                 if right in clerk.get_roles_list_simple():
-                    # FIXME: сообщение
-                    pass
+                    messages.error(request, u'Права установлены ранее')
                 else:
                     if right == 'Superviser': clerk.create_role(Superviser)
                     if right == 'Superuser': clerk.create_role(Superuser)
@@ -204,8 +203,7 @@ def baseUserObjectEdit(request, mode, filter_id = None, id = 0):
             if right == 'EduAdmin':
                 school = get_object_or_404(School, id = request.GET.get('school_id', 0))
                 if clerk.has_role('EduAdmin', school):
-                    # FIXME: сообщение
-                    pass
+                    messages.error(request, u'Права установлены ранее')
                 else:
                     if clerk.has_role('Teacher', school):
                         teacher = clerk.get_role_obj('Teacher', school)[0]
@@ -238,7 +236,7 @@ def baseUserObjectEdit(request, mode, filter_id = None, id = 0):
                     superviser.delete()
                     baseuser.delete()
                 else:
-                    # FIXME: сообщение
+                    messages.error(request, u'Права уже были удалены')
                     pass
 
             if right == 'EduAdmin':
@@ -262,9 +260,17 @@ def baseUserObjectEdit(request, mode, filter_id = None, id = 0):
                 return HttpResponseRedirect(url)
             except PlaningError, (error, ):
                 render['error'] = error
-                from django.contrib import messages
                 messages.error(request, u'Удаление невозможно: %s' % error)
                 return HttpResponseRedirect(url)
+        elif mode == 'reset_password':
+            try:
+                clerk = get_object_or_404(Clerk, id = id)
+            except Clerk.DoesNotExist:
+                messages.error(request, u'Запись не найдена')
+                return HttpResponseRedirect(url)
+            password = clerk.reset_password()
+            messages.success(request, u'Пароль установлен на "%s"' % password)
+            return HttpResponseRedirect(url)
         else:
             render['form'] = ClerkForm()
         return render_to_response('~userextended/clerk.html', render, context_instance = RequestContext(request))
@@ -276,7 +282,7 @@ def baseUserObjectEdit(request, mode, filter_id = None, id = 0):
                 return HttpResponseRedirect(url)
             else:
                 render['form'] = form
-                return render_to_response('~/userextended/clerk.html', render, context_instance = RequestContext(request))
+                return render_to_response('~userextended/clerk.html', render, context_instance = RequestContext(request))
         else:
             form = ClerkForm(data = request.POST)
             if form.is_valid():
@@ -366,7 +372,6 @@ def register_clerk(request):
             if auto_login:
                 if is_parent:
                     user.create_role(Parent)
-                # FIXME: password
                 user = authenticate(username = user.username, password = '123456789')
                 login(request, user)
                 return HttpResponseRedirect(reverse('odaybook.curatorship.views.send_parent_request'))
@@ -403,7 +408,7 @@ def connect_pupil(request, school):
         pupil.school = school
         pupil.grade = grade
         pupil.save()
-        # FIXME: message
+        messages.success(request, u'Ученик прикреплён')
         return HttpResponseRedirect('/administrator/uni/userextended.Pupil/%d/' % school.id)
 
 
@@ -455,7 +460,7 @@ def import_grade(request, filter_id):
                 grades.append(Grade(number = row[0], long_name = row[1], small_name = row[2], school = school))
             if len(errors) == 0:
                 for grade in grades: grade.save()
-                # FIXME: message
+                messages.success(request, u'Классы импортированы')
                 return HttpResponseRedirect('..')
     return render_to_response('~userextended/gradeImport.html', render, context_instance = RequestContext(request))
 
@@ -532,7 +537,7 @@ def import_teacher(request, filter_id):
                     [teacher.subjects.add(sbj) for sbj in teacher._subjects]
                     [teacher.grades.add(sbj) for sbj in teacher._grades]
                     teacher.save()
-                # FIXME: message
+                messages.success(request, u'Преподаватели импортированы')
                 return HttpResponseRedirect('..')
     return render_to_response('~userextended/teacherImport.html', render, context_instance = RequestContext(request))
 
@@ -610,6 +615,6 @@ def import_pupil(request, filter_id):
             if len(errors) == 0:
                 for pupil in pupils:
                     pupil.save()
-                # FIXME: message
+                messages.success(request, u'Ученики импортированы')
                 return HttpResponseRedirect('..')
     return render_to_response('~userextended/pupilImport.html', render, context_instance = RequestContext(request))
