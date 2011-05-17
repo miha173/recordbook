@@ -51,9 +51,14 @@ class AuthenticationMiddleware(object):
         return None
     def process_response(self, request, response):
         if hasattr(request, 'user') and request.META['PATH_INFO']!='/curatorship/send-append-request/' and request.user.is_authenticated():
-            if hasattr(request.user, 'type') and request.user.type == 'Parent' and not request.user.pupils.all():
-                messages.error(request, u'К вашему профилю не добавлено ни одного ребёнка. <a href="/curatorship/send-append-request">Отправить запрос на прикрепление ребёнка.</a>')
-                return render_to_response("message.html", context_instance = RequestContext(request))
+            if hasattr(request.user, 'type') and request.user.type == 'Parent':
+                if request.user.pupils.all():
+                    if not request.user.current_pupil:
+                        request.user.current_pupil = request.user.pupils.all()[0]
+                else:
+                    messages.error(request, u'К вашему профилю не добавлено ни одного ребёнка. <a href="/curatorship/send-append-request">Отправить запрос на прикрепление ребёнка.</a>')
+                    return render_to_response("message.html", context_instance = RequestContext(request))
+
         return response
     
 class AdminPeepingMiddleware(object):
