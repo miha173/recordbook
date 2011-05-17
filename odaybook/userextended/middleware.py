@@ -53,12 +53,12 @@ class AuthenticationMiddleware(object):
         if hasattr(request, 'user') and request.META['PATH_INFO']!='/curatorship/send-append-request/' and request.user.is_authenticated():
             if hasattr(request.user, 'type') and request.user.type == 'Parent':
                 if request.user.pupils.all():
-                    if request.user.current_pupil:
+                    if not request.user.current_pupil:
                         request.user.current_pupil = request.user.pupils.all()[0]
                         request.user.save()
-                    else:
-                        messages.error(request, u'К вашему профилю не добавлено ни одного ребёнка. <a href="/curatorship/send-append-request">Отправить запрос на прикрепление ребёнка.</a>')
-                        return render_to_response("message.html", context_instance = RequestContext(request))
+                else:
+                    messages.error(request, u'К вашему профилю не добавлено ни одного ребёнка. <a href="/curatorship/send-append-request">Отправить запрос на прикрепление ребёнка.</a>')
+                    return render_to_response("message.html", context_instance = RequestContext(request))
 
         return response
     

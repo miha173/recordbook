@@ -226,6 +226,7 @@ class BaseClerk(models.Model):
         else: t = 'Clerk'
         super(BaseClerk, self).save(*args, **kwargs)
         logger.info(u'Сохранён Baseclerk#%d с synctimestamp=%d, synctimeset=%d, type=%s' % (self.id, self.sync_timestamp, self._sync_timestamp_set, t))
+        self._sync_timestamp_set = False
 
     def __unicode__(self):
         return ' '.join((self.last_name, self.first_name, self.middle_name))
@@ -413,7 +414,6 @@ class Clerk(User, RestModel, BaseClerk):
             super(Clerk, self).save(*args, **kwargs)
         super(Clerk, self).save(*args, **kwargs)
 
-#        self._sync_timestamp_set = False
 
     def add_role(self, role):
         self.roles.add(role)
@@ -557,6 +557,7 @@ def BaseUser_update(sender, instance, **kwargs):
             role.set_clerk(instance)
             role.set_roles(instance)
             role.sync_timestamp = instance.sync_timestamp
+            role._sync_timestamp_set = True
             role.save()
     logger.info(u'Сигнал для копирования из clerk отработал')
 
