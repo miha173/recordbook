@@ -220,7 +220,7 @@ class BaseClerk(models.Model):
 
     def save(self, *args, **kwargs):
         if not self._sync_timestamp_set:
-            self.sync_timestamp = int(time.time()/100000*random.randint(10000, 100000))
+            self.sync_timestamp = random.randint(1, 10000000)
             self._sync_timestamp_set = True
         if hasattr(self, 'type'): t = self.type
         else: t = 'Clerk'
@@ -375,7 +375,7 @@ class BaseClerk(models.Model):
         if baseuser not in self.roles.all():
             raise
         self.current_role = baseuser
-        self.sync_timestamp /= 2
+        self.sync_timestamp = random.randint(1, 10000000)
         self.save()
         logger.info(u'Установлен current_role %s#%d для baseuser#%d' % (baseuser.type, baseuser.id, self.id))
 
@@ -413,7 +413,7 @@ class Clerk(User, RestModel, BaseClerk):
             super(Clerk, self).save(*args, **kwargs)
         super(Clerk, self).save(*args, **kwargs)
 
-        self._sync_timestamp_set = False
+#        self._sync_timestamp_set = False
 
     def add_role(self, role):
         self.roles.add(role)
@@ -511,7 +511,7 @@ class BaseUser(BaseClerk):
 #            self.sync_timestamp = int(time.time())
 #            self._sync_timestamp_set = True
 
-        if self.sync_timestamp != self.clerk.sync_timestamp:
+        if self.sync_timestamp != self.clerk.sync_timestamp and not self._sync_timestamp_set:
             self.clerk._sync_timestamp_set = True
             self.clerk.sync_timestamp = self.sync_timestamp
             self.send_to_clerk()
