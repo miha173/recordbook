@@ -1,8 +1,10 @@
 {% extends 'page.html' %}
 
 {% block padding %}
-    <a href="/administrator/uni/userextended.School/#sch{{ school.id }}">{{ school }}</a>
-    <span>&rarr;</span>
+    {% if school %}
+        <a href="/administrator/uni/userextended.School/#sch{{ school.id }}">{{ school }}</a>
+        <span>&rarr;</span>
+    {% endif %}
     <a href="/administrator/uni/userextended.Option/{{ school.id }}/">Настройки</a>
     <span>&rarr;</span>
     <h1>Редактирование</h1>
@@ -10,5 +12,11 @@
 
 
 {% block content %}
+    <form>
+        <table><tr>
+            <td>Опция: </td>
+            <td>{{ form.instance.key_ru }}</td>
+        </tr></table>
+    </form>
 	{% include 'helpers/uniForm.html' %}
 {% endblock %}

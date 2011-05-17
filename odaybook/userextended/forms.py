@@ -47,7 +47,7 @@ class OptionForm(forms.ModelForm):
         return result
     class Meta:
         model = Option
-        fields = ['key', 'value']
+        fields = ['value']
 
 class GradeForm(forms.ModelForm):
     def __init__(self, school = None, *args, **kwargs):

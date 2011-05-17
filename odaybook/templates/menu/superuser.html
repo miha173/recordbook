@@ -1,6 +1,9 @@
-{% if path == 'userextended_baseuser' %}
-    <big class="blue">Аккаунты</big>{% else %}<a href="/accounts/baseuser/">Аккаунты</a>
+{% if path == 'baseuser' %}
+    <big class="green">Аккаунты</big>{% else %}<a href="/accounts/baseuser/">Аккаунты</a>
 {% endif %}
-{% if path == 'userextended_schools' %}
+{% if path == 'userextended.School' %}
     <big class="yellow">Школы</big>{% else %}<a href="/accounts/uni/userextended.School/">Школы</a>
+{% endif %}
+{% if path == 'userextended.Option' %}
+    <big class="red">Настройки</big>{% else %}<a href="/accounts/uni/userextended.Option/">Настройки</a>
 {% endif %}

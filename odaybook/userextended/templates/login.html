@@ -20,10 +20,7 @@
   </div> 
   {% if form.errors %}
 	  <div class="errorExplanation" id="errorExplanation">
-	  	<h2>Возникли ошибки при заполнении формы</h2>
-	  	<ul>
-	  		{{ form.errors }}
-	  	</ul>
+	  	<h2>Неправильное имя пользователя или пароль</h2>
 	  </div>
   {% endif %}
   <form action="." class="new_user_session" id="new_user_session" method="post">

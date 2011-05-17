@@ -9,7 +9,7 @@ from django.db import models
 from django.db.models import Q
 from django.db.models.aggregates import Avg
 from django.contrib.auth.models import User, UserManager
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_syncdb
 from django.dispatch import receiver
 
 from odaybook.rest.models import RestModel, RestModelManager
@@ -88,10 +88,19 @@ class School(RestModel):
             for subject in subjects: Subject(school = self, name = subject).save()
 
 class Option(models.Model):
-    key = models.CharField(max_length = 255, verbose_name = u'Настройка')
-    value = models.CharField(max_length = 255, verbose_name = u'Значение')
+    key = models.CharField(max_length = 255, verbose_name = u'Ключ')
+    key_ru = models.CharField(max_length = 255, verbose_name = u'Настройка')
+    value = models.CharField(max_length = 255, verbose_name = u'Значение', null = True, blank = True)
     school = models.ForeignKey(School, verbose_name = u'Школа', null = True, blank = True)
 
+def SystemInitCallback(sender, **kwargs):
+    options = [
+        {'key': 'vnc_link', 'key_ru': u'Ссылка на приложение ТП', 'value': Null},
+    ]
+    for option in options:
+        Option(**option).save()
+
+post_syncdb.connect(SystemInitCallback, sender = Option)
 
 class Grade(RestModel):
     u'Классы в школах'

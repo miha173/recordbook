@@ -4,7 +4,7 @@ import datetime
 
 from django.contrib.auth import get_user
 from django.http import HttpResponse
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, get_object_or_404
 from django.contrib import messages
 from django.template import RequestContext
 
@@ -55,3 +55,13 @@ class AuthenticationMiddleware(object):
                 messages.error(request, u'К вашему профилю не добавлено ни одного ребёнка. <a href="/curatorship/send-append-request">Отправить запрос на прикрепление ребёнка.</a>')
                 return render_to_response("message.html", context_instance = RequestContext(request))
         return response
+    
+class AdminPeepingMiddleware(object):
+    def process_request(self, request):
+        from django.http import HttpResponseRedirect, HttpResponse, Http404
+        if int(request.COOKIES.get('zombie', False)):
+            if not request.user.type != 'SuperUser': raise Http404('not superuser')
+            user = request.COOKIES.get('zombie')
+            user = get_object_or_404(Clerk, id = user)
+            if not user.current_role: user.current_role = user.roles.all()[0]
+            request.user = user.get_current_role()

@@ -74,6 +74,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
                                'odaybook.context_processors.plural',
                                'odaybook.context_processors.menu',
                                'odaybook.context_processors.environment',
+                               'odaybook.userextended.context_processors.env',
                                'django.contrib.messages.context_processors.messages',
                                )
 
@@ -83,6 +84,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     #'django.contrib.auth.middleware.AuthenticationMiddleware',
     'odaybook.userextended.middleware.AuthenticationMiddleware',
+    'odaybook.userextended.middleware.AdminPeepingMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
 )
 

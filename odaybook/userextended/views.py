@@ -46,6 +46,14 @@ def objectList(request, app, model, filter_id = None):
             ext['grade__school'] = get_object_or_404(School, id = filter_id)
     elif app_model == 'userextended.Clerk':
         pass
+    elif app_model == 'userextended.Option':
+        if request.user.type == 'Teacher':
+            ext['school'] = request.user.school
+        elif request.user.type == 'Superuser':
+            if filter_id:
+                ext['school'] = get_object_or_404(School, id = filter_id)
+            else:
+                ext['school'] = None
     else:
         if request.user.type == 'Teacher':
             ext['school'] = request.user.school
@@ -114,6 +122,14 @@ def objectEdit(request, app, model, mode, filter_id = None, id = 0):
             ext['grade__school'] = request.user.school
         elif request.user.type == 'Superuser':
             ext['grade__school'] = get_object_or_404(School, id = filter_id)
+    elif app_model == 'userextended.Option':
+        if request.user.type == 'Teacher':
+            ext['school'] = request.user.school
+        elif request.user.type == 'Superuser':
+            if filter_id:
+                ext['school'] = get_object_or_404(School, id = filter_id)
+            else:
+                ext['school'] = None
     else:
         if request.user.type == 'Teacher':
             ext['school'] = request.user.school

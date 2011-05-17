@@ -6,7 +6,7 @@ from django.core.context_processors import request
 from django.core.signals import request_started
 
 from odaybook.curatorship.models import Connection
-from odaybook.userextended.models import Subject
+from odaybook.userextended.models import Subject, Option
 
 from odaybook import settings
 
@@ -49,6 +49,12 @@ def environment(request):
             render['subjects'] = subjects
         elif request.user.type == 'Pupil':
             render['subjects'] = user.get_subjects()
+
+        if user.type not in ['Pupil', 'Parent']:
+            try:
+                render['vnc_link'] = Option.objects.get(key = 'vnc_link')
+            except Option.DoesNotExist:
+                pass
     render['current_year'] = date.today().year
     return render
 

@@ -67,7 +67,19 @@
                     <div id="user">
                         <big>{{ user.fio }}</big>
                     </div>
+                    {% comment %}
+                    <div style="float: right; font-size: 0.8em;margin: 0.5em 20px 1.5em 37px;">
+
+                    </div>
+                    {%  endcomment %}
                     <div id="exit">
+                    <table>
+                        {% if vnc_link.value %}
+                            <tr><td>
+                                <a href="{{ vnc_link.value }}" style="background: none; float: right;">Техническая поддержка</a>
+                            </td></tr>
+                        {% endif %}
+                        <tr><td>
                     {% if user.roles.all.count > 1 %}
                     <ul id="change_user_mode" class="menu">
                         <li><a href="#" onclick="$('#change_user_mode').toggleClass('menu_on');return false">
@@ -109,7 +121,14 @@
                     </ul>
                     {% endif %}
                         <a href="/accounts/password_change/">Смена пароля</a>
-                        <a href="/accounts/logout">Выход</a>
+                        {% if zombie %}
+                            <a href="#" onclick="document.cookie='zombie=0;path=/;';document.location='/';return false;">Выход</a>
+                        {% else %}
+                            <a href="/accounts/logout">Выход</a>
+                        {% endif %}
+                        </td></tr>
+                    </table>
+
                     </div>
                 {% endif %}
                 <div class="clear">
