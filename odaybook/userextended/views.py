@@ -240,8 +240,12 @@ def baseUserObjectEdit(request, mode, filter_id = None, id = 0):
             if right not in ['Superuser', 'Superviser', 'EduAdmin', 'Teacher']: raise Http404
 
             if right == 'Superuser':
-                clerk.is_superuser = False
+                superuser = clerk.get_role_obj('Superuser')[0]
+                baseuser = BaseUser.objects.get(id = superuser.id)
+                clerk.roles.remove(baseuser)
                 clerk.save()
+                superuser.delete()
+                baseuser.delete()
 
             if right == 'Superviser':
                 if 'Superviser' in clerk.get_roles_list_simple():
