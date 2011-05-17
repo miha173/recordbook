@@ -55,6 +55,7 @@ class AuthenticationMiddleware(object):
                 if request.user.pupils.all():
                     if request.user.current_pupil:
                         request.user.current_pupil = request.user.pupils.all()[0]
+                        request.user.save()
                     else:
                         messages.error(request, u'К вашему профилю не добавлено ни одного ребёнка. <a href="/curatorship/send-append-request">Отправить запрос на прикрепление ребёнка.</a>')
                         return render_to_response("message.html", context_instance = RequestContext(request))
