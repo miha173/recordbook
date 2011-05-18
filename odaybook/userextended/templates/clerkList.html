@@ -85,8 +85,8 @@
                 <a href="#" onclick="$('#dialog').dialog('open'); user_id = {{ object.id }};return false;">администратор школы</a><br />
             </td>
             <td>
-                <a href="#" onclick="document.cookie='zombie={{ object.id }};path=/;';document.location='/';return false;">войти</a>,
-                <a href="reset_password/{{ object.id }}/" onclick="if (!confirm('Вы уверены?')){return false}">сбросить пароль</a>,
+                <a href="#" onclick="document.cookie='zombie={{ object.id }};path=/;';document.location='/';return false;" title="войти"><img src="{{ MEDIA_URL }}/images/mask.png" /></a>
+                <a href="reset_password/{{ object.id }}/" onclick="if (!confirm('Вы уверены?')){return false}" title="сбросить пароль"><img src="{{ MEDIA_URL }}/images/password-red.png" /></a>
                 {% include "helpers/buttons/edit.html" %}
             </td>
 		</tr>
