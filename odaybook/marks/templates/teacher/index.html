@@ -129,7 +129,14 @@ lesson_id = 0;
 </table>
 <script type="text/javascript">
 	var active = null;
-	function hide_inputs(){ $('td.for-mark input').remove() }
+	function hide_inputs(){
+        $('td.for-mark').each(function(){
+            $(this).children('input').remove();
+            if ($(this).attr('mark')!='true'){
+                $(this).html('<div class="' + $(this).attr('mark-class') + '">' + $(this).attr('mark') + '</div>');
+            }
+        });
+    }
 	function init_mark_input(id){
 		mark = $('#' + id.replace('m-', '')).children('div');
 		if(mark.html()){
