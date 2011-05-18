@@ -323,7 +323,8 @@ def clerkAppendRole(request):
     render = {}
     render['step'] = request.GET.get('step', '1')
     render['username'] = request.POST.get('username', '')
-    render['school'] = request.GET.get('school', '1')
+    render['school'] = request.GET.get('school', '0')
+    render['schoolObj'] = get_object_or_404(School, id = request.GET.get('school', '0'))
 
     if request.GET.get('step', '1') == '1':
         if request.method == 'POST':

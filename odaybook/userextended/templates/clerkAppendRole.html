@@ -1,11 +1,10 @@
 {% extends 'page.html' %}
 
 {% block padding %}
-{% comment %}
-    <a href="/accounts/baseuser/">Аккаунты</a>
+    <a href="/administrator/uni/userextended.School/#sch{{ schoolObj.id }}">{{ schoolObj }}</a>
     <span>&rarr;</span>
-    <h1>Редактирование</h1>
-{% endcomment %}
+    <a href="/administrator/uni/userextended.Teacher/{{ schoolObj.id }}/">Учителя</a>
+    <span>&rarr;</span>
     {% if step == '1' %}
         <h1>Проверка пользователя</h1>
     {% endif %}

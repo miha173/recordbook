@@ -71,7 +71,21 @@
 				</h2>
 			</td>
 		</tr>
-		<tr>
+        <tr>
+            <td>
+                {% if school.show.subjects %}
+                    <a href="/administrator/uni/userextended.Subject/{{ school.id }}/">Предметы</a>
+                {% else %}
+                    Предметы
+                {% endif %}
+            </td>
+            <td>
+                {% if school.show.grades %}
+                    <a href="/administrator/uni/userextended.Grade/{{ school.id }}/">Классы</a>
+                {% else %}
+                    Классы
+                {% endif %}
+            </td>
 			<td>
 				{% if school.show.pupils %}
 					<a href="/administrator/uni/userextended.Pupil/{{ school.id }}/">Ученики</a>
@@ -79,6 +93,8 @@
 					Ученики
 				{% endif %}
 			</td>
+        </tr>
+		<tr>
 			<td>
 				{% if school.show.teachers %}
 					<a href="/administrator/uni/userextended.Teacher/{{ school.id }}/">Учителя</a>
@@ -86,6 +102,13 @@
 					Учителя
 				{% endif %}
 			</td>
+            <td>
+                {% if school.show.connections %}
+                  <a href="/administrator/uni/curatorship.Connection/{{ school.id }}/">Связки</a>
+                {% else %}
+                  Связки
+                {% endif %}
+            </td>
 			<td>
                 {% comment %}
 				{% if school.show.staff %}
@@ -104,29 +127,6 @@
 				{% else %}
 					Расписания
 				{% endif %}
-			</td>
-		</tr>
-		<tr>
-			<td>
-				{% if school.show.subjects %}
-					<a href="/administrator/uni/userextended.Subject/{{ school.id }}/">Предметы</a>
-				{% else %}
-					Предметы
-				{% endif %}
-			</td>
-			<td>
-				{% if school.show.grades %}
-					<a href="/administrator/uni/userextended.Grade/{{ school.id }}/">Классы</a>
-				{% else %}
-					Классы
-				{% endif %}
-			</td>
-			<td>
-		        {% if school.show.connections %}
-		          <a href="/administrator/uni/curatorship.Connection/{{ school.id }}/">Связки</a>
-		        {% else %}
-		          Связки
-		        {% endif %}
 			</td>
 		</tr>
     {% comment %}
