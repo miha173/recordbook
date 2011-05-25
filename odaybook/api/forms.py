@@ -50,7 +50,7 @@ class MarkRestForm(forms.ModelForm):
 class ResultDateRestForm(forms.ModelForm):
     class Meta:
         model = ResultDate
-        fields = ['name', 'school', 'period', 'startdate', 'enddate', 'grades']
+        fields = ['name', 'school', 'date', 'grades']
 
 class ResultRestForm(forms.ModelForm):
     class Meta:
