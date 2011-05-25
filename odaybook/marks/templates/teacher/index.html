@@ -15,9 +15,12 @@ lesson_id = 0;
 		buttons: {
 			"Закрыть": function() { 
 				$.get('?set_lesson=1&lesson=' + lesson_id, $('#lesson_form').serializeArray());
+                if ($('#id_topic').val()!='') {
+                    $('#lesson-' + lesson_id).removeClass('red');
+                }
 				$('#id_topic').val('');
 				$('#id_task').val('');
-				$(this).dialog("close"); 
+				$(this).dialog("close");
 				$('lesson_form').css('display', 'none');
 			}, 
 		},
@@ -110,7 +113,7 @@ lesson_id = 0;
             {% if lesson.resultdate %}
                 <th>{{ lesson.resultdate }}</th>
             {% else %}
-                <th><a style="border-bottom: 1px #0E90B8 dotted; text-decoration: none;" href="#" class="dialog_link" lesson="{{ lesson.id }}">{{ lesson.date|date:"d" }}</a></th>
+                <th><a id="lesson-{{ lesson.id }}" href="#" class="ajax dialog_link{% if not lesson.topic %} red{% endif %}" lesson="{{ lesson.id }}">{{ lesson.date|date:"d" }}</a></th>
             {% endif %}
 		{% endfor %}
 	</tr></thead>

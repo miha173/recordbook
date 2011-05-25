@@ -866,3 +866,13 @@ table fieldset li, table.form li{
 legend{
 	margin: 0 5px;
 }
+
+a.ajax{
+    border-bottom: 1px #0E90B8 dotted!important;
+    text-decoration: none!important;
+    color: #0E90B8!important;
+}
+
+a.red{
+    color: #ff0000!important;
+}
