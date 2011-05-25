@@ -79,7 +79,7 @@ lesson_id = 0;
 			<tbody>
 				{% for gr in user.get_grades_for_marks %}
 					<tr><td>
-						<ul
+						<ul>
 							<li>
                                 {% if gr == user.current_grade %}
                                     {{ gr }}
@@ -108,7 +108,7 @@ lesson_id = 0;
 		<th></td>
 		{% for lesson in lessons %}
             {% if lesson.resultdate %}
-                <th><a style="border-bottom: 1px #0E90B8 dotted; text-decoration: none;" href="#" class="dialog_link" lesson="{{ lesson.id }}">{{ lesson.resultdate }}</a></th>
+                <th>{{ lesson.resultdate }}</th>
             {% else %}
                 <th><a style="border-bottom: 1px #0E90B8 dotted; text-decoration: none;" href="#" class="dialog_link" lesson="{{ lesson.id }}">{{ lesson.date|date:"d" }}</a></th>
             {% endif %}
@@ -165,6 +165,8 @@ lesson_id = 0;
 				$.get('?', {pupil: $(this).attr('pupil'), lesson: $(this).attr('lesson'), 'mark': mark.children('input').val(), 'set_mark': 1}, function(data){
 					if (data.mark!='no'){
 						$('#' + data.id).html(data.mark);
+						$('#' + data.id).attr('mark', 'true');
+						$('#' + data.id).attr('mark-class', 'mark-' + data.mark_type);
 					}
 				}, 'json');
 			}

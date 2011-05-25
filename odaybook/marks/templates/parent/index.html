@@ -16,7 +16,13 @@
   <tr>
     <th class="active">Уроки</th>
 	{% for date in dates %}
-	    <th style="padding-right: 10px;">{{ date|date:"d.m" }}</th>
+	    <th style="padding-right: 10px;">
+            {% if date.resultdate %}
+                {{ date.resultdate }}
+            {% else %}
+                {{ date|date:"d.m" }}
+            {% endif %}
+        </th>
 	{% endfor %}
     <th>Средний балл</th>
     <th>Учителя</th>

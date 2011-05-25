@@ -23,12 +23,14 @@ from forms import LessonForm, MarkForm, ResultForm, DeliveryForm, StatForm, Mark
 
 @login_required
 def index(request):
+    class ExtendedDate(date):
+        pass
     render = {}
     if request.user.type == 'Parent':
         dates = []
         start = date.today() - timedelta(weeks = 2)
         end = date.today() + timedelta(days = 1)
-        if request.method == 'GET': 
+        if request.method == 'GET':
             render['form'] = form = StatForm()
         else:
             render['form'] = form = StatForm(request.POST)
@@ -37,6 +39,10 @@ def index(request):
                 end = form.cleaned_data['end']
         temp = start
         while temp != end:
+            temp = ExtendedDate.fromordinal(temp.toordinal())
+            resultdates = ResultDate.objects.filter(grades = request.user.current_pupil.grade, date = temp)
+            if resultdates:
+                temp.resultdate = resultdates[0]
             dates.append(temp)
             temp += timedelta(days = 1)
         marks = []
@@ -118,7 +124,7 @@ def index(request):
             else:
                 m.mark = int(mark)
             m.save()
-            return HttpResponse(demjson.encode({'id': tr_id, 'mark': get_mark(pupil, lesson)}, encoding = 'utf-8'))
+            return HttpResponse(demjson.encode({'id': tr_id, 'mark': get_mark(pupil, lesson), 'mark_value': str(m).strip(), 'mark_type': m.get_type()}, encoding = 'utf-8'))
         
         from pytils import dt
         if not request.user.current_grade:
