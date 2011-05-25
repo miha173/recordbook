@@ -1,8 +1,14 @@
 {% extends 'page.html' %}
 
+
 {% block padding %}
-    <a href="/administrator/uni/userextended.School/#sch{{ school.id }}">{{ school }}</a>
-    <span>&rarr;</span>
+    {%  if school %}
+        <a href="/administrator/uni/userextended.School/#sch{{ school.id }}">{{ school }}</a>
+        <span>&rarr;</span>
+    {% else %}
+        <a href="/administrator/uni/userextended.School/">Школы</a>
+        <span>&rarr;</span>
+    {% endif %}
     <h1>Периоды</h1>
     <table><tr style="vertical-align: baseline;"><td>
 		<a href="add/">Добавить период</a>
@@ -15,14 +21,14 @@
 	<thead>
 		<th>Период</th>
 		<th>Дата окончания</th>
-		<th>Классы</th>
+		{% if school %}<th>Классы</th>{% endif %}
 		<th>Действия</th>
 	</thead>
 	{% for object in objects.object_list %}
 		<tr class="{% cycle 'gray' '' %}">
-			<td>{{ object.get_period_display }}</td>
-			<td>{{ object.enddate|date:"d.n.Y" }}</td>
-			<td>{% for grade in object.grades.all %}{{ grade }}; {% endfor %}</td>
+			<td>{{ object.name }}</td>
+			<td>{{ object.date|date:"d.m.Y" }}</td>
+			{% if school %}<td>{% for grade in object.grades.all %}{{ grade }}; {% endfor %}</td>{% endif %}
 			<td>{% include "helpers/buttons/edit.html" %}</td>
 	{% endfor %}
 </table>

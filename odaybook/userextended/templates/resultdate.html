@@ -1,8 +1,17 @@
 {% extends 'page.html' %}
 
+{% block  js_ready %}
+    $("#id_date").datepicker($.datepicker.regional["ru"]);
+{% endblock %}
+
 {% block padding %}
-    <a href="/administrator/uni/userextended.School/#sch{{ school.id }}">{{ school }}</a>
-    <span>&rarr;</span>
+    {% if school %}
+        <a href="/administrator/uni/userextended.School/#sch{{ school.id }}">{{ school }}</a>
+        <span>&rarr;</span>
+    {% else %}
+        <a href="/administrator/uni/userextended.School/">Школы</a>
+        <span>&rarr;</span>
+    {% endif %}
     <a href="/administrator/uni/marks.ResultDate/{{ school.id }}/">Итоговые периоды</a>
     <span>&rarr;</span>
     <h1>Редактирование</h1>

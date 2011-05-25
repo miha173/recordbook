@@ -107,7 +107,11 @@ lesson_id = 0;
 		<tr>
 		<th></td>
 		{% for lesson in lessons %}
-			<th><a style="border-bottom: 1px #0E90B8 dotted; text-decoration: none;" href="#" class="dialog_link" lesson="{{ lesson.id }}">{{ lesson.date|date:"d" }}</a></th>
+            {% if lesson.resultdate %}
+                <th><a style="border-bottom: 1px #0E90B8 dotted; text-decoration: none;" href="#" class="dialog_link" lesson="{{ lesson.id }}">{{ lesson.resultdate }}</a></th>
+            {% else %}
+                <th><a style="border-bottom: 1px #0E90B8 dotted; text-decoration: none;" href="#" class="dialog_link" lesson="{{ lesson.id }}">{{ lesson.date|date:"d" }}</a></th>
+            {% endif %}
 		{% endfor %}
 	</tr></thead>
 	<tbody>

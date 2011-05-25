@@ -6,6 +6,7 @@ from odaybook.userextended.models import Pupil, Teacher, Subject, Grade, School
 from odaybook import settings
 
 class LessonManager(RestModelManager):
+    # FIXME
     def search(self, str):
         values = []
         a = super(LessonManager, self).get_query_set().filter(grade__long_name__contains = str)
@@ -25,11 +26,13 @@ class Lesson(RestModel):
     subject = models.ForeignKey(Subject, verbose_name = u'Предмет')
     grade = models.ManyToManyField(Grade, verbose_name = u'Класс')
     file = models.FileField(verbose_name = u'Приложить файл', null = True, blank = True, upload_to = 'lessons')
+    resultdate = models.ForeignKey('ResultDate', null = True, blank = True)
 
     serialize_fields = ['id', 'teacher_id', 'date', 'topic', 'task', 'subject_id', 'grade']
     serialize_name = 'lesson'
     
     class Meta:
+        # FIXME: unics
         ordering = ['-date']
     def delete(self):
         Mark.objects.filter(lesson = self).delete()
@@ -70,28 +73,22 @@ class Mark(RestModel):
     class Meta:
         ordering = ['-date']
 
-class ResultDate(RestModel):
-    school = models.ForeignKey(School)
+class ResultDate(models.Model):
+    school = models.ForeignKey(School, null = True, blank = True)
     name = models.CharField(max_length=255, verbose_name = u'Имя периода', null = True, blank = True)
-    period = models.CharField(u'Итоговый период', max_length = 1, choices = (('1', u'1 четверть'),
-                                                                       ('2', u'2 четверть'),
-                                                                       ('5', u'1 полугодие'),
-                                                                       ('3', u'3 четверть'),
-                                                                       ('4', u'4 четверть'),
-                                                                       ('6', u'2 полугодие'),
-                                                                       ))
-    startdate = models.DateField(verbose_name = u'Дата начала периода')
-    enddate = models.DateField(verbose_name = u'Дата подведения итога')
+    date = models.DateField(verbose_name = u'Дата подведения итога')
     grades = models.ManyToManyField(Grade, verbose_name = u'Классы')
 
-    serialize_fields = ['id', 'name', 'school_id', 'period', 'startdate', 'enddate', 'grades']
-    serialize_name = 'resultdate'
-    
+    def save(self, *args, **kwargs):
+        pk = self.pk
+        super(ResultDate, self).save(*args, **kwargs)
+        if not self.school and not pk:
+            from odaybook.userextended.models import School
+            for school in School.objects.all():
+                ResultDate(school = school, name = self.name, date = self.date).save()
+
     class Meta:
-        ordering = ['enddate']
-    def delete(self):
-        Result.objects.filter(resultdate = self).delete()
-        super(ResultDate, self).delete()
+        ordering = ['date']
     def __unicode__(self):
         return self.name
 
@@ -103,4 +100,3 @@ class Result(RestModel):
 
     serialize_fields = ['id', 'resultdate_id', 'subject_id', 'pupil_id', 'mark']
     serialize_name = 'result'
-    

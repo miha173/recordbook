@@ -163,6 +163,21 @@ def index(request):
                         t.save()
                         t.grade.add(request.user.current_grade)
                         t.save()
+            resultdates = ResultDate.objects.filter(date = d, grades = request.user.current_grade)
+            if resultdates:
+                resultdate = resultdates[0]
+                kwargs4lesson = {
+                    'resultdate': resultdate,
+                    'grade': request.user.current_grade,
+                    'subject': request.user.current_subject,
+                    'teacher': request.user
+                }
+                if not Lesson.objects.filter(**kwargs4lesson):
+                    del kwargs4lesson['grade']
+                    lesson = Lesson(topic = resultdate.name, date = resultdate.date, **kwargs4lesson)
+                    lesson.save()
+                    lesson.grade.add(request.user.current_grade)
+                    lesson.save()
 
         if len(kwargs4lesson) == 0: raise Http404(u'Нет расписания')
 
@@ -171,8 +186,8 @@ def index(request):
         for lesson in Lesson.objects.filter(**kwargs4lesson).order_by('date'):
             monthes[lesson.date.month] = (dt.ru_strftime(u'%B', lesson.date), monthes[lesson.date.month][1] + 1)
             lessons_range.append(lesson)
-        
-        for i in monthes.keys(): 
+
+        for i in monthes.keys():
             if monthes[i][1] == 0: del monthes[i]
         render['lessons'] = lessons_range
         

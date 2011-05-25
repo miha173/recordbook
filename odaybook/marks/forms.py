@@ -91,14 +91,18 @@ class ResultDateForm(forms.ModelForm):
         super(ResultDateForm, self).__init__(*args, **kwargs)
         self.school = school
         self.fields['grades'].widget = forms.CheckboxSelectMultiple()
+        self.fields['grades'].help_text = ''
         self.fields['grades'].queryset = Grade.objects.filter(school = school)
+        self.fields['date'].widget.format = '%d.%m.%Y'
+        if not school:
+            del self.fields['grades']
     class Meta:
         model = ResultDate
-        fields = ['name', 'period', 'startdate', 'enddate', 'grades']
+        fields = ['name', 'date', 'grades']
     def save(self):
         result = super(ResultDateForm, self).save(commit = False)
         result.school = self.school
         result.save()
+        self.save_m2m()
         return result
-    startdate = forms.DateField(('%d.%m.%y',), label = u'Дата начала периода', widget=forms.DateTimeInput(format='%d.%m.%y'))
-    enddate = forms.DateField(('%d.%m.%y',), label = u'Дата подведения итога', widget=forms.DateTimeInput(format='%d.%m.%y'))
+    date = forms.DateField(('%d.%m.%y','%d.%m.%Y',), label = u'Дата подведения итога')

@@ -54,6 +54,11 @@ def objectList(request, app, model, filter_id = None):
                 ext['school'] = get_object_or_404(School, id = filter_id)
             else:
                 ext['school'] = None
+    elif app_model == 'marks.ResultDate':
+        if request.user.type == 'Superuser':
+            ext['school'] = None
+        else:
+            ext['school'] = request.user.school
     else:
         if request.user.type == 'Teacher':
             ext['school'] = request.user.school
@@ -66,7 +71,7 @@ def objectList(request, app, model, filter_id = None):
             'userextended.Grade', 'userextended.Subject', 'userextended.Pupil',
             'userextended.Teacher', 'userextended.Staff', 'userextended.School',
             'userextended.Option', 'userextended.Achievement', 'marks.ResultDate',
-            'curatorship.Connection'
+            'curatorship.Connection', 'marks.ResultDate',
     ]
     if request.user.type == 'Superuser': allowed_apps += 'userextended.Clerk', 
     if app + '.' + model not in allowed_apps:
@@ -106,7 +111,7 @@ def objectEdit(request, app, model, mode, filter_id = None, id = 0):
             'userextended.Grade', 'userextended.Subject', 'userextended.Pupil',
             'userextended.Teacher', 'userextended.Staff', 'userextended.School',
             'userextended.Option', 'userextended.Achievement', 'marks.ResultDate',
-            'curatorship.Connection',
+            'curatorship.Connection', 'marks.ResultDate',
     ]
     if app + '.' + model not in allowed_apps: raise Http404('Object not allowed')
     template = render['object_name'] = model.lower()
@@ -117,6 +122,9 @@ def objectEdit(request, app, model, mode, filter_id = None, id = 0):
         if request.user.type == 'Teacher':
            if int(id) != request.user.school.id:
                raise Http404(u'Не та школа')
+        else:
+            if app_model == 'marks.ResultDate':
+                ext['school'] = None
     elif app_model == 'curatorship.Connection':
         if request.user.type == 'Teacher':
             ext['grade__school'] = request.user.school
@@ -130,6 +138,11 @@ def objectEdit(request, app, model, mode, filter_id = None, id = 0):
                 ext['school'] = get_object_or_404(School, id = filter_id)
             else:
                 ext['school'] = None
+    elif app_model == 'marks.ResultDate':
+        if request.user.type == 'Teacher':
+            ext['school'] = request.user.school
+        elif request.user.type == 'Superuser':
+            ext['school'] = None
     else:
         if request.user.type == 'Teacher':
             ext['school'] = request.user.school
