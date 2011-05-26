@@ -9,12 +9,53 @@
 {% endblock %}
 
 {% block content %}
-	{{ valid }}
-	{{ form.errors }}
-	<form method="post" action=".">
-	<table class="table">
-		{{ form.get_fields|safe }}
-	<tr><td colspan="3"><input type="submit" /></td></tr>
-	</table>
-	</form>
+	<table class="no-hover">
+    <tr>
+        <td id="subjects">
+            Выберите предмет:
+            {% for subject in subjects %}
+                {% if subject.groups %}
+                    <div subject="{{ subject.id }}" class="dndbar">{{ subject }} (весь класс)</div>
+                    {% for group in subject.get_groups %}
+                        <div subject="{{ subject.id }}" class="dndbar">{{ subject }} ({{ group }} гр.)</div>
+                    {% endfor %}
+                {% else %}
+                    <div subject="{{ subject.id }}" class="dndbar">{{ subject }}</div>
+                {% endif %}
+            {% endfor %}
+        </td>
+        <td>
+
+            <table class="attendance-editor-table">
+                <thead>
+                    <th colspan="2">Понедельник</th>
+                </thead>
+                {% for lesson in lessons %}
+                    <tr>
+                        <th>{{ lesson.1 }}</th>
+                        <td></td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </td>
+    </tr>
+    </table>
+    <script type="text/javascript">
+    $( "div.dndbar" ).draggable({
+			appendTo: "body",
+			helper: "clone"
+	});
+    $( "table.attendance-editor-table tr td" ).droppable({
+/*        activeClass: "ui-state-default",
+        hoverClass: "ui-state-hover",
+        accept: ":not(.ui-sortable-helper)",
+*/        drop: function( event, ui ) {
+            $('<div class="dndbar"></div>').text(ui.draggable.text()).attr('subject', ui.draggable.attr('subject')).appendTo( this );
+            $( "table.attendance-editor-table div.dndbar" ).draggable({
+                    appendTo: "body",
+                    stop: function(){$(this).remove();}
+            });
+        }
+	})
+    </script>
 {% endblock %}

@@ -49,41 +49,48 @@ def timetableSet(request, id, school = 0):
     else:
         school = request.user.school
     render['school'] = school
-    grade = get_object_or_404(Grade, id = id, school = school)
-    form = TimetableForm()
-    for day in settings.WORKDAYS:
-        if not school.saturday and day[0] == 6: continue 
-        for lesson in settings.LESSON_NUMBERS:
-            for i in xrange(1, 3):
-                room = ''
-                subject = None
-                if UsalTimetable.objects.filter(grade = grade, number = lesson[0], group = i, school = school, workday = day[0]).count() != 0:
-                    u = UsalTimetable.objects.get(grade = grade, number = lesson[0], group = i, school = school, workday = day[0])
-                    room = u.room
-                    subject = u.subject.id
-                form.fields['l_r_%s_%s_%d' % (day[0], lesson[0], i)] = forms.CharField(initial = room, required = False)
-#                form.fields['l_s_%s_%s_%d' % (day[0], lesson[0], i)] = forms.CharField(initial = room, required = False)
-                form.fields['l_s_%s_%s_%d' % (day[0], lesson[0], i)] = forms.ModelChoiceField(initial = subject, queryset = grade.get_subjects_queryset(), required = False)
-    if request.method == 'POST':
-        form.initial = request.POST
-        for day in settings.WORKDAYS:
-            if not school.saturday and day[0] == 6: continue 
-            for lesson in settings.LESSON_NUMBERS:
-                for i in xrange(1, 3):
-                    subject = request.POST.get('l_s_%s_%s_%d' % (day[0], lesson[0], i), '')
-                    if subject == '': 
-                        if UsalTimetable.objects.filter(grade = grade, number = lesson[0], group = i, school = school, workday = day[0]).count() != 0:
-                            UsalTimetable.objects.filter(grade = grade, number = lesson[0], group = i, school = school, workday = day[0]).delete()
-                        continue
-                    subject = get_object_or_404(Subject, id = subject, school = school)
-                    if UsalTimetable.objects.filter(grade = grade, number = lesson[0], group = i, school = school, workday = day[0]).count() == 0:
-                        tt = UsalTimetable(grade = grade, number = lesson[0], group = i, school = school, workday = day[0])
-                    else:
-                        tt = UsalTimetable.objects.get(grade = grade, number = lesson[0], group = i, school = school, workday = day[0])
-                    tt.subject = subject
-                    tt.room = request.POST.get('l_r_%s_%s_%d' % (day[0], lesson[0], i), '')
-                    tt.save()
-    render['form'] = form
+    render['grade'] = grade = get_object_or_404(Grade, id = id, school = school)
+    render['workdays'] = settings.WORKDAYS
+    render['lessons'] = settings.LESSON_NUMBERS
+    render['subjects'] = grade.get_subjects()
+
+
+#    form = TimetableForm()
+#    for day in settings.WORKDAYS:
+#        if not school.saturday and day[0] == 6: continue
+#        for lesson in settings.LESSON_NUMBERS:
+#            for i in xrange(1, 3):
+#                room = ''
+#                subject = None
+#                if UsalTimetable.objects.filter(grade = grade, number = lesson[0], group = i, school = school, workday = day[0]).count() != 0:
+#                    u = UsalTimetable.objects.get(grade = grade, number = lesson[0], group = i, school = school, workday = day[0])
+#                    room = u.room
+#                    subject = u.subject.id
+#                form.fields['l_r_%s_%s_%d' % (day[0], lesson[0], i)] = forms.CharField(initial = room, required = False)
+##                form.fields['l_s_%s_%s_%d' % (day[0], lesson[0], i)] = forms.CharField(initial = room, required = False)
+#                form.fields['l_s_%s_%s_%d' % (day[0], lesson[0], i)] = forms.ModelChoiceField(initial = subject, queryset = grade.get_subjects_queryset(), required = False)
+#    if request.method == 'POST':
+#        form.initial = request.POST
+#        for day in settings.WORKDAYS:
+#            if not school.saturday and day[0] == 6: continue
+#            for lesson in settings.LESSON_NUMBERS:
+#                for i in xrange(1, 3):
+#                    subject = request.POST.get('l_s_%s_%s_%d' % (day[0], lesson[0], i), '')
+#                    if subject == '':
+#                        if UsalTimetable.objects.filter(grade = grade, number = lesson[0], group = i, school = school, workday = day[0]).count() != 0:
+#                            UsalTimetable.objects.filter(grade = grade, number = lesson[0], group = i, school = school, workday = day[0]).delete()
+#                        continue
+#                    subject = get_object_or_404(Subject, id = subject, school = school)
+#                    if UsalTimetable.objects.filter(grade = grade, number = lesson[0], group = i, school = school, workday = day[0]).count() == 0:
+#                        tt = UsalTimetable(grade = grade, number = lesson[0], group = i, school = school, workday = day[0])
+#                    else:
+#                        tt = UsalTimetable.objects.get(grade = grade, number = lesson[0], group = i, school = school, workday = day[0])
+#                    tt.subject = subject
+#                    tt.room = request.POST.get('l_r_%s_%s_%d' % (day[0], lesson[0], i), '')
+#                    tt.save()
+#    render['form'] = form
+
+
     return render_to_response('timetableSet.html', render, context_instance = RequestContext(request))
 
 @login_required

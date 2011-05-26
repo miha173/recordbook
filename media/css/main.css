@@ -18,6 +18,7 @@ table {
 	font-size:100%;
 	border-collapse:collapse;
 	text-align: left;
+    vertical-align: top;
 }
 
 form table th{
@@ -466,7 +467,7 @@ body#admin #header #exit ul.menu_on{
 	#content table_marks tr {height: 51px;}
 	#content table_marks td {width: 26px; padding-right: 10px!important}
 	#content table thead tr:hover {background:#fff;}
-	#content table td {padding:0.8em 20px 0.8em 10px;}
+	#content table td {padding:0.8em 20px 0.8em 10px;vertical-align:top}
     #content table#marks td {padding:0.8em 10px;width:46px!important;}
     #content table#marks th {width:46px!important;}
 	#content table#marks tr {height:51px!important}
@@ -506,7 +507,7 @@ body#admin #header #exit ul.menu_on{
 			color:#999;
 			text-decoration:none;
 			border-bottom:1px dotted #999;
-			cursor: hand;
+			cursor: pointer;
 		}
 		
 		#content table thead th a {
@@ -875,4 +876,37 @@ a.ajax{
 
 a.red{
     color: #ff0000!important;
+}
+
+div.dndbar{
+    width: 200px;
+    border: 1px dashed #0E90B8;
+    padding: 5px;
+    margin: 10px;
+    cursor: pointer;
+    
+}
+
+table.attendance-editor-table{
+    width: 600px;
+}
+
+table.attendance-editor-table th{
+    border: 1px solid #d3d3d3;
+    font-weight:normal;
+    padding: 3px;
+    text-align: center;
+    font-size: 36px;
+    width: 50px;
+}
+
+table.attendance-editor-table thead th{
+    font-weight:normal;
+    font-size: 36px!important;
+    color: #000000!important;
+    padding: 5px 10px!important;
+}
+
+table.attendance-editor-table td{
+    border: 1px solid #d3d3d3;
 }

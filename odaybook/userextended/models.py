@@ -177,6 +177,9 @@ class Subject(RestModel):
             teacher.subjects.remove(self)
             teacher.save()
         super(Subject, self).delete()
+
+    def get_groups(self):
+        return range(1, int(self.groups)+1)
     class Meta:
         ordering = ['name']
 
