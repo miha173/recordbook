@@ -884,7 +884,7 @@ div.dndbar{
     padding: 5px;
     margin: 10px;
     cursor: pointer;
-    
+    background: #ffffff;
 }
 
 table.attendance-editor-table{
@@ -897,7 +897,7 @@ table.attendance-editor-table th{
     padding: 3px;
     text-align: center;
     font-size: 36px;
-    width: 50px;
+    width: 60px;
 }
 
 table.attendance-editor-table thead th{
@@ -909,4 +909,23 @@ table.attendance-editor-table thead th{
 
 table.attendance-editor-table td{
     border: 1px solid #d3d3d3;
+}
+
+table.attendance-editor-table td a{
+    float: right;
+}
+
+table.attendance-editor-table td.ui-state-hover{
+    background: #e9f9fd;
+}
+
+table.attendance-editor-table div.dndbar{
+    width: 500px;
+    border: 1px dashed green;
+    cursor: auto;
+}
+
+table.attendance-editor-table div.dndbar input{
+    width: 35px;
+    margin: 0 10px;
 }

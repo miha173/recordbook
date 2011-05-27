@@ -6,34 +6,53 @@
     <a href="/attendance/timetable/select/{{ school.id }}/">Расписания</a>
     <span>&rarr;</span>
     <h1>Редактирование</h1>
+    <table>
+    <tr>
+        {% for workday in workdays %}
+            <td>
+                {% if current_workday.0 == workday.0 %}
+                    <h1>{{ workday.1 }}</h1>
+                {% else %}
+                    <a href="?workday={{ workday.0 }}">{{ workday.1 }}</a>
+                {% endif %}
+            </td>
+        {% endfor %}
+    </tr>
+    </table>
 {% endblock %}
 
-{% block content %}
+{% block content %}<div id="debug"></div>
 	<table class="no-hover">
     <tr>
         <td id="subjects">
             Выберите предмет:
             {% for subject in subjects %}
                 {% if subject.groups %}
-                    <div subject="{{ subject.id }}" class="dndbar">{{ subject }} (весь класс)</div>
+                    <div subject="{{ subject.id }}" class="dndbar" group="0">{{ subject }} (весь класс)</div>
                     {% for group in subject.get_groups %}
-                        <div subject="{{ subject.id }}" class="dndbar">{{ subject }} ({{ group }} гр.)</div>
+                        <div subject="{{ subject.id }}" class="dndbar" group="{{ group }}">{{ subject }} ({{ group }} гр.)</div>
                     {% endfor %}
                 {% else %}
-                    <div subject="{{ subject.id }}" class="dndbar">{{ subject }}</div>
+                    <div subject="{{ subject.id }}" class="dndbar" group="0">{{ subject }}</div>
                 {% endif %}
             {% endfor %}
         </td>
         <td>
 
             <table class="attendance-editor-table">
-                <thead>
-                    <th colspan="2">Понедельник</th>
-                </thead>
-                {% for lesson in lessons %}
+                {% for number, lessons in attendance.lessons.items %}
                     <tr>
-                        <th>{{ lesson.1 }}</th>
-                        <td></td>
+                        <th>{{ number }}</th>
+                        <td lesson="{{ number }}">
+                            {% for lesson in lessons %}
+                                <div subject="{{ lesson.subject.id }}" class="dndbar already-in" group="{{ lesson.group }}" lesson_id="{{ lesson.id }}">
+                                    {{ lesson.subject }}
+                                    {% if lesson.group != '0' %}({{ lesson.group }} гр.){% endif %}
+                                    <input type="text" name="room" value="{{ lesson.room }}" />
+                                    <a href="#"><img src="{{ MEDIA_URL }}images/delete.png"/></a>
+                                </div>
+                            {% endfor %}
+                        </td>
                     </tr>
                 {% endfor %}
             </table>
@@ -41,21 +60,84 @@
     </tr>
     </table>
     <script type="text/javascript">
-    $( "div.dndbar" ).draggable({
+    $( "td#subjects div.dndbar" ).draggable({
 			appendTo: "body",
-			helper: "clone"
+			helper: "clone",
 	});
+    $( "table.attendance-editor-table div.dndbar" ).draggable({
+        appendTo: "body"
+    });
     $( "table.attendance-editor-table tr td" ).droppable({
-/*        activeClass: "ui-state-default",
         hoverClass: "ui-state-hover",
-        accept: ":not(.ui-sortable-helper)",
-*/        drop: function( event, ui ) {
-            $('<div class="dndbar"></div>').text(ui.draggable.text()).attr('subject', ui.draggable.attr('subject')).appendTo( this );
-            $( "table.attendance-editor-table div.dndbar" ).draggable({
-                    appendTo: "body",
-                    stop: function(){$(this).remove();}
+        drop: function( event, ui ) {
+            ui.draggable.draggable('option', 'revert', false);
+            if(ui.draggable.attr('group') == '0'){
+                if($(this).children('div.dndbar').length!=0){
+                    ui.draggable.draggable('option', 'revert', true);
+                    return ;
+                }
+            }
+            else{
+                if($(this).children('div[group="' + ui.draggable.attr('group') + '"]').length!=0){
+                    ui.draggable.draggable('option', 'revert', true);
+                    return ;
+                }
+                if($(this).children('div[group="0"]').length!=0){
+                    ui.draggable.draggable('option', 'revert', true);
+                    return ;
+                }
+            }
+            if (ui.draggable.hasClass('already-in')){
+                ui.draggable.children('a').click()
+            }
+            obj = $('<div class="dndbar"></div>')
+                    .html(ui.draggable.text() + '<input type="text" name="room" value="" /><a href="#"><img src="{{ MEDIA_URL }}images/delete.png"/></a>')
+                    .attr('subject', ui.draggable.attr('subject'))
+                    .attr('group', ui.draggable.attr('group'))
+            obj.children('input["name"="room"]').val(ui.draggable.children('input["name"="room"]').val());
+            obj.appendTo( this );
+            $.get('.', {
+                method: 'add',
+                subject: ui.draggable.attr('subject'),
+                group: ui.draggable.attr('group'),
+                workday: '{{ current_workday.0 }}',
+                lesson: $(this).attr('lesson'),
+                room: ui.draggable.children('input["name"="room"]').val(),
+            }, function(data){
+                obj.attr('lesson_id', data)
+            });
+            obj.addClass('already-in');
+            obj.draggable({
+                appendTo: "body"
             });
         }
-	})
+	});
+    $('div.dndbar a').live('click', function(){
+        parent = $(this).parent('div');
+        $.get('.', {
+            method: 'delete',
+            lesson_id: parent.attr('lesson_id'),
+            subject: parent.attr('subject'),
+            group: parent.attr('group'),
+            workday: '{{ current_workday.0 }}',
+            lesson: parent.parent('td').attr('lesson'),
+        });
+
+        parent.remove();
+        return false;
+    });
+    $('div.dndbar input').live('blur', function(){
+        parent = $(this).parent('div');
+        $.get('.', {
+            method: 'set_room',
+            lesson_id: parent.attr('lesson_id'),
+            subject: parent.attr('subject'),
+            group: parent.attr('group'),
+            workday: '{{ current_workday.0 }}',
+            lesson: parent.parent('td').attr('lesson'),
+            room: $(this).val(),
+        });
+        return false;
+    });
     </script>
 {% endblock %}

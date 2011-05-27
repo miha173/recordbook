@@ -66,12 +66,27 @@ class School(RestModel):
     
     def __unicode__(self):
         return self.name
+    
     def get_workdays(self):
         if self.saturday:
             days = 6
         else:
             days = 5
-        return xrange(1, days+1)
+        return range(1, days+1)
+
+    def get_workdays_tuple(self):
+        from django.conf import settings
+        result = ()
+        for d in settings.WORKDAYS:
+            if int(d[0]) in self.get_workdays(): result += (d, )
+        return result
+
+    def get_workdays_dict(self):
+        from django.conf import settings
+        result = {}
+        for d in settings.WORKDAYS:
+            if int(d[0]) in self.get_workdays(): result[int(d[0])] = d
+        return result
 
     def save(self, *args, **kwargs):
         u'''

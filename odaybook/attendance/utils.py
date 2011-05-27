@@ -60,3 +60,10 @@ class TimetableDayPupil(TimetableDay):
             if connection.value == '0' or connection.value == lesson.group:
                 self.lessons[int(lesson.number)] = lesson
 
+class TimetableDayGrade(TimetableDay):
+    def __init__(self, workday, grade, *args, **kwargs):
+        self.grade = grade
+        self.lessons = {}
+        for lesson in xrange(10): self.lessons[lesson+1] = []
+        for lesson in UsalTimetable.objects.filter(grade = grade, workday = workday):
+            self.lessons[int(lesson.number)].append(lesson)

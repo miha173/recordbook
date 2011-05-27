@@ -16,7 +16,7 @@ from odaybook.userextended.forms import ImportForm
 from odaybook.userextended.views import get_grade
 
 from models import UsalTimetable, SpecicalTimetable, Holiday, UsalRingTimetable
-from utils import TimetableDayPupil
+from utils import TimetableDayPupil, TimetableDayGrade
 
 @login_required
 def index(request):
@@ -50,46 +50,56 @@ def timetableSet(request, id, school = 0):
         school = request.user.school
     render['school'] = school
     render['grade'] = grade = get_object_or_404(Grade, id = id, school = school)
-    render['workdays'] = settings.WORKDAYS
+
+    try: current_workday = int(request.GET.get('workday', '1'))
+    except ValueError: current_workday = 1
+    if current_workday not in school.get_workdays(): current_workday = 1
+
+    render['workdays'] = school.get_workdays_tuple()
+    render['current_workday'] = current_workday = school.get_workdays_dict()[current_workday]
     render['lessons'] = settings.LESSON_NUMBERS
     render['subjects'] = grade.get_subjects()
+    render['attendance'] = TimetableDayGrade(workday = current_workday[0], grade = grade)
 
-
-#    form = TimetableForm()
-#    for day in settings.WORKDAYS:
-#        if not school.saturday and day[0] == 6: continue
-#        for lesson in settings.LESSON_NUMBERS:
-#            for i in xrange(1, 3):
-#                room = ''
-#                subject = None
-#                if UsalTimetable.objects.filter(grade = grade, number = lesson[0], group = i, school = school, workday = day[0]).count() != 0:
-#                    u = UsalTimetable.objects.get(grade = grade, number = lesson[0], group = i, school = school, workday = day[0])
-#                    room = u.room
-#                    subject = u.subject.id
-#                form.fields['l_r_%s_%s_%d' % (day[0], lesson[0], i)] = forms.CharField(initial = room, required = False)
-##                form.fields['l_s_%s_%s_%d' % (day[0], lesson[0], i)] = forms.CharField(initial = room, required = False)
-#                form.fields['l_s_%s_%s_%d' % (day[0], lesson[0], i)] = forms.ModelChoiceField(initial = subject, queryset = grade.get_subjects_queryset(), required = False)
-#    if request.method == 'POST':
-#        form.initial = request.POST
-#        for day in settings.WORKDAYS:
-#            if not school.saturday and day[0] == 6: continue
-#            for lesson in settings.LESSON_NUMBERS:
-#                for i in xrange(1, 3):
-#                    subject = request.POST.get('l_s_%s_%s_%d' % (day[0], lesson[0], i), '')
-#                    if subject == '':
-#                        if UsalTimetable.objects.filter(grade = grade, number = lesson[0], group = i, school = school, workday = day[0]).count() != 0:
-#                            UsalTimetable.objects.filter(grade = grade, number = lesson[0], group = i, school = school, workday = day[0]).delete()
-#                        continue
-#                    subject = get_object_or_404(Subject, id = subject, school = school)
-#                    if UsalTimetable.objects.filter(grade = grade, number = lesson[0], group = i, school = school, workday = day[0]).count() == 0:
-#                        tt = UsalTimetable(grade = grade, number = lesson[0], group = i, school = school, workday = day[0])
-#                    else:
-#                        tt = UsalTimetable.objects.get(grade = grade, number = lesson[0], group = i, school = school, workday = day[0])
-#                    tt.subject = subject
-#                    tt.room = request.POST.get('l_r_%s_%s_%d' % (day[0], lesson[0], i), '')
-#                    tt.save()
-#    render['form'] = form
-
+    if request.GET.get('method', False):
+#    if request.is_ajax():
+        subject = get_object_or_404(Subject, id = request.GET.get('subject'), school = school)
+        if request.GET.get('method') == 'add':
+            timetable = UsalTimetable(
+                    grade = grade,
+                    number = request.GET.get('lesson'),
+                    subject = subject,
+                    group = request.GET.get('group'),
+                    school = school,
+                    workday = current_workday[0],
+                    room = request.GET.get('room', ''),
+            )
+            timetable.save()
+            return HttpResponse(str(timetable.id))
+        elif request.GET.get('method') == 'set_room':
+            timetable = get_object_or_404(UsalTimetable,
+                    id = request.GET.get('lesson_id'),
+                    grade = grade,
+                    number = request.GET.get('lesson'),
+                    subject = subject,
+                    group = request.GET.get('group'),
+                    school = school,
+                    workday = current_workday[0],
+            )
+            timetable.room = request.GET.get('room', '')
+            timetable.save()
+        else:
+            timetable = get_object_or_404(UsalTimetable,
+                    id = request.GET.get('lesson_id'),
+                    grade = grade,
+                    number = request.GET.get('lesson'),
+                    subject = subject,
+                    group = request.GET.get('group'),
+                    school = school,
+                    workday = current_workday[0],
+            )
+            timetable.delete()
+        return HttpResponse('ok')
 
     return render_to_response('timetableSet.html', render, context_instance = RequestContext(request))
 
