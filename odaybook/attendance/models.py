@@ -23,7 +23,7 @@ class SpecicalRingTimetable(RingTimetable):
 class Timetable(RestModel):
     from odaybook.userextended.models import Grade, Subject
     grade = models.ForeignKey(Grade)
-    number = models.CharField(u"Номер урока", max_length = 1, choices = settings.LESSON_NUMBERS)
+    number = models.CharField(u"Номер урока", max_length = 2, choices = settings.LESSON_NUMBERS)
     subject = models.ForeignKey(Subject, verbose_name = u"Предмет")
     room = models.CharField(u"Кабинет", max_length = 25, null = True, blank = True)
     group = models.CharField(u"Группа", max_length = 1, choices = ( ('1', '1 группа'), ('2', '2 группа') ))

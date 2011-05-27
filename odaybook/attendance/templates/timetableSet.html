@@ -61,11 +61,14 @@
     </table>
     <script type="text/javascript">
     $( "td#subjects div.dndbar" ).draggable({
-			appendTo: "body",
-			helper: "clone",
+		appendTo: "body",
+		helper: "clone",
+        scroll: true,
 	});
     $( "table.attendance-editor-table div.dndbar" ).draggable({
-        appendTo: "body"
+        appendTo: "body",
+        scroll: true,
+        revert: true,
     });
     $( "table.attendance-editor-table tr td" ).droppable({
         hoverClass: "ui-state-hover",
@@ -108,7 +111,9 @@
             });
             obj.addClass('already-in');
             obj.draggable({
-                appendTo: "body"
+                appendTo: "body",
+                scroll: true,
+                revert: true,
             });
         }
 	});
