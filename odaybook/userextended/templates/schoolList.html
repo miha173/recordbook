@@ -129,17 +129,15 @@
 				{% endif %}
 			</td>
 		</tr>
-    {% comment %}
 		<tr>
-			<td>
-			</td>
-			<td>
+			<td colspan="3">
 				{% if school.show.resultdates %}
 					<a href="/administrator/uni/marks.ResultDate/{{ school.id }}/">Итоговые периоды</a>
 				{% else %}
 					Итоговые периоды
 				{% endif %}
 			</td>
+    {% comment %}
 			<td>
 		        {% if school.show.ringtimetable %}
 		          <a href="/attendance/ringtimetable/{{ school.id }}/">Расписание звонков</a>
@@ -147,8 +145,8 @@
 		          Расписание звонков
 		        {% endif %}
 			</td>
-		</tr>
     {% endcomment %}
+		</tr>
 		<tr>
 			<td colspan="3"><hr /></td>
 		</tr>
