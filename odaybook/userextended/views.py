@@ -407,7 +407,6 @@ def register_clerk(request):
                 if is_parent:
                     user.create_role(Parent)
                 user = authenticate(username = user.username, password = '123456789')
-                login(request, user)
                 return HttpResponseRedirect(reverse('odaybook.curatorship.views.send_parent_request'))
 #                return HttpResponseRedirect('/curatorship/send-append-request/')
     else:
