@@ -384,7 +384,6 @@ def get_subject(request, id):
     return HttpResponse(demjson.encode({'subject': subject.name, 'groups': subject.groups}))
 
 def register_clerk(request):
-    from django.contrib.auth import login, authenticate
     render = {}
 
     is_parent = auto_login = False
@@ -407,7 +406,6 @@ def register_clerk(request):
                 if is_parent:
                     user.create_role(Parent)
                 return HttpResponseRedirect(reverse('odaybook.curatorship.views.send_parent_request'))
-#                return HttpResponseRedirect('/curatorship/send-append-request/')
     else:
         render['form'] = ClerkRegisterForm()
 

@@ -163,8 +163,11 @@ def index(request):
             if UsalTimetable.objects.filter(**kwargs):
                 lessons = set([tt.number for tt in UsalTimetable.objects.filter(**kwargs)])
                 kwargs4lesson = {'teacher': request.user, 'date': d, 'subject': request.user.current_subject}
-                if Lesson.objects.filter(grade = request.user.current_grade, **kwargs4lesson).count() != len(lessons):
-                    for j in xrange(len(lessons) - Lesson.objects.filter(**kwargs4lesson).count()):
+                groups = {}
+                for lesson in UsalTimetable.objects.filter(**kwargs): groups[lesson.group] = groups.get(lesson.group, 0) + 1
+                groups = groups.values()
+                if Lesson.objects.filter(grade = request.user.current_grade, **kwargs4lesson).count() != max(groups):
+                    for j in xrange(max(groups) - Lesson.objects.filter(**kwargs4lesson).count()):
                         t = Lesson(**kwargs4lesson)
                         t.save()
                         t.grade.add(request.user.current_grade)
