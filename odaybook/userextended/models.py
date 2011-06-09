@@ -110,12 +110,12 @@ class Option(models.Model):
 
 def SystemInitCallback(sender, **kwargs):
     options = [
-        {'key': 'vnc_link', 'key_ru': u'Ссылка на приложение ТП', 'value': Null},
+        {'key': 'vnc_link', 'key_ru': u'Ссылка на приложение ТП', 'value': ''},
     ]
     for option in options:
-        Option(**option).save()
+        Option.objects.get_or_create(**option)
 
-post_syncdb.connect(SystemInitCallback, sender = Option)
+post_syncdb.connect(SystemInitCallback)
 
 class Grade(RestModel):
     u'Классы в школах'
