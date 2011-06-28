@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 class School(RestModel):
     u'Модель для школы'
-    name = models.CharField(u"Имя учебного заведения", max_length = 100)
+    name = models.CharField(u"Имя учебного заведения", max_length = 250)
 #    prefix = models.CharField(u"Префикс для логина", max_length = 5)
     saturday = models.BooleanField(verbose_name = u'Шестидневка', default = True)
     url = models.URLField(verbose_name = u'Веб-сайт', null = True, blank = True)
@@ -405,7 +405,7 @@ class Clerk(User, RestModel, BaseClerk):
 
     objects = ClerkManager(['last_name', 'first_name', 'middle_name', 'username'])
 
-    def save(self, init = False, safe = False, *args, **kwargs):
+    def save(self, set_password = None, init = False, safe = False, *args, **kwargs):
 
         if not self.pk or init:
             if not self.username:
@@ -414,8 +414,8 @@ class Clerk(User, RestModel, BaseClerk):
                 while User.objects.filter(username = username):
                     username = str(randint(10**6, 9999999))
                 self.username = username
-            password = None
-            if not self.password:
+            password = set_password
+            if not password:
                 password = User.objects.make_random_password(10, '1234567890')
                 self.set_password(password)
             if self.email:
@@ -511,7 +511,10 @@ class BaseUser(BaseClerk):
                           middle_name = self.middle_name,
                           email = self.email,
             )
-            clerk.save()
+            set_password = kwargs.get('set_password', None)
+            if set_password:
+                del kwargs['set_password']
+            clerk.save(set_password = set_password)
             self.username = clerk.username
             self.clerk = clerk
             self._append_to_clerk = True
@@ -665,7 +668,7 @@ class Pupil(BaseUser, Scholar):
     serialize_name = 'pupil'
 
     groups = {}
-    
+
     def get_curator(self):
         teacher = Teacher.objects.filter(grade = self.grade)
         if teacher:

@@ -46,4 +46,23 @@
   
   </tbody>
 </table>
+<table>
+    <thead><tr>
+        <th colspan="2">Сводка</th>
+    </tr></thead>
+    <tbody>
+    <tr>
+        <td>Пропусков</td>
+        <td>{{ cols.0 }}{# FIXME: plural часы #}</td>
+    </tr>
+    {% for key, value in cols.items %}
+        {% if key != 0 %}
+            <tr class="{% cycle 'gray' '' %}">
+                <td>Количество &laquo;{{ key }}&raquo;</td>
+                <td>{{ value }}</td>
+            </tr>
+        {% endif %}
+    {% endfor %}
+    </tbody>
+</table>
 {% endblock %}

@@ -46,6 +46,7 @@ def index(request):
             dates.append(temp)
             temp += timedelta(days = 1)
         marks = []
+        render['cols'] = cols = {}
         for subject in request.user.current_pupil.get_subjects():
             subj = []
             subj.append(subject)
@@ -57,7 +58,10 @@ def index(request):
                     t = []
                     for mark in Mark.objects.filter(pupil = request.user.current_pupil, lesson__date = day, lesson__subject = subject):
                         t.append(mark)
-                        if not mark.absent:
+                        if mark.absent:
+                            cols[0] = cols.get(0, 0) + 1
+                        else:
+                            cols[mark.mark] = cols.get(mark.mark, 0) + 1
                             sum += mark.mark
                             sum_n += 1
                     m.append(t)
@@ -132,7 +136,7 @@ def index(request):
                 request.user.current_grade = request.user.get_grades()[0]
                 request.user.save()
             else:
-                messages.error(request, u'К ван не привязано классов')
+                messages.error(request, u'К вам не привязано классов')
                 return HttpResponseRedirect('/')
         request.user.current_grade.get_pupils_for_teacher_and_subject(request.user, request.user.current_subject)
         
@@ -153,7 +157,7 @@ def index(request):
         conn = Connection.objects.filter(teacher = request.user, **kwargs)
         if not conn: raise Http404('No connections')
         conn = conn[0]
-        if conn.connection in ['1', '2']:
+        if conn.connection!='0':
             kwargs['group'] = conn.connection
 
         kwargs4lesson = {}

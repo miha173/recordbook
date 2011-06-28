@@ -59,6 +59,9 @@ class AuthenticationMiddleware(object):
                 else:
                     messages.error(request, u'К вашему профилю не добавлено ни одного ребёнка. <a href="/curatorship/send-append-request">Отправить запрос на прикрепление ребёнка.</a>')
                     return render_to_response("message.html", context_instance = RequestContext(request))
+            if hasattr(request.user, 'type') and request.user.type == 'Pupil':
+                messages.error(request, u'Вход запрещён')
+                return render_to_response("message.html", context_instance = RequestContext(request))
 
         return response
     

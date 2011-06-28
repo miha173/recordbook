@@ -56,7 +56,9 @@
         <div id="all">
             <!-- Верхняя полоса -->
             <div id="headline">
-              <a href="http://school-record-book.ru">Система электронных дневников</a> 
+  <a href="http://e-sch.ru">Электронная школа</a>
+
+              {#<a href="http://school-record-book.ru">Система электронных дневников</a> #}
 				{% if user.school.url %}
 	                <a href="{{ user.school.url }}" id="right">{{ user.school }}</a>
 				{% endif %}
@@ -163,7 +165,8 @@
             <div id="copyright">
                 <div class="column">
                     <p>
-	                    &copy;&nbsp;2009&#150;{{ current_year }}&nbsp;<a href="http://aleks-komkov.ru/">Комков&nbsp;Александр</a>
+                        &copy;&nbsp;2008&#150;{{ current_year }}&nbsp;<a href="http://ikagroup.ru/">ИКА ГРУПП</a>
+	                    {#&copy;&nbsp;2009&#150;{{ current_year }}&nbsp;<a href="http://aleks-komkov.ru/">Комков&nbsp;Александр</a>#}
                     </p>
                 </div>
                 <div class="column">
