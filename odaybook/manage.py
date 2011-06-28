@@ -2,8 +2,8 @@
 import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '.env/lib'))
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '.env/lib/site-packages'))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '.env/lib/python2.6'))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '.env/lib/python2.6/site-packages'))
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'libs'))
 from django.core.management import execute_manager
 try:
