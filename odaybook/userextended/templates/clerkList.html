@@ -38,7 +38,11 @@
         </select>
         <input type="button" value="Выбрать" onclick="$.get('set/' + user_id + '/', {set_right: 'EduAdmin', 'school_id': $('#school_id').val()}, function(data){window.location.reload()})" />
     </div>
-        
+
+    <p>
+        Всего пользователей: {{ users_count }}; ролей: {{ roles_count }}.
+    </p>
+
 <table class="table">
 	<thead>
         {# FIXME: сортировка #}

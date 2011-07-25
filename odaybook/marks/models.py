@@ -27,6 +27,7 @@ class Lesson(RestModel):
     grade = models.ManyToManyField(Grade, verbose_name = u'Класс')
     file = models.FileField(verbose_name = u'Приложить файл', null = True, blank = True, upload_to = 'lessons')
     resultdate = models.ForeignKey('ResultDate', null = True, blank = True)
+    fullness = models.BooleanField(default = False)
 
     serialize_fields = ['id', 'teacher_id', 'date', 'topic', 'task', 'subject_id', 'grade']
     serialize_name = 'lesson'
@@ -34,9 +35,12 @@ class Lesson(RestModel):
     class Meta:
         # FIXME: unics
         ordering = ['-date']
-    def delete(self):
-        Mark.objects.filter(lesson = self).delete()
-        super(Lesson, self).delete()
+
+    def save(self, safe = False, *args, **kwargs):
+        if not safe and not self.fullness:
+            if self.topic and Mark.objects.filter(lesson = self).count()>4:
+                self.fullness = True
+        super(Lesson, self).save(*args, **kwargs)
 
 class Mark(RestModel):
     pupil = models.ForeignKey(Pupil, verbose_name = u'Ученик')
@@ -67,6 +71,10 @@ class Mark(RestModel):
 
     def save(self, *args, **kwargs):
         from odaybook.userextended.models import Notify
+        if not self.lesson.fullness:
+            if self.lesson.topic and Mark.objects.filter(lesson = self.lesson)>4:
+                self.lesson.fullness = True
+                self.lesson.save(safe = True)
         super(Mark, self).save(*args, **kwargs)
         Notify.objects.filter(user = self.lesson.teacher, type = '1').delete()
     

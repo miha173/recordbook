@@ -1,0 +1,32 @@
+{% extends '~reports/page.html' %}
+
+{% block js %}
+      google.load("visualization", "1", {packages:["corechart"]});
+      google.setOnLoadCallback(drawChart);
+      function drawChart() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Переменная');
+        data.addColumn('number', 'Значение');
+        data.addRows(4);
+        data.setValue(0, 0, 'Заполнено');
+        data.setValue(0, 1, {{ all.filled }});
+        data.setValue(1, 0, 'Не заполнено меньше 10 дней');
+        data.setValue(1, 1, {{ all.not_filled }});
+        data.setValue(2, 0, 'Не заполнено больше 10 дней');
+        data.setValue(2, 1, {{ all.not_filled_from_10_to_15_days }});
+        data.setValue(3, 0, 'Не заполнено больше 15 дней');
+        data.setValue(3, 1, {{ all.not_filled_more_15_days }});
+
+        var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+        chart.draw(data, {width: 500, height: 300, title: 'Иллюстрация', reverseCategories: true});
+      }
+{% endblock %}
+
+{% block content %}
+    <form method="GET" action=".">
+        Выбрать школу: {{ form.school }}
+        <input type="submit" value="Показать">
+    </form>
+    {% include 'report_form.html' %}
+    <div id="chart_div"></div>
+{% endblock %}

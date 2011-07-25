@@ -7,12 +7,18 @@ from django import template
 register = template.Library()
 
 @register.filter(name='number_format')
-def number(value):
+def number(value, places = None):
+    try:
+        float(value)
+    except ValueError:
+        return value
     value = unicode(value)
     i = value
     if value.find('.')!=-1:
         i = value[:value.find('.')]
         f = value[value.find('.')+1:]
+        if places:
+            f = f[:int(places)]
     else:
         i = value
         f = 0

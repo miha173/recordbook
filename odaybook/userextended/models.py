@@ -4,6 +4,7 @@ from datetime import timedelta, datetime
 import pytils
 import time
 import random
+import logging
 
 from django.db import models
 from django.db.models import Q
@@ -14,7 +15,7 @@ from django.dispatch import receiver
 
 from odaybook.rest.models import RestModel, RestModelManager
 from odaybook.utils import PlaningError
-import logging
+from odaybook import settings
 
 logger = logging.getLogger(__name__)
 
@@ -642,21 +643,10 @@ class Pupil(BaseUser, Scholar):
     grade = models.ForeignKey(Grade, verbose_name = u"Класс", null=True)
     sex = models.CharField(max_length = 1, choices = (('1', u'Юноша'), ('2', u'Девушка')), verbose_name = u'Пол')
     special = models.BooleanField(verbose_name = u'Специальная группа')
-    health_group = models.CharField(null = True, blank = False, default = '1', choices=(('1', '1'),
-                                                                                        ('2', '2'),
-                                                                                        ('3', '3'),
-                                                                                        ('4', '4'),
-                                                                                        ),
+    health_group = models.CharField(null = True, blank = False, default = '1', choices=zip(*(settings.HEALTH_GROUPS, )*2),
                                     max_length = 1, verbose_name = u'Группа здоровья')
     health_note = models.CharField(null = True, blank = True, default='', max_length = 255, verbose_name = u'Примечание')
-    order = models.CharField(null = True, max_length = 100, verbose_name = u'Социальная группа', choices = (
-        ('0', u'полноценная семья'),
-        ('1', u'мать-одиночка'),
-        ('2', u'малообеспеченные'),
-        ('3', u'неблагополучная семья'),
-        ('4', u'беженцы'),
-        ('5', u'ребенок-инвалид'),
-    ), default = '0')
+    order = models.CharField(null = True, max_length = 100, verbose_name = u'Социальная группа', choices = settings.PUPIL_ORDER, default = '0')
     # TODO: примечение (см. ТЗ)
     parent_1 = models.CharField(max_length = 255, verbose_name = u'Родитель 1', blank = True, null = True)
     parent_2 = models.CharField(max_length = 255, verbose_name = u'Родитель 2', blank = True, null = True)
@@ -815,3 +805,13 @@ class Notify(models.Model):
             return datetime.now() - self.notify_start
         else:
             return None
+
+class MembershipChange(models.Model):
+    pupil = models.ForeignKey(Pupil)
+    timestamp = models.DateTimeField(auto_now_add = True)
+    type = models.CharField(max_length = 1, choices = (('+', u'принят'), ('-', u'исключён')))
+    school = models.ForeignKey(School, null = True, blank = True)
+
+    class Meta:
+        ordering = ['-timestamp']
+

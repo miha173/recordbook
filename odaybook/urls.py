@@ -23,4 +23,5 @@ urlpatterns = patterns('',
                        (r'^administrator/', include('odaybook.userextended.urls')),
                        (r'^attendance/', include('odaybook.attendance.urls')),
                        (r'^api/', include('odaybook.api.urls')),
+                       (r'^reports/', include('odaybook.reports.urls')),
 )

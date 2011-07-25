@@ -7,5 +7,5 @@
 {% if user.edu_admin %}
     {# FIXME #}
     {% if ACTIVE_URL == 'accounts' %}<big class="green">Управление</big>{% else %}<a href="/accounts/uni/userextended.School/">Управление</a>{% endif %}
-    {% if ACTIVE_URL == 'uni' %}<big class="red">Отчёты</big>{% else %}<a href="#">Отчёты</a>{% endif %}
+    {% if ACTIVE_URL == 'reports' %}<big class="red">Отчёты</big>{% else %}<a href="/reports/">Отчёты</a>{% endif %}
 {% endif %}

@@ -3,7 +3,7 @@ from datetime import date
 
 from django.template import RequestContext
 from django.shortcuts import render_to_response, get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import ObjectDoesNotExist
@@ -183,6 +183,10 @@ def send_parent_request(request):
 
     school = grade = None
     step = 1
+
+    for param in ['school', 'grade', 'pupil']:
+        try: int(request.GET.get(param, False))
+        except: raise Http404
 
     if request.GET.get('school', False):
         render['school'] = school = get_object_or_404(School, id = request.GET.get('school'))

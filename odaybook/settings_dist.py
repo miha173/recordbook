@@ -118,6 +118,16 @@ LESSON_NUMBERS = ( ('1', '1'),
                    ('10', '10')
 )
 
+HEALTH_GROUPS = [str(i) for i in range(1, 5)]
+
+PUPIL_ORDER = (
+        ('0', u'полноценная семья'),
+        ('1', u'мать-одиночка'),
+        ('2', u'малообеспеченные'),
+        ('3', u'неблагополучная семья'),
+        ('4', u'беженцы'),
+        ('5', u'ребенок-инвалид'),
+    )
 
 APPEND_SLASH = True
 
@@ -163,6 +173,7 @@ INSTALLED_APPS = (
     'odaybook.rest',
     'odaybook.api',
     'odaybook.billing',
+    'odaybook.reports',
 )
 
 

@@ -16,7 +16,7 @@ from django.conf import settings
 from django.db.models import get_model
 from django.core.urlresolvers import resolve, reverse
 
-from models import School, Clerk, Superviser, Teacher, Pupil, Parent, BaseUser, Superuser, Subject, Grade
+from models import School, Clerk, Superviser, Teacher, Pupil, Parent, BaseUser, Superuser, Subject, Grade, MembershipChange
 from forms import ClerkForm, PupilConnectionForm, ClerkRegisterForm, ImportForm
 import odaybook.userextended.forms
 import odaybook.attendance.forms
@@ -64,6 +64,10 @@ def objectList(request, app, model, filter_id = None):
             ext['school'] = request.user.school
         elif request.user.type == 'Superuser':
             ext['school'] = get_object_or_404(School, id = filter_id)
+
+    if app_model == 'userextended.Clerk':
+        render['users_count'] = Clerk.objects.all().count()
+        render['roles_count'] = BaseUser.objects.all().count()
 
     render.update(ext)
 
@@ -417,6 +421,7 @@ def exclude_pupil(request, filter_id, id):
     if request.user.type == 'EduAdmin':
         if request.user.school.id != int(id): raise Http404
     pupil = get_object_or_404(Pupil, id = id, school__id = filter_id)
+    MembershipChange(pupil = pupil, type = '-', school = pupil.school).save()
     pupil.school = pupil.grade = None
     pupil.save()
     return HttpResponseRedirect('/administrator/uni/userextended.Pupil/%d/' % int(filter_id))
@@ -436,6 +441,7 @@ def connect_pupil(request, school):
         pupil = Pupil.objects.get(id = request.POST.get('pupil'), school = None)
         grade = get_object_or_404(Grade, id = request.POST.get('grade'), school = school)
         pupil.school = school
+        MembershipChange(pupil = pupil, type = '+', school = pupil.school).save()
         pupil.grade = grade
         pupil.save()
         messages.success(request, u'Ученик прикреплён')

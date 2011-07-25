@@ -1,0 +1,33 @@
+{% extends '~reports/page.html' %}
+
+{% block content %}
+    <form method="GET" action=".">
+        Фильтр по школе: {{ form.school }}
+        <input type="submit" value="Фильтровать">
+    </form>
+ <table class="table">
+	<thead>
+        <th></th>
+        <th>Дата</th>
+		<th>Ученик</th>
+		<th>Школа</th>
+	</thead>
+	{% for object in objects.object_list %}
+		<tr class="{% cycle 'gray' '' %}">
+            <td>
+                {% if object.type == '-' %}
+                    <img src="{{ MEDIA_URL }}/images/delete.png" />
+                {% else %}
+                    <img src="{{ MEDIA_URL }}/images/add.png" />
+                {% endif %}
+            </td>
+            <td>{{ object.timestamp }}</td>
+            <td>{{ object.pupil }}</td>
+            <td>{{ object.school }}</td>
+		</tr>
+	{% empty %}
+		<tr><td colspan="4">Событий нет</td></tr>
+	{% endfor %}
+</table>
+{% include "helpers/paginator.html" %}
+{% endblock %}

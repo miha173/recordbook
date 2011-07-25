@@ -1,0 +1,24 @@
+{% load formater %}
+
+
+<table class="table">
+	<thead>
+		{% for row in rows.get_header %}
+            <th>{{ row }}</th>
+        {% endfor %}
+	</thead>
+    <tbody>
+        {% for row in rows.get_content %}
+            <tr class="{% cycle '' 'gray' %}">
+                {% for col in row %}
+                    <td>
+                        {{ col|number_format:2 }}
+                    </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<p>
+    <a href="?export_to_csv=1">Экспортировать в CSV</a>
+</p>
