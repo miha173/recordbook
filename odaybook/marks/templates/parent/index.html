@@ -11,58 +11,5 @@
 
 {% block content %}
 {% include 'helpers/uniForm.html' %}
-<table class="table sort">
-  <thead>
-  <tr>
-    <th class="active">Уроки</th>
-	{% for date in dates %}
-	    <th style="padding-right: 10px;">
-            {% if date.resultdate %}
-                {{ date.resultdate }}
-            {% else %}
-                {{ date|date:"d.m" }}
-            {% endif %}
-        </th>
-	{% endfor %}
-    <th>Средний балл</th>
-    <th>Учителя</th>
-  </tr>
-  </thead>
-  
-  <tbody>
-  	
-	{% for subject in marks %}
-		<tr class="{% cycle 'gray' '' %}">
-			<td><a href="/marks/{{ subject.0.id }}/">{{ subject.0 }}</a></td>
-			{% for mark in subject.1 %}
-				<td>
-                    {% for m in mark %}<div class="mark-{{ m.get_type }}" style="display:inline">{{ m }}</div>{% if not forloop.last %},&nbsp;{% endif %}{% endfor %}
-                </td>
-			{% endfor %}
-			<td><div class="mark-{{ subject.4 }}">{{ subject.2|floatformat:"-2"|number_format }}</div></td>
-    		<td><div class="teacher"><a href="/teachers/{{ subject.3.id }}/">{{ subject.3.fio }}</a></div></td>
-		</tr>
-	{% endfor %}
-  
-  </tbody>
-</table>
-<table>
-    <thead><tr>
-        <th colspan="2">Сводка</th>
-    </tr></thead>
-    <tbody>
-    <tr>
-        <td>Пропусков</td>
-        <td>{{ cols.0 }}{# FIXME: plural часы #}</td>
-    </tr>
-    {% for key, value in cols.items %}
-        {% if key != 0 %}
-            <tr class="{% cycle 'gray' '' %}">
-                <td>Количество &laquo;{{ key }}&raquo;</td>
-                <td>{{ value }}</td>
-            </tr>
-        {% endif %}
-    {% endfor %}
-    </tbody>
-</table>
+{% include '~reports/marks.html' %}
 {% endblock %}

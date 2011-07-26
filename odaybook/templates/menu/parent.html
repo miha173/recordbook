@@ -2,7 +2,7 @@
     {% if ACTIVE_URL == '' %}<big class="gay">Главная</big>{% else %}<a href="/">Главная</a>{% endif %}
     {% if ACTIVE_URL == 'subjects' %}<big class="yellow">Уроки</big>{% else %}<a href="/subjects/">Уроки</a>{% endif %}
     {% if ACTIVE_URL == 'attendance' %}<big class="green">Расписание</big>{% else %}<a href="/attendance/">Расписание</a>{% endif %}
-    {% if ACTIVE_URL == 'marks' %}<big class="red">Оценки</big>{% else %}<a href="/marks/">Оценки</a>{% endif %}
+    {% if ACTIVE_URL == 'reports' %}<big class="red">Оценки</big>{% else %}<a href="/reports/marks/">Оценки</a>{% endif %}
     {% if ACTIVE_URL == 'grade' %}<big class="purple">Класс</big>{% else %}<a href="/grade/">Класс</a>{% endif %}
     {% if ACTIVE_URL == 'teachers' %}<big class="blue">Учителя</big>{% else %}<a href="/teachers/">Учителя</a>{% endif %}
 {% endif %}

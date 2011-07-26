@@ -23,11 +23,8 @@ from forms import LessonForm, MarkForm, ResultForm, DeliveryForm, StatForm, Mark
 
 @login_required
 def index(request):
-    class ExtendedDate(date):
-        pass
     render = {}
     if request.user.type == 'Parent':
-        dates = []
         start = date.today() - timedelta(weeks = 2)
         end = date.today() + timedelta(days = 1)
         if request.method == 'GET':
@@ -37,57 +34,9 @@ def index(request):
             if form.is_valid():
                 start = form.cleaned_data['start']
                 end = form.cleaned_data['end']
-        temp = start
-        while temp != end:
-            temp = ExtendedDate.fromordinal(temp.toordinal())
-            resultdates = ResultDate.objects.filter(grades = request.user.current_pupil.grade, date = temp)
-            if resultdates:
-                temp.resultdate = resultdates[0]
-            dates.append(temp)
-            temp += timedelta(days = 1)
-        marks = []
-        render['cols'] = cols = {}
-        for subject in request.user.current_pupil.get_subjects():
-            subj = []
-            subj.append(subject)
-            m = []
-            sum = 0
-            sum_n = 0
-            for day in dates:
-                if Mark.objects.filter(pupil = request.user.current_pupil, lesson__date = day, lesson__subject = subject).count():
-                    t = []
-                    for mark in Mark.objects.filter(pupil = request.user.current_pupil, lesson__date = day, lesson__subject = subject):
-                        t.append(mark)
-                        if mark.absent:
-                            cols[0] = cols.get(0, 0) + 1
-                        else:
-                            cols[mark.mark] = cols.get(mark.mark, 0) + 1
-                            sum += mark.mark
-                            sum_n += 1
-                    m.append(t)
-                else:
-                    m.append('')
-            subj.append(m)
-            if sum_n != 0:
-                subj.append(float(sum)/sum_n)
-            else:
-                subj.append(0)
-            # FIXME
-            subj.append(Teacher.objects.filter(grades = request.user.current_pupil.grade, subjects = subject)[0])
-#            subj.append(Teacher.objects.get(grades = request.user.grade, subjects = subject))
-#            subj.append(Connection.objects.get(Q(connection = 0) | Q(connection = request.user.group) | Q(connection = int(request.user.sex)+2), subject = subject, grade = request.user.grade).teacher)
-            if subj[2]<3:
-                type = "bad"
-            elif subj[2]>=4:
-                type = "good"
-            else:
-                type = "normal"
-            subj.append(type)
-            marks.append(subj)
-        render['marks'] = marks
-        render['dates'] = dates
-        results = Result.objects.filter(pupil = request.user).order_by('resultdate__enddate')
-        render['results'] = results
+
+        render.update(request.user.current_pupil.get_marks(start, end))
+
     elif request.user.type == 'Teacher':
         import demjson
 

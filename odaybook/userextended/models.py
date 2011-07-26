@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, date
 import pytils
 import time
 import random
@@ -672,6 +672,133 @@ class Pupil(BaseUser, Scholar):
         if not temp:
             temp = 0
         return "%.2f" % temp
+
+    def get_marks(self, start, end):
+        from odaybook.marks.models import Mark, ResultDate
+        class ExtendedDate(date):
+            pass
+        result = {}
+
+        temp = start
+        dates = []
+        while temp != end:
+            temp = ExtendedDate.fromordinal(temp.toordinal())
+            resultdates = ResultDate.objects.filter(grades = self.grade, date = temp)
+            if resultdates:
+                temp.resultdate = resultdates[0]
+            dates.append(temp)
+            temp += timedelta(days = 1)
+
+        marks = []
+        result['cols'] = cols = {}
+        for subject in self.get_subjects():
+            subj = []
+            subj.append(subject)
+            m = []
+            sum = 0
+            sum_n = 0
+            for day in dates:
+                if Mark.objects.filter(pupil = self, lesson__date = day, lesson__subject = subject).count():
+                    t = []
+                    for mark in Mark.objects.filter(pupil = self, lesson__date = day, lesson__subject = subject):
+                        t.append(mark)
+                        if mark.absent:
+                            cols[0] = cols.get(0, 0) + 1
+                        else:
+                            cols[mark.mark] = cols.get(mark.mark, 0) + 1
+                            sum += mark.mark
+                            sum_n += 1
+                    m.append(t)
+                else:
+                    m.append('')
+            subj.append(m)
+            if sum_n != 0:
+                subj.append(float(sum)/sum_n)
+            else:
+                subj.append(0)
+            # FIXME
+            subj.append(Teacher.objects.filter(grades = self.grade, subjects = subject)[0])
+#            subj.append(Teacher.objects.get(grades = request.user.grade, subjects = subject))
+#            subj.append(Connection.objects.get(Q(connection = 0) | Q(connection = request.user.group) | Q(connection = int(request.user.sex)+2), subject = subject, grade = request.user.grade).teacher)
+            if subj[2]<3:
+                type = "bad"
+            elif subj[2]>=4:
+                type = "good"
+            else:
+                type = "normal"
+            subj.append(type)
+            marks.append(subj)
+        result['marks'] = marks
+        result['dates'] = dates
+
+        return result
+
+    def get_result_marks(self):
+        # FIXME
+        from odaybook.marks.models import Mark, ResultDate
+        class ExtendedDate(date):
+            pass
+        result = {}
+
+        if date.today() < date(year = date.today().year, month = 9, day = 1):
+            start = date(year = date.today().year-1, month = 9, day = 1)
+        else:
+            start = date(year = date.today().year, month = 9, day = 1)
+        end = date.today()
+
+        temp = start
+        dates = []
+        while temp != end:
+            temp = ExtendedDate.fromordinal(temp.toordinal())
+            resultdates = ResultDate.objects.filter(grades = self.grade, date = temp)
+            if resultdates:
+                temp.resultdate = resultdates[0]
+                dates.append(temp)
+            temp += timedelta(days = 1)
+
+        marks = []
+        result['cols'] = cols = {}
+        for subject in self.get_subjects():
+            subj = []
+            subj.append(subject)
+            m = []
+            sum = 0
+            sum_n = 0
+            for day in dates:
+                if Mark.objects.filter(pupil = self, lesson__date = day, lesson__subject = subject).count():
+                    t = []
+                    for mark in Mark.objects.filter(pupil = self, lesson__date = day, lesson__subject = subject):
+                        t.append(mark)
+                        if mark.absent:
+                            cols[0] = cols.get(0, 0) + 1
+                        else:
+                            cols[mark.mark] = cols.get(mark.mark, 0) + 1
+                            sum += mark.mark
+                            sum_n += 1
+                    m.append(t)
+                else:
+                    m.append('')
+            subj.append(m)
+            if sum_n != 0:
+                subj.append(float(sum)/sum_n)
+            else:
+                subj.append(0)
+            # FIXME
+            subj.append(Teacher.objects.filter(grades = self.grade, subjects = subject)[0])
+#            subj.append(Teacher.objects.get(grades = request.user.grade, subjects = subject))
+#            subj.append(Connection.objects.get(Q(connection = 0) | Q(connection = request.user.group) | Q(connection = int(request.user.sex)+2), subject = subject, grade = request.user.grade).teacher)
+            if subj[2]<3:
+                type = "bad"
+            elif subj[2]>=4:
+                type = "good"
+            else:
+                type = "normal"
+            subj.append(type)
+            marks.append(subj)
+        result['marks'] = marks
+        result['dates'] = dates
+
+        return result
 
     def get_marks_avg_type(self, delta = timedelta(weeks = 4)):
         mark = self.get_marks_avg(delta)

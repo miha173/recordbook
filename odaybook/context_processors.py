@@ -22,13 +22,17 @@ def menu(request):
     if len(dirs) == 1:
         url = ''
     path = ''
-    if len(dirs)>3:
+    if len(dirs)>4:
         path = dirs[2]
+    elif len(dirs)>1:
+        path = dirs[1]
     if path == 'uni':
         path = dirs[3]
+    # FIXME: WTF?
     return {'ACTIVE_URL': url,
             'DIR': path,
             'path': path,
+            'FA': request.path,
             }
 
 def environment(request):

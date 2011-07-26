@@ -162,7 +162,7 @@ def report_fillability(request):
     total = {}
     rows = Array()
     rows.insert_row()
-    rows.append_cols('', u'Заполнено', u'не заполненно больше 10 дней', u'не заполненно больше 15 дней')
+    rows.append_cols('', u'заполнено, %', u'не заполненно больше 10 дней, % ', u'не заполненно больше 15 дней, %')
     schools = School.objects.all()
     render['form'] = form = SchoolSelectForm(request.GET)
     if form.is_valid():
@@ -222,6 +222,107 @@ def report_membershipchanges(request):
     render['paginator'] = paginator.num_pages - 1
 
     return render_to_response('~reports/report_membershipchanges.html', render, context_instance = RequestContext(request))
+
+
+@login_required
+@user_passes_test(lambda u: u.type in ['Superviser', 'Teacher', 'Parent'])
+def report_marks(request, mode = 'all'):
+    from django import forms
+    from odaybook.marks.forms import StatForm
+
+    class PupilSelectForm(forms.Form):
+        from smart_selects.form_fields import ChainedModelChoiceField, SimpleChainedModelChoiceField
+        school = forms.ModelChoiceField(queryset = School.objects.all(), label = u'Школа', required = False)
+        grade = ChainedModelChoiceField(app_name = 'userextended',
+                                        model_name = 'Grade',
+                                        chain_field = 'school',
+                                        model_field = 'school',
+                                        queryset = Grade.objects.all(),
+                                        label = u'Класс',
+                                        required = False
+        )
+        pupil = ChainedModelChoiceField(app_name = 'userextended',
+                                        model_name = 'Pupil',
+                                        chain_field = 'grade',
+                                        model_field = 'grade',
+                                        queryset = Pupil.objects.all(),
+                                        label = u'Ученик'
+        )
+        def __init__(self, school = None, grades = None, grade = None, pupil = None, *args, **kwargs):
+            super(PupilSelectForm, self).__init__(*args, **kwargs)
+            if school:
+                del self.fields['school']
+                if grades:
+                    self.fields['grade'] = forms.ModelChoiceField(queryset = grades, label = u'Класс')
+                else:
+                    self.fields['grade'] = forms.ModelChoiceField(queryset = Grade.objects.filter(school = school), label = u'Класс')
+            if grade:
+                del self.fields['grade']
+                self.fields['pupil'] = forms.ModelChoiceField(queryset = Pupil.objects.filter(grade = grade), label = u'Ученик')
+            if pupil:
+                del self.fields['school']
+                del self.fields['grade']
+                del self.fields['pupil']
+                
+    render = {}
+
+    school = grades = grade = pupil = None
+
+    if request.user.type == 'Teacher':
+        grades = [g.id for g in request.user.grades.all()]
+
+        if request.user.grade: grades.append(request.user.grade.id)
+
+        if request.user.edu_admin: grades += [g.id for g in Grade.objects.filter(school = request.user.school)]
+
+        school = request.user.school
+
+        grades = set(grades)
+        if len(grades) == 0:
+            raise Http404()
+        elif len(grades) == 1:
+            grades = None
+            grade = Grade.objects.get(id = grades[0])
+        else:
+            grades = Grade.objects.filter(id__in = grades)
+
+    elif request.user.type == 'Parent':
+        pupil = request.user.current_pupil
+
+
+
+    render['pupilSelectForm'] = pupilSelectForm = PupilSelectForm(school = school,
+                                                                  grade = grade,
+                                                                  grades = grades,
+                                                                  pupil = pupil,
+                                                                  data = request.GET
+                                                                  )
+
+    start = datetime.date.today() - datetime.timedelta(weeks = 2)
+    end = datetime.date.today() + datetime.timedelta(days = 1)
+    render['form'] = form = StatForm(request.GET)
+    if form.is_valid():
+        start = form.cleaned_data['start']
+        end = form.cleaned_data['end']
+    else:
+        render['form'] = StatForm()
+
+    if pupilSelectForm.is_valid() or pupil:
+        pupil = render['pupil'] = pupil or pupilSelectForm.cleaned_data['pupil']
+        if mode == 'all':
+            render.update(pupil.get_marks(start, end))
+        else:
+            render.update(pupil.get_result_marks())
+    else:
+        render['pupilSelectForm'] = PupilSelectForm(school = school,
+                                                    grade = grade,
+                                                    grades = grades,
+                                                    pupil = pupil,
+                                                   )
+
+    render['mode'] = mode
+    
+    return render_to_response('~reports/report_marks.html', render, context_instance = RequestContext(request))
 
 
 

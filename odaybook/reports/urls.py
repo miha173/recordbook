@@ -8,4 +8,6 @@ urlpatterns = patterns("odaybook.reports.views",
                        (r'^order/$', 'report_order'),
                        (r'^fillability/$', 'report_fillability'),
                        (r'^membershipchanges/$', 'report_membershipchanges'),
+                       (r'^marks/$', 'report_marks'),
+                       (r'^marks/result/$', 'report_marks', {'mode': 'result'}),
                        )

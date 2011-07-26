@@ -1,14 +1,16 @@
 {%  extends 'page.html' %}
 
 {% block padding %}
-    {%  if user.type == 'Teacher' %}
-        {%  if path == 'health' %}<h1>Группы здоровья</h1>{% else %}<a href="/reports/health/">Группы здоровья</a>{% endif %}
-        {%  if path == 'order' %}<h1>Социальные группы</h1>{% else %}<a href="/reports/order/">Социальные группы</a>{% endif %}
+    {% if user.type == 'Teacher' %}
+        {% if path == 'health' %}<h1>Группы здоровья</h1>{% else %}<a href="/reports/health/">Группы здоровья</a>{% endif %}
+        {% if path == 'order' %}<h1>Социальные группы</h1>{% else %}<a href="/reports/order/">Социальные группы</a>{% endif %}
+        {% if '/reports/marks' in FA %}<h1>Успеваемость</h1>{% else %}<a href="/reports/marks/">Успеваемость</a>{% endif %}
     {%  endif %}
     {%  if user.type == 'Superviser' %}
         {%  if path == 'fillability' %}<h1>Заполненность</h1>{% else %}<a href="/reports/fillability/">Заполненность</a>{% endif %}
         {%  if path == 'quality' %}<h1>Качество и обученность</h1>{% else %}<a href="/reports/quality/">Качество и обученность</a>{% endif %}
         {%  if path == 'membershipchanges' %}<h1>Зачисления и исключения</h1>{% else %}<a href="/reports/membershipchanges/">Зачисления и исключения</a>{% endif %}
+        {% if path == 'grade' %}<h1>Успеваемость</h1>{% else %}<a href="/reports/marks/">Успеваемость</a>{% endif %}
     {%  endif %}
     {%  if user.type == 'Superuser' %}
         {%  if path == 'fillability' %}<h1>Заполненность</h1>{% else %}<a href="/reports/fillability/">Заполненность</a>{% endif %}

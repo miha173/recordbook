@@ -1,0 +1,42 @@
+{% extends '~reports/page.html' %}
+
+{% block  js_ready %}
+    $("#id_start").datepicker($.datepicker.regional["ru"]);
+    $("#id_end").datepicker($.datepicker.regional["ru"]);
+{% endblock %}
+
+{% block content %}
+    <p>
+        <a href="/reports/marks/">Все</a> или <a href="/reports/marks/result/">итоговые</a>.
+    </p>
+    <form method="get" action=".">
+        <table class="table form">
+            {% for field in pupilSelectForm %}
+            <tr>
+                <td class="label"><label for="{{ field.label }}">{{ field.label_tag }}:</label></td>
+                <td>{{ field }}</td>
+                <td>
+                    {% if field.errors %}<div class="error_text">{{ field.errors }}</div>{% endif %}
+                    {% if field.help_text %}<div class="help_text">{{ field.help_text}}</div>{% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        {% if marks and mode == 'all' %}
+            {% for field in form %}
+            <tr>
+                <td class="label"><label for="{{ field.label }}">{{ field.label_tag }}:</label></td>
+                <td>{{ field }}</td>
+                <td>
+                    {% if field.errors %}<div class="error_text">{{ field.errors }}</div>{% endif %}
+                    {% if field.help_text %}<div class="help_text">{{ field.help_text}}</div>{% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        {% endif %}
+            {% if pupilSelectForm.fields or mode == 'all' %}<tr><td colspan="2"><input type="submit" value="Показать"></td></tr>{% endif %}
+        </table>
+    </form>
+    {% if marks %}
+        {% include '~reports/marks.html' %}
+    {% endif %}
+{% endblock %}
