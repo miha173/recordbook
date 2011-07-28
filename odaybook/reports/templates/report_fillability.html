@@ -18,15 +18,18 @@
         data.setValue(3, 1, {{ all.not_filled_more_15_days }});
 
         var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
-        chart.draw(data, {width: 500, height: 300, title: 'Иллюстрация', reverseCategories: true});
+        chart.draw(data, {width: 500, height: 300, title: '', reverseCategories: true});
       }
 {% endblock %}
 
 {% block content %}
     <form method="GET" action=".">
-        Выбрать школу: {{ form.school }}
+        Школа: {{ form.school }}
         <input type="submit" value="Показать">
+        <a href="?export_to_csv=1" style="padding-left: 10px;">Экспортировать в CSV</a>
     </form>
-    {% include 'report_form.html' %}
-    <div id="chart_div"></div>
+    {% with hide_export_link=1 %}
+        {% include 'report_form.html' %}
+        <div id="chart_div" style=""></div>
+    {% endwith %}
 {% endblock %}

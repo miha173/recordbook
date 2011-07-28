@@ -929,3 +929,16 @@ table.attendance-editor-table div.dndbar input{
     width: 35px;
     margin: 0 10px;
 }
+
+
+div#content table.no-style{
+    margin: 0px;
+    padding: 0px;
+}
+div#content table.no-style tr:hover{
+    background: none;
+}
+div#content table.no-style > td{
+    margin: 0px;
+    padding: 0px;
+}

@@ -1,26 +1,29 @@
 # -*- coding: UTF-8 -*-
-
+'''
+    Context proccesor's для всей системы
+'''
 from datetime import date
 
-from django.core.context_processors import request
-from django.core.signals import request_started
-
-from odaybook.curatorship.models import Connection
-from odaybook.userextended.models import Subject, Option
-
-from odaybook import settings
+from odaybook.userextended.models import Option
 
 def plural(request):
-    plural = {}
-    plural['page_plural'] = (u"страница", u"страницы", u"страниц")
-    plural['pupil_plural'] = ("ученик", "ученика", "учеников")
-    return plural
+    '''
+        Значения для pytils
+    '''
+    result = {}
+    result['page_plural'] = (u"страница", u"страницы", u"страниц")
+    result['pupil_plural'] = ("ученик", "ученика", "учеников")
+    return result
 
 def menu(request):
+    '''
+        Всяческие констаны для отображения меню
+    '''
     dirs = request.path.split('/')
 
     CM = ''
-    if len(dirs)>1: CM = dirs[1]
+    if len(dirs)>1:
+        CM = dirs[1]
     if len(dirs)>3:
         if dirs[2] == 'uni':
             CM = dirs[3]
@@ -36,22 +39,13 @@ def menu(request):
     }
 
 def environment(request):
+    '''
+        Подгрузка раздичных переменных окружения
+    '''
     render = {}
     user = request.user
     if request.user.is_authenticated():
-        if request.user.type == 'Teacher':
-            subjects = []
-            last_subject = None
-            for connection in Connection.objects.filter(teacher = user).order_by('subject'):
-                if last_subject != connection.subject:
-                    last_subject = connection.subject
-                    subjects.append({'id': connection.subject.id, 'name': connection.subject.name})
-            if not user.current_subject:
-                if len(subjects) != 0:
-                    user.current_subject = Subject.objects.get(id = subjects[0]['id'])
-                    user.save()
-            render['subjects'] = subjects
-        elif request.user.type == 'Pupil':
+        if request.user.type == 'Pupil':
             render['subjects'] = user.get_subjects()
 
         if user.type not in ['Pupil', 'Parent']:

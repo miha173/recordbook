@@ -1,23 +1,15 @@
 # -*- coding: UTF-8 -*-
 
-import demjson
 import datetime
-import csv
-import re
 
 from django.template import RequestContext
 from django.shortcuts import render_to_response, get_object_or_404
-from django.template.loader import render_to_string
-from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.http import HttpResponse, Http404
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib.auth.models import User
-from django.contrib import messages
-from django.db.models import get_model
-from django.core.urlresolvers import resolve, reverse
 
 from odaybook import settings
-from odaybook.userextended.models import Grade, Subject, School, Teacher, Pupil, MembershipChange
+from odaybook.userextended.models import Grade, Subject, School, Pupil, MembershipChange
 from odaybook.attendance.models import UsalTimetable
 from odaybook.marks.forms import StatForm
 from odaybook.marks.models import Lesson, Mark

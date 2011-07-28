@@ -20,5 +20,7 @@
     </tbody>
 </table>
 <p>
-    <a href="?export_to_csv=1">Экспортировать в CSV</a>
+    {% if not hide_export_link %}
+        <a href="?export_to_csv=1">Экспортировать в CSV</a>
+    {% endif %}
 </p>

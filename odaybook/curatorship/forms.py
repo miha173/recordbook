@@ -5,24 +5,6 @@ from models import Connection
 from odaybook.userextended.models import Pupil, Subject, Parent
 from odaybook.marks.models import Result, ResultDate
 
-class ConnectionStep1Wizard(forms.ModelForm):
-    class Meta:
-        model = Connection
-        fields = ('teacher',)
-
-class ConnectionStep2Wizard(forms.ModelForm):
-    class Meta:
-        model = Connection
-        fields = ('subject',)
-
-class ConnectionStep3Wizard(forms.ModelForm):
-    class Meta:
-        model = Connection
-        fields = ('connection',)
-    def __init__(self, *args, **kwargs):
-        super(ConnectionStep3Wizard, self).__init__(*args, **kwargs)
-        self.fields['connection'].initial = '0'
-
 class ConnectionForm(forms.ModelForm):
     class Meta:
         model = Connection
@@ -38,7 +20,7 @@ class PupilForm(forms.ModelForm):
         model = Pupil
         fields = [
                 'last_name', 'first_name', 'middle_name', 'email', 'phone',
-                'sex', 'grade', 'special', 'order', 'health_group', 'health_note',
+                'sex', 'special', 'order', 'health_group', 'health_note',
                 'parent_phone_1', 'parent_phone_2',
         ]
 

@@ -6,12 +6,12 @@
     {% if user.type == 'Teacher' %}
         {% padding_menu_block 'Группы здоровья' '/reports/health/' SM %}
         {% padding_menu_block 'Социальные группы' '/reports/order/' SM %}
-        {% padding_menu_block 'Успеваемость' '/reports/marks/' SM %}
+        {% padding_menu_block 'Оценки' '/reports/marks/' SM %}
     {%  endif %}
     {%  if user.type == 'Superviser' %}
         {% padding_menu_block 'Заполненность' '/reports/fillability/' SM %}
         {% padding_menu_block 'Зачисления и исключения' '/reports/membershipchanges/' SM %}
-        {% padding_menu_block 'Успеваемость' '/reports/marks/' SM %}
+        {% padding_menu_block 'Оценки' '/reports/marks/' SM %}
     {%  endif %}
     {%  if user.type == 'Superuser' %}
         {% padding_menu_block 'Заполненность' '/reports/fillability/' SM %}

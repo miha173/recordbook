@@ -3,9 +3,11 @@
 {% block  js_ready %}
     $("#id_start").datepicker($.datepicker.regional["ru"]);
     $("#id_end").datepicker($.datepicker.regional["ru"]);
+    $( "#radio" ).buttonset();
 {% endblock %}
 
 {% load formater %}
+
 
 {% block content %}
     <p>
