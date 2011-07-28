@@ -19,13 +19,12 @@ urlpatterns = patterns("odaybook.userextended.views",
 
                        (r'password_reset_complete/$', password_reset_complete, {'template_name': 'password_reset_complete.html',}),
 
-                       # FIXME: а нужно?
                        (r'^uni/(?P<app>\w+).(?P<model>\w+)/$', 'objectList'),
                        (r'^uni/(?P<app>\w+).(?P<model>\w+)/add/$', 'objectEdit', {'mode': 'add'}),
                        (r'^uni/(?P<app>\w+).(?P<model>\w+)/edit/(?P<id>\d+)/$', 'objectEdit', {'mode': 'edit'}),
                        (r'^uni/(?P<app>\w+).(?P<model>\w+)/delete/(?P<id>\d+)/$', 'objectEdit', {'mode': 'delete'}),
 
-                       # FIXME: дубляж ради school_id очень некрасив
+                       # дубляж ради filter_id очень некрасив
                        (r'^uni/(?P<app>\w+).(?P<model>\w+)/(?P<filter_id>\d+)/$', 'objectList'),
                        (r'^uni/(?P<app>\w+).(?P<model>\w+)/(?P<filter_id>\d+)/add/$', 'objectEdit', {'mode': 'add'}),
                        (r'^uni/(?P<app>\w+).(?P<model>\w+)/(?P<filter_id>\d+)/edit/(?P<id>\d+)/$', 'objectEdit', {'mode': 'edit'}),

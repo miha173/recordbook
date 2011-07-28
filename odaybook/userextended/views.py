@@ -15,6 +15,7 @@ from django.contrib import messages
 from django.conf import settings
 from django.db.models import get_model
 from django.core.urlresolvers import resolve, reverse
+from django.core.validators import validate_email
 
 from models import School, Clerk, Superviser, Teacher, Pupil, Parent, BaseUser, Superuser, Subject, Grade, MembershipChange
 from forms import ClerkForm, PupilConnectionForm, ClerkRegisterForm, ImportForm
@@ -217,14 +218,15 @@ def baseUserObjectEdit(request, mode, filter_id = None, id = 0):
 
     url = '/accounts/baseuser/'
 
-    if request.method == 'GET':
-        if mode == 'set_right':
-            # FIXME: url reverse
-            # FIXME: DRY
-            clerk = get_object_or_404(Clerk, id = id)
-            right = request.GET.get('set_right', None)
+    if id:
+        clerk = get_object_or_404(Clerk, id = id)
 
-            if right not in ['Superuser', 'Superviser', 'EduAdmin']: raise Http404
+    if request.method == 'GET':
+
+        right = request.GET.get('set_right', None)
+        if right not in ['Superuser', 'Superviser', 'EduAdmin', 'Teacher', None]: raise Http404
+
+        if mode == 'set_right':
 
             if right in ['Superviser', 'Superuser']:
                 if right in clerk.get_roles_list_simple():
@@ -246,15 +248,9 @@ def baseUserObjectEdit(request, mode, filter_id = None, id = 0):
                     teacher.edu_admin = True
                     teacher.save()
 
-            return HttpResponseRedirect('/accounts/baseuser/')
+            return HttpResponseRedirect(url)
 
         if mode == 'dismiss':
-            # FIXME: url reverse
-            # FIXME: DRY
-            clerk = get_object_or_404(Clerk, id = id)
-            right = request.GET.get('right', None)
-
-            if right not in ['Superuser', 'Superviser', 'EduAdmin', 'Teacher']: raise Http404
 
             if right == 'Superuser':
                 superuser = clerk.get_role_obj('Superuser')[0]
@@ -274,7 +270,6 @@ def baseUserObjectEdit(request, mode, filter_id = None, id = 0):
                     baseuser.delete()
                 else:
                     messages.error(request, u'Права уже были удалены')
-                    pass
 
             if right == 'EduAdmin':
                 role = get_object_or_404(Teacher, id = request.GET.get('role_id'), edu_admin = True, clerk = clerk)
@@ -290,21 +285,16 @@ def baseUserObjectEdit(request, mode, filter_id = None, id = 0):
             return HttpResponseRedirect('/accounts/baseuser/')
 
         if mode == 'edit':
-            render['form'] = ClerkForm(instance = get_object_or_404(Clerk, id = id))
+            render['form'] = ClerkForm(instance = clerk)
         elif mode == 'delete':
             try:
-                get_object_or_404(Clerk, id = id).delete()
+                clerk.delete()
                 return HttpResponseRedirect(url)
             except PlaningError, (error, ):
                 render['error'] = error
                 messages.error(request, u'Удаление невозможно: %s' % error)
                 return HttpResponseRedirect(url)
         elif mode == 'reset_password':
-            try:
-                clerk = get_object_or_404(Clerk, id = id)
-            except Clerk.DoesNotExist:
-                messages.error(request, u'Запись не найдена')
-                return HttpResponseRedirect(url)
             password = clerk.reset_password()
             messages.success(request, u'Пароль установлен на "%s"' % password)
             return HttpResponseRedirect(url)
@@ -313,7 +303,7 @@ def baseUserObjectEdit(request, mode, filter_id = None, id = 0):
         return render_to_response('~userextended/clerk.html', render, context_instance = RequestContext(request))
     if request.method == 'POST':
         if mode == 'edit':
-            form = ClerkForm(data = request.POST, files = request.FILES, instance = get_object_or_404(Clerk, id = id))
+            form = ClerkForm(data = request.POST, files = request.FILES, instance = clerk)
             if form.is_valid():
                 form.save()
                 return HttpResponseRedirect(url)
@@ -541,7 +531,11 @@ def import_teacher(request, filter_id):
                 if len(row[0])<2 or len(row[1])<2 or len(row[2])<2:
                     errors.append({'line': i, 'column': 0, 'error': u'сликшом короткое ФИО'})
                     continue
-                # TODO: email regexp
+                try:
+                    validate_email(row[3])
+                except:
+                    errors.append({'line': i, 'column': 4, 'error': u'email указан неверно'})
+                    continue
                 teacher = Teacher(school = school, last_name = row[0], first_name = row[1], middle_name = row[2], email = row[3])
                 teacher._subjects = []
                 t = [j.strip() for j in row[4].split(',')]
@@ -609,7 +603,11 @@ def import_pupil(request, filter_id):
                 if len(row[0])<2 or len(row[1])<2 or len(row[2])<2:
                     errors.append({'line': i, 'column': 0, 'error': u'сликшом короткое ФИО'})
                     continue
-                # TODO: email regexp
+                try:
+                    validate_email(row[7])
+                except:
+                    errors.append({'line': i, 'column': 8, 'error': u'email указан неверно'})
+                    continue
                 pupil = Pupil(
                         school = school,
                         last_name = row[0],

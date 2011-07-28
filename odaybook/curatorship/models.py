@@ -3,12 +3,14 @@
 import datetime
 
 from django.db import models
-from odaybook.userextended.models import Teacher, Subject, Grade
-from odaybook.rest.models import RestModel
+from django.core.mail import send_mail
 
 from smart_selects.db_fields import ChainedForeignKey, GroupedForeignKey, SimpleChainedForeignKey
 
+from odaybook.userextended.models import Teacher, Subject, Grade
+from odaybook.rest.models import RestModel
 from odaybook.userextended.models import Parent, Pupil
+from django.conf import settings
 
 GROUPS = zip(*([str(i) for i in range(1, 11)], )*2)
 GROUPS.insert(0, ('0', u'Весь класс'))
@@ -38,13 +40,15 @@ class Request(models.Model):
         self.parent.save()
         self.activated = True
         self.activated_timestamp = datetime.datetime.now()
-        # TODO: send mail
+        send_mail(u'Система электронных дневников. Одобрение привязки к ученику.', u'''Здравствуйте!
+Привязка к ученику одобрена классным руководителем. Можете приступать к работе.''', settings['DEFAULT_FROM_EMAIL'], [self.parent.email])
         self.save()
 
     def disapprove(self):
         self.activated = True
         self.activated_timestamp = datetime.datetime.now()
-        # TODO: send mail
+        send_mail(u'Система электронных дневников. Отклонение привязки к ученику.', u'''Здравствуйте!
+Привязка к ученику не одобрена классным руководителем. Возможно, вам стоит связаться с классным руководителем и повторить заявку.''', settings['DEFAULT_FROM_EMAIL'], [self.parent.email])
         self.save()
 
     

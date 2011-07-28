@@ -5,9 +5,11 @@
     $("#id_end").datepicker($.datepicker.regional["ru"]);
 {% endblock %}
 
+{% load formater %}
+
 {% block content %}
     <p>
-        <a href="/reports/marks/">Все</a> или <a href="/reports/marks/result/">итоговые</a>.
+        <a href="/reports/marks/?{{ params|urllibencode }}">Все</a> или <a href="/reports/marks/result/?{{ params|urllibencode }}">итоговые</a>.
     </p>
     <form method="get" action=".">
         <table class="table form">

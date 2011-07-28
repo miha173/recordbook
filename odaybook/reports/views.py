@@ -18,7 +18,9 @@ from django.core.urlresolvers import resolve, reverse
 
 from odaybook import settings
 from odaybook.userextended.models import Grade, Subject, School, Teacher, Pupil, MembershipChange
-from odaybook.marks.models import Lesson
+from odaybook.attendance.models import UsalTimetable
+from odaybook.marks.forms import StatForm
+from odaybook.marks.models import Lesson, Mark
 from reports import get_fillability
 from forms import SchoolSelectForm
 
@@ -86,11 +88,8 @@ def report_health(request):
             c = Pupil.objects.filter(school = request.user.school, grade = grade, health_group = group)
             rows.append_col(c.count())
             total[group] = total.get(group, 0) + c.count()
-            # FIXME
-            if all == 0:
-                rows.append_col(0)
-            else:
-                rows.append_col((c.count()/all)*100)
+            if all == 0: rows.append_col(0)
+            else: rows.append_col((c.count()/all)*100)
         rows.append_col(str(all))
 
     rows.insert_row()
@@ -131,11 +130,8 @@ def report_order(request):
             c = Pupil.objects.filter(school = request.user.school, grade = grade, order = order[0])
             rows.append_col(c.count())
             total[order[0]] = total.get(order[0], 0) + c.count()
-            # FIXME
-            if all == 0:
-                rows.append_col(0)
-            else:
-                rows.append_col((c.count()/all)*100)
+            if all == 0: rows.append_col(0)
+            else: rows.append_col((c.count()/all)*100)
         rows.append_col(str(all))
 
     rows.insert_row()
@@ -309,8 +305,13 @@ def report_marks(request, mode = 'all'):
 
     if pupilSelectForm.is_valid() or pupil:
         pupil = render['pupil'] = pupil or pupilSelectForm.cleaned_data['pupil']
+        if pupilSelectForm.is_valid():
+            render['params'] = {}
+            for param in 'school', 'grade', 'pupil':
+                render['params'][param] = request.GET.get(param, None)
+
         if mode == 'all':
-            render.update(pupil.get_marks(start, end))
+            render.update(pupil.get_all_marks(start, end))
         else:
             render.update(pupil.get_result_marks())
     else:
@@ -326,7 +327,53 @@ def report_marks(request, mode = 'all'):
 
 
 
+@login_required
+def viewMarks(request, id):
+    from django.db.models import Avg
+    render = {}
+    pupil = request.user.current_pupil
+    subject = get_object_or_404(Subject, id = id, school = pupil.school)
+    subject.teacher = pupil.get_teacher(subject)
+    subject.avg = Mark.objects.filter(pupil = pupil, absent = False, lesson__date__gte = datetime.datetime.now() - datetime.timedelta(weeks = 4), lesson__subject = subject).aggregate(Avg('mark'))['mark__avg']
+    if subject.avg<3:
+        subject.avg_type = "bad"
+    elif subject.avg>=4:
+        subject.avg_type = "good"
+    else:
+        subject.avg_type = "normal"
+    days = {
+        1: u'Пн',
+        2: u'Вт',
+        3: u'Ср',
+        4: u'Чт',
+        5: u'Пт',
+        6: u'Сб',
+    }
+    subject.days = []
+    lessons = UsalTimetable.objects.filter(grade = pupil.grade,
+                                           subject = subject,
+                                           group = pupil.groups[subject.id].group).order_by('workday')
+    for lesson in lessons:
+        if int(lesson.workday) not in subject.days:
+            subject.days.append(int(lesson.workday))
+    subject.days = [days[day] for day in subject.days]
 
+    start = datetime.date.today() - datetime.timedelta(weeks = 4)
+    end = datetime.date.today() + datetime.timedelta(days = 1)
+    if request.method == 'GET':
+        render['form'] = form = StatForm()
+    else:
+        render['form'] = form = StatForm(request.POST)
+        if form.is_valid():
+            start = form.cleaned_data['start']
+            end = form.cleaned_data['end']
+    render['lessons'] = Lesson.objects.filter(grade = pupil.grade, date__gte = start, date__lte = end, subject = subject)
+    for lesson in render['lessons']:
+        if Mark.objects.filter(pupil = pupil, lesson = lesson):
+            lesson.mark = Mark.objects.get(pupil = pupil, lesson = lesson)
+
+    render['subject'] = subject
+    return render_to_response('~marks/%s/marks.html' % request.user.type.lower(), render, context_instance = RequestContext(request))
 
 
 

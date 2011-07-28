@@ -64,9 +64,9 @@
 			<td colspan="3">
 				<h2>
 					{{ school.name }} 
-					<a href="/administrator/uni/userextended.School/edit/{{ school.id }}/"><img src="{{ MEDIA_URL}}images/edit.png" /></a>
+					<a href="/administrator/uni/userextended.School/{{ school.id }}/edit/{{ school.id }}/"><img src="{{ MEDIA_URL}}images/edit.png" /></a>
 					{%  if user.type == 'Superuser' %}
-                        <a href="/administrator/uni/userextended.School/delete/{{ school.id }}/" class="delete"><img src="{{ MEDIA_URL}}images/delete.png" /></a>
+                        <a href="/administrator/uni/userextended.School/{{ school.id }}/delete/{{ school.id }}/" class="delete"><img src="{{ MEDIA_URL}}images/delete.png" /></a>
                     {%  endif %}
 				</h2>
 			</td>

@@ -170,8 +170,6 @@ INSTALLED_APPS = (
     'odaybook.marks',
     'odaybook.curatorship',
     'odaybook.tests',
-    'odaybook.rest',
-    'odaybook.api',
     'odaybook.billing',
     'odaybook.reports',
 )

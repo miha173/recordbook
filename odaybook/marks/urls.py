@@ -4,7 +4,6 @@ from django.conf.urls.defaults import *
 
 urlpatterns = patterns("odaybook.marks.views",
                        (r'^$', 'index'),
-                       (r'^(?P<id>\d+)/$', 'viewMarks'),
                        (r'set_current_subject/(?P<subject_id>\d+)', 'set_current_subject'),
                        
                        (r'^lesson/$', 'lessonList'),

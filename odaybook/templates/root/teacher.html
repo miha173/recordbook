@@ -4,7 +4,7 @@
 	<h1>{{ teacher.fio }}</h1>
 	<div class="subject">
 		{% for subject in teacher.subjects.all %}
-	    <a href="/marks/{{ subject.id }}/">{{ subject }}</a><br />
+	    <a href="/reports/marks/{{ subject.id }}/">{{ subject }}</a><br />
 		{% endfor %}
 	</div>
 	{#<div class="classroom"><div><div>23</div></div></div>#}

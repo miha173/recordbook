@@ -18,22 +18,22 @@ def plural(request):
 
 def menu(request):
     dirs = request.path.split('/')
-    url = dirs[1]
-    if len(dirs) == 1:
-        url = ''
-    path = ''
-    if len(dirs)>4:
-        path = dirs[2]
-    elif len(dirs)>1:
-        path = dirs[1]
-    if path == 'uni':
-        path = dirs[3]
-    # FIXME: WTF?
-    return {'ACTIVE_URL': url,
-            'DIR': path,
-            'path': path,
+
+    CM = ''
+    if len(dirs)>1: CM = dirs[1]
+    if len(dirs)>3:
+        if dirs[2] == 'uni':
+            CM = dirs[3]
+
+    SM = ''
+    if len(dirs)>2:
+        SM = dirs[2]
+
+    return {
             'FA': request.path,
-            }
+            'CM': CM,
+            'SM': SM,
+    }
 
 def environment(request):
     render = {}

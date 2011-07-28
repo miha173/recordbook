@@ -1,14 +1,14 @@
+{%  load formater %}
+
 {% if user.connection_set.all %}
-    {% if ACTIVE_URL == 'marks' %}<big class="gay">Оценки</big>{% else %}<a href="/marks/">Оценки</a>{% endif %}
+    {%  main_menu_block 'Оценки' '/marks/' '' CM 'marks' %}
 {% endif %}
 {% if user.grade %}
-    {% if ACTIVE_URL == 'curatorship' %}<big class="yellow">Классное руководство</big>{% else %}<a href="/curatorship/">Классное руководство</a>{% endif %}
+    {%  main_menu_block 'Классное руководство' '/curatorship/' '' CM 'curatorship' %}
 {% endif %}
 {% if user.edu_admin %}
-    {# FIXME #}
-    {% if ACTIVE_URL == 'accounts' %}<big class="green">Управление</big>{% else %}<a href="/accounts/uni/userextended.School/">Управление</a>{% endif %}
+    {%  main_menu_block 'Управление' '/accounts/uni/userextended.School/' '' CM 'userextended.School' %}
 {% endif %}
 {% if user.edu_admin or user.grade %}
-    {# FIXME #}
-    {% if ACTIVE_URL == 'reports' %}<big class="red">Отчёты</big>{% else %}<a href="/reports/">Отчёты</a>{% endif %}
+    {%  main_menu_block 'Отчёты' '/reports/' '' CM 'reports' %}
 {% endif %}

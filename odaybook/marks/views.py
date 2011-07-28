@@ -35,7 +35,7 @@ def index(request):
                 start = form.cleaned_data['start']
                 end = form.cleaned_data['end']
 
-        render.update(request.user.current_pupil.get_marks(start, end))
+        render.update(request.user.current_pupil.get_all_marks(start, end))
 
     elif request.user.type == 'Teacher':
         import demjson
@@ -154,47 +154,6 @@ def index(request):
         render['lessons'] = lessons_range
         
     return render_to_response('~marks/%s/index.html' % request.user.type.lower(), render, context_instance = RequestContext(request))
-
-@login_required
-def viewMarks(request, id):
-    render = {}
-    pupil = request.user.current_pupil
-    subject = get_object_or_404(Subject, id = id, school = pupil.school)
-    subject.teacher = pupil.get_teacher(subject)
-    subject.avg = Mark.objects.filter(pupil = pupil, absent = False, lesson__date__gte = datetime.now() - timedelta(weeks = 4), lesson__subject = subject).aggregate(Avg('mark'))['mark__avg']
-    if subject.avg<3:
-        subject.avg_type = "bad"
-    elif subject.avg>=4:
-        subject.avg_type = "good"
-    else:
-        subject.avg_type = "normal"
-    days = {1: u'Пн',
-            2: u'Вт',
-            3: u'Ср',
-            4: u'Чт',
-            5: u'Пт',
-            6: u'Вс',
-            }
-    # FIXME
-    subject.days = []
-    subject.days = [int(lesson.workday) for lesson in UsalTimetable.objects.filter(grade = pupil.grade, subject = subject, group = pupil.groups[subject.id]).order_by('workday') if int(lesson.workday) not in subject.days]
-    subject.days = [days[day] for day in subject.days]
-    start = date.today() - timedelta(weeks = 4)
-    end = date.today() + timedelta(days = 1)
-    if request.method == 'GET':
-        render['form'] = form = StatForm()
-    else:
-        render['form'] = form = StatForm(request.POST)
-        if form.is_valid():
-            start = form.cleaned_data['start']
-            end = form.cleaned_data['end']
-    render['lessons'] = Lesson.objects.filter(grade = pupil.grade, date__gte = start, date__lte = end, subject = subject)
-    for lesson in render['lessons']:
-        if Mark.objects.filter(pupil = pupil, lesson = lesson):
-            lesson.mark = Mark.objects.get(pupil = pupil, lesson = lesson)
-
-    render['subject'] = subject
-    return render_to_response('~marks/%s/marks.html' % request.user.type.lower(), render, context_instance = RequestContext(request))
 
 @login_required
 @user_passes_test(lambda u: u.type == 'Teacher')

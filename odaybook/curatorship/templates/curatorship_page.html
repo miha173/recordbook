@@ -1,8 +1,6 @@
 {% extends 'page.html' %}
 
 {% block padding %}
-	{% ifequal path "connections" %}<h1>Связки</h1> {% else %}<a href="/curatorship/connections/">Связки</a>{% endifequal %}
-	{% ifequal path "pupil" %}<h1>Ученики</h1> {% else %}<a href="/curatorship/pupil/">Ученики</a>{% endifequal %}
-	{#{% ifequal path "pupil_passwords" %}<h1>Пароли учеников</h1> {% else %}<a href="/curatorship/pupil_passwords/">Пароли учеников</a>{% endifequal %}#}
-	{#{% ifequal path "graphics" %}<h1>Аналитика</h1> {% else %}<a href="/curatorship/graphics/">Аналитика</a>{% endifequal %}#}
+	{% if SM == "connections" %}<h1>Связки</h1> {% else %}<a href="/curatorship/connections/">Связки</a>{% endif %}
+	{% if SM == "pupil" %}<h1>Ученики</h1> {% else %}<a href="/curatorship/pupil/">Ученики</a>{% endif %}
 {% endblock %}

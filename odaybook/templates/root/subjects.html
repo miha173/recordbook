@@ -24,7 +24,7 @@
   <tbody>
   	{% for subject in subjects %}
 	  <tr class="{% cycle 'gray' '' %}">
-	    <td><a href="/marks/{{ subject.id }}/">{{ subject }}</a></td>
+	    <td><a href="/reports/marks/{{ subject.id }}/">{{ subject }}</a></td>
 	    {#<td><div class="classroom"><div><div>205</div></div></div></td>#}
 	    <td><div class="calendar">{{ subject.days|join:", " }}</div></td>
 	    <td><div class="mark-normal">{{ subject.avg|default:0|floatformat:"-1"|number_format }}</div></td>

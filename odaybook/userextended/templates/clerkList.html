@@ -19,12 +19,12 @@
     user_id = 0;
         
     $( "#dialog" ).dialog({
-        height: 80,
-        width: 500,
+        height: 150,
+        width: 600,
         modal: true,
         autoOpen: false,
         title: 'Выберите школу для администрирования',
-        
+
     });
 
 {% endblock %}
@@ -36,6 +36,8 @@
                 <option value="{{ school.id }}">{{ school.name }}</option>
             {% endfor %}
         </select>
+        <br />
+        <br />
         <input type="button" value="Выбрать" onclick="$.get('set/' + user_id + '/', {set_right: 'EduAdmin', 'school_id': $('#school_id').val()}, function(data){window.location.reload()})" />
     </div>
 

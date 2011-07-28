@@ -13,4 +13,3 @@ from settings_dist import *
 #    }
 #}
 
-INSTALLED_APPS +=('django_extensions', )

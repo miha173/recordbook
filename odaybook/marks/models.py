@@ -5,20 +5,7 @@ from odaybook.rest.models import RestModel, RestModelManager
 from odaybook.userextended.models import Pupil, Teacher, Subject, Grade, School
 from odaybook import settings
 
-class LessonManager(RestModelManager):
-    # FIXME
-    def search(self, str):
-        values = []
-        a = super(LessonManager, self).get_query_set().filter(grade__long_name__contains = str)
-        for obj in a: values.append(obj.id)
-        a = super(LessonManager, self).get_query_set().filter(grade__small_name__contains = str)
-        for obj in a: values.append(obj.id)
-        a = super(LessonManager, self).get_query_set().filter(topic__contains = str)
-        for obj in a: values.append(obj.id)
-        return super(LessonManager, self).get_query_set().filter(id__in = values)
-
 class Lesson(RestModel):
-    objects = LessonManager()
     teacher = models.ForeignKey(Teacher, verbose_name = u'Учитель', blank = True, null = True)
     date = models.DateField(u'Дата')
     topic = models.CharField(u'Тема урока', max_length = 200, blank = True, null = True)
@@ -33,7 +20,6 @@ class Lesson(RestModel):
     serialize_name = 'lesson'
     
     class Meta:
-        # FIXME: unics
         ordering = ['-date']
 
     def save(self, safe = False, *args, **kwargs):

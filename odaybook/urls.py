@@ -12,7 +12,6 @@ urlpatterns = patterns('',
                        (r"^subjects/$", "odaybook.views.subjects"),
                        (r"^teachers/$", "odaybook.views.teachers"),
                        (r"^teachers/(?P<id>\d+)/$", "odaybook.views.teacher"),
-                       (r"^sms/$", "odaybook.views.sms"),
                        
                        (r'^admin/doc/', include('django.contrib.admindocs.urls')),
                        (r'^admin/(.*)', include(admin.site.urls)),

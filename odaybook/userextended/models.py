@@ -212,9 +212,6 @@ class ClerkManager(RestModelManager, UserManager, SearchManager):
     pass
 
 class BaseClerk(models.Model):
-    # FIXME: прозрачное удаление, добавление ролей etc
-    # FIXME: REST
-#    objects = ClerkManager(['last_name', 'first_name', 'middle_name'])
     middle_name = models.CharField(u"Отчество", max_length = 30)
     cart = models.CharField(u'Карта', max_length = 10, null = True, blank = True)
     phone = models.CharField(max_length = 20, verbose_name = u'Номер телефона', null = True, blank = True)
@@ -387,13 +384,12 @@ class BaseClerk(models.Model):
         return self.get_role_display(self.current_role.type)
 
     def set_current_role(self, id):
-        # FIXME: exceptions
         try:
             baseuser = BaseUser.objects.get(id = id)
         except BaseUser.DoesNotExist:
             raise BaseUser.DoesNotExist
         if baseuser not in self.roles.all():
-            raise
+            raise BaseUser.DoesNotExist
         self.current_role = baseuser
         self.sync_timestamp = random.randint(1, 10000000)
         self.save()
@@ -475,7 +471,7 @@ class BaseUser(BaseClerk):
     last_name = models.CharField(max_length=30, null = True, default = '')
     email = models.EmailField(null = True, blank = True)
 
-    # FIXME:
+    # некрасиво
     is_staff = models.BooleanField('staff status', default=False, help_text= ("Designates whether the user can log into this admin site."))
     is_active = models.BooleanField('active', default=True, help_text=("Designates whether this user should be treated as active. Unselect this instead of deleting accounts."))
     is_superuser = models.BooleanField('superuser status', default=False, help_text=("Designates that this user has all permissions without explicitly assigning them."))
@@ -647,7 +643,7 @@ class Pupil(BaseUser, Scholar):
                                     max_length = 1, verbose_name = u'Группа здоровья')
     health_note = models.CharField(null = True, blank = True, default='', max_length = 255, verbose_name = u'Примечание')
     order = models.CharField(null = True, max_length = 100, verbose_name = u'Социальная группа', choices = settings.PUPIL_ORDER, default = '0')
-    # TODO: примечение (см. ТЗ)
+
     parent_1 = models.CharField(max_length = 255, verbose_name = u'Родитель 1', blank = True, null = True)
     parent_2 = models.CharField(max_length = 255, verbose_name = u'Родитель 2', blank = True, null = True)
     parent_phone_1 = models.CharField(max_length = 255, verbose_name = u'Телефон родителя 1', blank = True, null = True)
@@ -673,10 +669,9 @@ class Pupil(BaseUser, Scholar):
             temp = 0
         return "%.2f" % temp
 
-    def get_marks(self, start, end):
+    def get_marks(self, mode, start, end):
         from odaybook.marks.models import Mark, ResultDate
-        class ExtendedDate(date):
-            pass
+        class ExtendedDate(date): pass
         result = {}
 
         temp = start
@@ -686,73 +681,7 @@ class Pupil(BaseUser, Scholar):
             resultdates = ResultDate.objects.filter(grades = self.grade, date = temp)
             if resultdates:
                 temp.resultdate = resultdates[0]
-            dates.append(temp)
-            temp += timedelta(days = 1)
-
-        marks = []
-        result['cols'] = cols = {}
-        for subject in self.get_subjects():
-            subj = []
-            subj.append(subject)
-            m = []
-            sum = 0
-            sum_n = 0
-            for day in dates:
-                if Mark.objects.filter(pupil = self, lesson__date = day, lesson__subject = subject).count():
-                    t = []
-                    for mark in Mark.objects.filter(pupil = self, lesson__date = day, lesson__subject = subject):
-                        t.append(mark)
-                        if mark.absent:
-                            cols[0] = cols.get(0, 0) + 1
-                        else:
-                            cols[mark.mark] = cols.get(mark.mark, 0) + 1
-                            sum += mark.mark
-                            sum_n += 1
-                    m.append(t)
-                else:
-                    m.append('')
-            subj.append(m)
-            if sum_n != 0:
-                subj.append(float(sum)/sum_n)
-            else:
-                subj.append(0)
-            # FIXME
-            subj.append(Teacher.objects.filter(grades = self.grade, subjects = subject)[0])
-#            subj.append(Teacher.objects.get(grades = request.user.grade, subjects = subject))
-#            subj.append(Connection.objects.get(Q(connection = 0) | Q(connection = request.user.group) | Q(connection = int(request.user.sex)+2), subject = subject, grade = request.user.grade).teacher)
-            if subj[2]<3:
-                type = "bad"
-            elif subj[2]>=4:
-                type = "good"
-            else:
-                type = "normal"
-            subj.append(type)
-            marks.append(subj)
-        result['marks'] = marks
-        result['dates'] = dates
-
-        return result
-
-    def get_result_marks(self):
-        # FIXME
-        from odaybook.marks.models import Mark, ResultDate
-        class ExtendedDate(date):
-            pass
-        result = {}
-
-        if date.today() < date(year = date.today().year, month = 9, day = 1):
-            start = date(year = date.today().year-1, month = 9, day = 1)
-        else:
-            start = date(year = date.today().year, month = 9, day = 1)
-        end = date.today()
-
-        temp = start
-        dates = []
-        while temp != end:
-            temp = ExtendedDate.fromordinal(temp.toordinal())
-            resultdates = ResultDate.objects.filter(grades = self.grade, date = temp)
-            if resultdates:
-                temp.resultdate = resultdates[0]
+            if (mode == 'result' and resultdates) or mode == 'all':
                 dates.append(temp)
             temp += timedelta(days = 1)
 
@@ -765,28 +694,22 @@ class Pupil(BaseUser, Scholar):
             sum = 0
             sum_n = 0
             for day in dates:
-                if Mark.objects.filter(pupil = self, lesson__date = day, lesson__subject = subject).count():
-                    t = []
-                    for mark in Mark.objects.filter(pupil = self, lesson__date = day, lesson__subject = subject):
-                        t.append(mark)
-                        if mark.absent:
-                            cols[0] = cols.get(0, 0) + 1
-                        else:
-                            cols[mark.mark] = cols.get(mark.mark, 0) + 1
-                            sum += mark.mark
-                            sum_n += 1
-                    m.append(t)
-                else:
-                    m.append('')
+                t = []
+                for mark in Mark.objects.filter(pupil = self, lesson__date = day, lesson__subject = subject):
+                    t.append(mark)
+                    if mark.absent:
+                        cols[0] = cols.get(0, 0) + 1
+                    else:
+                        cols[mark.mark] = cols.get(mark.mark, 0) + 1
+                        sum += mark.mark
+                        sum_n += 1
+                if len(t) == 0: m.append('')
+                else: m.append(t)
+
             subj.append(m)
-            if sum_n != 0:
-                subj.append(float(sum)/sum_n)
-            else:
-                subj.append(0)
-            # FIXME
-            subj.append(Teacher.objects.filter(grades = self.grade, subjects = subject)[0])
-#            subj.append(Teacher.objects.get(grades = request.user.grade, subjects = subject))
-#            subj.append(Connection.objects.get(Q(connection = 0) | Q(connection = request.user.group) | Q(connection = int(request.user.sex)+2), subject = subject, grade = request.user.grade).teacher)
+            if sum_n != 0: subj.append(float(sum)/sum_n)
+            else: subj.append(0)
+            subj.append(self.get_teacher(subject))
             if subj[2]<3:
                 type = "bad"
             elif subj[2]>=4:
@@ -795,10 +718,23 @@ class Pupil(BaseUser, Scholar):
                 type = "normal"
             subj.append(type)
             marks.append(subj)
+
         result['marks'] = marks
         result['dates'] = dates
 
         return result
+
+    def get_all_marks(self, start, end):
+        return self.get_marks('all', start, end)
+
+    def get_result_marks(self):
+        if date.today() < date(year = date.today().year, month = 9, day = 1):
+            start = date(year = date.today().year-1, month = 9, day = 1)
+        else:
+            start = date(year = date.today().year, month = 9, day = 1)
+        end = date.today()
+
+        return self.get_marks('result', start, end)
 
     def get_marks_avg_type(self, delta = timedelta(weeks = 4)):
         mark = self.get_marks_avg(delta)
@@ -819,14 +755,6 @@ class Pupil(BaseUser, Scholar):
             connection.group = connection.value
             self.groups[subject.id] = connection
 
-#    def get_teacher_connections(self):
-#        # FIXME
-#        from odaybook.curatorship.models import Connection
-#        return [
-#                connection for connection in Connection.objects.filter(grade = self.grade)
-#                    if connection.connection == '0' or connection.connection == self.group
-#                ]
-
     def get_connections(self):
         from odaybook.curatorship.models import Connection
         result = []
@@ -841,9 +769,9 @@ class Pupil(BaseUser, Scholar):
         if not len(self.groups): self.get_groups()
         try:
             return Connection.objects.get(
+                Q(connection = self.groups[subject.id].group) | Q(connection = 0),
                     subject = subject,
                     grade = self.grade,
-                    connection = self.groups[subject.id].group
                    ).teacher
         except KeyError:
             return None
@@ -851,11 +779,9 @@ class Pupil(BaseUser, Scholar):
             return None
 
     def get_teachers(self):
-        # FIXME
         return set([connection.teacher for connection in self.get_connections()])
 
     def get_subjects(self):
-        # FIXME
         return set([connection.subject for connection in self.get_connections()])
 
     class Meta:
@@ -878,24 +804,12 @@ class Superviser(BaseUser):
 class Superuser(BaseUser):
     pass
 
-# FIXME: WTF??
 class Achievement(models.Model):
     title = models.CharField(verbose_name = u'Достижение', max_length = 255)
     description = models.TextField(verbose_name = u'Описание достижения')
     date = models.DateField(verbose_name = u'Дата')
     pupil = models.ForeignKey(Pupil)
 
-# FIXME: WTF?
-class Permission(models.Model):
-    user_id = models.IntegerField()
-    user_type = models.CharField(max_length = 1, choices = (('p', 'p'), ('t', 't'), ('s', 's')))
-    permission = models.CharField(max_length = 255)
-
-    def user(self):
-        if self.user_type == 'p': Model = Pupil
-        elif self.user_type == 't': Model = Teacher
-        elif self.user_type == 's': Model = Staff
-        return Model.objects.get(id = self.user_id)
 
 class PupilConnection(models.Model):
     pupil = models.ForeignKey(Pupil)

@@ -1,17 +1,9 @@
-{# FIXME: DRY в меню #}
-{% if path == 'accounts' %}
-    <big class="green">Аккаунты</big>{% else %}<a href="/accounts/baseuser/">Аккаунты</a>
-{% endif %}
-{% if path == 'userextended.School' %}
-    <big class="yellow">Школы</big>{% else %}<a href="/accounts/uni/userextended.School/">Школы</a>
-{% endif %}
-{% if path == 'userextended.Option' %}
-    <big class="red">Настройки</big>{% else %}<a href="/accounts/uni/userextended.Option/">Настройки</a>
-{% endif %}
-{% if path == 'marks.ResultDate' %}
-    <big class="purple">Итоговые</big>{% else %}<a href="/accounts/uni/marks.ResultDate/">Итоговые</a>
-{% endif %}
-{% if path == 'reports' %}
-    <big class="blue">Отчёты</big>{% else %}<a href="/reports/">Отчёты</a>
-{% endif %}
+{%  load formater %}
+
+{%  main_menu_block 'Аккаунты' '/accounts/baseuser/' '' CM 'accounts' %}
+{%  main_menu_block 'Школы' '/accounts/uni/userextended.School/' '' CM 'userextended.School' %}
+{%  main_menu_block 'Настройки' '/accounts/uni/userextended.Option/' '' CM 'userextended.Option' %}
+{%  main_menu_block 'Итоговые' '/accounts/uni/marks.ResultDate/' '' CM 'marks.ResultDate' %}
+{%  main_menu_block 'Отчёты' '/reports/' '' CM 'reports' %}
+
 
