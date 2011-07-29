@@ -3,17 +3,18 @@
 from datetime import date, timedelta
 import pytils
 
-from odaybook.attendance.models import UsalTimetable, UsalRingTimetable
+from odaybook.attendance.models import UsalTimetable
 
 class TimetableDay(object):
+    u'''
+        Класс для удобного представления расписания дня.
+
+        Использовать только потомки.
+    '''
     def __init__(self, workday, day_date = None):
-        show_date = False
         workday = int(workday)
         self.day_n = workday
         self.day_ru = self.numDay2ruday(workday)
-#        self.grade = grade
-#        self.group = group
-#        self.lessons = [lesson for lesson in UsalTimetable.objects.filter(grade = grade, group = group, workday = workday)]
         today = date.today().isoweekday()
         if today == workday:
             self.date = u'Сегодня'
@@ -29,13 +30,10 @@ class TimetableDay(object):
                 self.date = pytils.dt.ru_strftime(u"%d %B", inflected=True, date=date.today() + timedelta(days = (workday - today)))
         self.timestamp = (date.today() + timedelta(days = (workday - today))).isoformat()
         self.rings = {}
-#        for ring in UsalRingTimetable.objects.filter(school = grade.school, workday = workday):
-#            self.rings[ring.number] = ring
-#        if UsalRingTimetable.objects.filter(school = grade.school, workday = workday, number = len(self.lessons)):
-#            self.rings['end_of_day'] = UsalRingTimetable.objects.get(school = grade.school, workday = workday, number = len(self.lessons))
 
 
     def numDay2ruday(self, workday):
+        u'''Руссификация'''
         days = {1: u'Понедельник',
                 2: u'Вторник',
                 3: u'Среда',
@@ -47,6 +45,9 @@ class TimetableDay(object):
         return days[int(workday)]
 
 class TimetableDayPupil(TimetableDay):
+    u'''
+        Расписание дня ученика.
+    '''
     def __init__(self, workday, pupil, *args, **kwargs):
         from odaybook.userextended.models import PupilConnection
         super(TimetableDayPupil, self).__init__(workday, *args, **kwargs)
@@ -61,7 +62,11 @@ class TimetableDayPupil(TimetableDay):
                 self.lessons[int(lesson.number)] = lesson
 
 class TimetableDayGrade(TimetableDay):
+    u'''
+        Расписание на день для класса. 
+    '''
     def __init__(self, workday, grade, *args, **kwargs):
+        super(TimetableDayGrade, self).__init__(workday, *args, **kwargs)
         self.grade = grade
         self.lessons = {}
         for lesson in xrange(10): self.lessons[lesson+1] = []

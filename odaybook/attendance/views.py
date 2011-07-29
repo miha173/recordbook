@@ -1,12 +1,8 @@
 # -*- coding: UTF-8 -*-
-import re
-
 
 from django.template import RequestContext
 from django.shortcuts import render_to_response, get_object_or_404
-from django.template.loader import render_to_string
 from django.http import HttpResponse, HttpResponseRedirect, Http404
-from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 
@@ -15,20 +11,26 @@ from odaybook.userextended.models import Grade, Subject, School
 from odaybook.userextended.forms import ImportForm
 from odaybook.userextended.views import get_grade
 
-from models import UsalTimetable, SpecicalTimetable, Holiday, UsalRingTimetable
+from models import UsalTimetable
 from utils import TimetableDayPupil, TimetableDayGrade
 
 @login_required
 def index(request):
+    u'''
+        Актуален вопрос необходимости этой страницы. 
+    '''
     render = {}
     if request.user.type == 'Parent':
-        render['timetables'] = [TimetableDayPupil(workday = workday, pupil = request.user.current_pupil) for workday in request.user.current_pupil.school.get_workdays()]
+        render['timetables'] = [TimetableDayPupil(workday = workday, pupil = request.user.current_pupil)
+                                for workday in request.user.current_pupil.school.get_workdays()]
     return render_to_response('~attendance/page_pupil.html', render, context_instance = RequestContext(request))
 
 @login_required
 @user_passes_test(lambda u: reduce(lambda x, y: x or y, map(lambda a: a in ['Superuser', 'EduAdmin'], u.types)))
-#@user_passes_test(lambda u: 'EduAdmin' in u.types)
 def timetableSelect(request, school = 0):
+    u'''
+        Выбор класс для заполнения расписания.s
+    '''
     render = {}
     if school:
         school = get_object_or_404(School, id = school)
@@ -41,8 +43,11 @@ def timetableSelect(request, school = 0):
 @login_required
 @user_passes_test(lambda u: reduce(lambda x, y: x or y, map(lambda a: a in ['Superuser', 'EduAdmin'], u.types)))
 def timetableSet(request, id, school = 0):
-    from forms import TimetableForm
-    from django import forms
+    u'''
+        Форма заполнения расписания.
+
+        Внимание: много непонятного
+    '''
     render = {}
     if school:
         school = get_object_or_404(School, id = school)
@@ -51,9 +56,12 @@ def timetableSet(request, id, school = 0):
     render['school'] = school
     render['grade'] = grade = get_object_or_404(Grade, id = id, school = school)
 
-    try: current_workday = int(request.GET.get('workday', '1'))
-    except ValueError: current_workday = 1
-    if current_workday not in school.get_workdays(): current_workday = 1
+    try:
+        current_workday = int(request.GET.get('workday', '1'))
+    except ValueError:
+        current_workday = 1
+    if current_workday not in school.get_workdays():
+        current_workday = 1
 
     render['workdays'] = school.get_workdays_tuple()
     render['current_workday'] = current_workday = school.get_workdays_dict()[current_workday]
@@ -61,8 +69,7 @@ def timetableSet(request, id, school = 0):
     render['subjects'] = grade.get_subjects()
     render['attendance'] = TimetableDayGrade(workday = current_workday[0], grade = grade)
 
-    if request.GET.get('method', False):
-#    if request.is_ajax():
+    if request.is_ajax():
         subject = get_object_or_404(Subject, id = request.GET.get('subject'), school = school)
         if request.GET.get('method') == 'add':
             timetable = UsalTimetable(
@@ -104,53 +111,11 @@ def timetableSet(request, id, school = 0):
     return render_to_response('timetableSet.html', render, context_instance = RequestContext(request))
 
 @login_required
-@user_passes_test(lambda u: u.is_administrator())
-def ringtimetableList(request, school):
-    from forms import RingTimetableForm
-    from django import forms
-    render = {}
-    if school:
-        school = get_object_or_404(School, id = school)
-    else:
-        school = request.user.school
-    render['school'] = school
-    form = RingTimetableForm()
-    for day in settings.WORKDAYS:
-        if not school.saturday and day[0] == 6: continue 
-        for lesson in settings.LESSON_NUMBERS:
-            if UsalRingTimetable.objects.filter(number = lesson[0], school = school, workday = day[0]).count() != 0:
-                u = UsalRingTimetable.objects.get(number = lesson[0], school = school, workday = day[0])
-                start = u.start
-                end = u.end
-            else:
-                start = end = None
-            form.fields['l_s_%s_%s' % (day[0], lesson[0])] = forms.TimeField(initial = start)
-            form.fields['l_e_%s_%s' % (day[0], lesson[0])] = forms.TimeField(initial = end)
-    if request.method == 'POST':
-        form.initial = request.POST
-        for day in settings.WORKDAYS:
-            if not school.saturday and day[0] == 6: continue 
-            for lesson in settings.LESSON_NUMBERS:
-                start = request.POST.get('l_s_%s_%s' % (day[0], lesson[0]), '').replace('-', ':')
-                if start == '': 
-                    if UsalRingTimetable.objects.filter(number = lesson[0], school = school, workday = day[0]).count() != 0:
-                        UsalRingTimetable.objects.filter(number = lesson[0], school = school, workday = day[0]).delete()
-                    continue
-                if UsalRingTimetable.objects.filter(number = lesson[0], school = school, workday = day[0]).count() == 0:
-                    tt = UsalRingTimetable(number = lesson[0], school = school, workday = day[0])
-                else:
-                    tt = UsalRingTimetable.objects.get(number = lesson[0], school = school, workday = day[0])
-                tt.start = start
-                tt.end = request.POST.get('l_e_%s_%s' % (day[0], lesson[0]), '').replace('-', ':')
-                if not (re.match('^\d2:\d2$', tt.start) and re.match('^\d2:\d2$', tt.end)) : continue
-                tt.save()
-    render['form'] = form
-    return render_to_response('ringtimetable.html', render, context_instance = RequestContext(request))
-
-@login_required
 @user_passes_test(lambda u: reduce(lambda x, y: x or y, map(lambda a: a in ['Superuser', 'EduAdmin'], u.types)))
 def importTimetable(request, school):
-    # not tested
+    '''
+        Представление для импорта расписания. Не тестировалась.
+    '''
     import csv
     render = {}
     if request.user.type == 'EduAdmin':

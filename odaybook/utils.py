@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-
+'''
+    Всякие вспомогательные штуки для системы в целом.
+'''
 import os
 
 from django.template import TemplateDoesNotExist
@@ -8,10 +10,25 @@ from django.utils.importlib import import_module
 from django.core.exceptions import ImproperlyConfigured
 
 class PlaningError(Exception):
+    '''
+        Пока в системе используется только это универсальное исключение.
+
+        Необходимо переработать, чтобы всё было красиво.
+    '''
     pass
 
 def load_template_from_app(template_name, template_dirs = None):
-    if template_name[0] != '~': raise TemplateDoesNotExist, template_name
+    '''
+        Это template loader.
+
+        Благодаря ему можно указать в папке какого приложения
+        следует искать тот или иной шаблон.
+
+        Например, чтобы указать на шаблон page.html приложения accounts
+        неообходимо указать ~accounts/page.html
+    '''
+    if template_name[0] != '~':
+        raise TemplateDoesNotExist, template_name
     
     template_name  = template_name[1:].split('/')
     

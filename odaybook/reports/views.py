@@ -17,6 +17,12 @@ from reports import get_fillability
 from forms import SchoolSelectForm
 
 class Array(object):
+    '''
+        Инструмент для работы с таблицой данных.
+
+        Сейчас можно загружать данные, читать их в шаблоне и экспортировать
+        в CSV. Возможно скоро можно будет подговтоить данные для кэша. 
+    '''
 
     n = 0 # столбцы
     m = 0 # строки
@@ -28,39 +34,67 @@ class Array(object):
         n = m = 0
 
     def append_col(self, val):
+        '''
+            Добавление колонки.
+        '''
         self.rows[self.current_row].append(unicode(val))
-        if self.n < len(self.rows[self.current_row]): self.n += 1
+        if self.n < len(self.rows[self.current_row]):
+            self.n += 1
 
     def append_cols(self, *vals):
+        '''
+            Добавление нескольких колонок.
+            Передаются неименованными параметрами.
+        '''
         for val in vals:
             self.rows[self.current_row].append(unicode(val))
-            if self.n < len(self.rows[self.current_row]): self.n += 1
+            if self.n < len(self.rows[self.current_row]):
+                self.n += 1
 
     def insert_row(self, *rows):
+        '''
+            Добавить строку в *конец* массива
+        '''
         self.rows.append(list(rows))
         self.current_row += 1
         self.m += 1
 
     def get_content(self):
+        '''
+            Получить все данные кроме первой строчки
+        '''
         return self.rows[1:]
 
     def export_to_csv(self):
+        '''
+            Получить строку с CSV
+        '''
         result = ''
         for row in self.rows:
             result += ';'.join(['"%s"' % r for r in row]) + '\n'
         return result
 
     def get_header(self):
+        '''
+            Получить "шапку" таблицы.
+        '''
         return self.rows[0]
 
 @login_required
 @user_passes_test(lambda u: u.type != 'Pupil')
 def index(request):
-    return render_to_response('~reports/index.html', context_instance = RequestContext(request))
+    '''
+        Начальная странциа раздела. Её необходимо облагородить.
+    '''
+    return render_to_response('~reports/index.html',
+                              context_instance=RequestContext(request))
 
 @login_required
 @user_passes_test(lambda u: u.type == 'Teacher' and u.edu_admin)
 def report_health(request):
+    '''
+        Отчёт по группам здоровья. 
+    '''
     render = {}
 
     total = {'all': 0}
@@ -77,7 +111,9 @@ def report_health(request):
         all = Pupil.objects.filter(grade = grade).count()
         total['all'] += all
         for group in settings.HEALTH_GROUPS:
-            c = Pupil.objects.filter(school = request.user.school, grade = grade, health_group = group)
+            c = Pupil.objects.filter(school = request.user.school,
+                                     grade = grade,
+                                     health_group = group)
             rows.append_col(c.count())
             total[group] = total.get(group, 0) + c.count()
             if all == 0: rows.append_col(0)
@@ -98,11 +134,16 @@ def report_health(request):
         response['Content-Disposition'] = 'attachment; filename=report_health.csv'
         return response
 
-    return render_to_response('~reports/report_health.html', render, context_instance = RequestContext(request))
+    return render_to_response('~reports/report_health.html',
+                              render,
+                              context_instance = RequestContext(request))
 
 @login_required
 @user_passes_test(lambda u: u.type == 'Teacher' and u.edu_admin)
 def report_order(request):
+    '''
+        Отчёт по социальным группам.
+    '''
     render = {}
 
     total = {'all': 0}
@@ -119,7 +160,9 @@ def report_order(request):
         all = Pupil.objects.filter(grade = grade).count()
         total['all'] += all
         for order in settings.PUPIL_ORDER:
-            c = Pupil.objects.filter(school = request.user.school, grade = grade, order = order[0])
+            c = Pupil.objects.filter(school = request.user.school,
+                                     grade = grade,
+                                     order = order[0])
             rows.append_col(c.count())
             total[order[0]] = total.get(order[0], 0) + c.count()
             if all == 0: rows.append_col(0)
@@ -140,17 +183,24 @@ def report_order(request):
         response['Content-Disposition'] = 'attachment; filename=report_order.csv'
         return response
 
-    return render_to_response('~reports/report_order.html', render, context_instance = RequestContext(request))
+    return render_to_response('~reports/report_order.html',
+                              render,
+                              context_instance=RequestContext(request))
 
 @login_required
 @user_passes_test(lambda u: u.type in ['Superviser', 'Superuser'])
 def report_fillability(request):
+    '''
+        Отчёт о заполненности дневников.
+    '''
     render = {}
 
     total = {}
     rows = Array()
     rows.insert_row()
-    rows.append_cols('', u'заполнено, %', u'не заполненно больше 10 дней, % ', u'не заполненно больше 15 дней, %')
+    rows.append_cols('',
+                     u'заполнено, %', u'не заполненно больше 10 дней, % ',
+                     u'не заполненно больше 15 дней, %')
     schools = School.objects.all()
     render['form'] = form = SchoolSelectForm(request.GET)
     if form.is_valid():
@@ -163,9 +213,12 @@ def report_fillability(request):
     }
     for school in schools:
         rows.insert_row()
-        fillability = get_fillability(Lesson.objects.filter(grade__school = school))
+        fillability = get_fillability(
+                Lesson.objects.filter(grade__school=school)
+        )
         for i in fillability:
-            if 'percent' not in i and i!='all': all[i] += fillability[i]
+            if 'percent' not in i and i != 'all':
+                all[i] += fillability[i]
         rows.append_col(unicode(school))
         rows.append_cols(
                 fillability['filled_percent'],
@@ -183,7 +236,9 @@ def report_fillability(request):
 
     render['GOOGLE_JS_API'] = True
     
-    return render_to_response('~reports/report_fillability.html', render, context_instance = RequestContext(request))
+    return render_to_response('~reports/report_fillability.html',
+                              render,
+                              context_instance = RequestContext(request))
 
 @login_required
 @user_passes_test(lambda u: u.type == 'Superviser')
@@ -191,7 +246,6 @@ def report_membershipchanges(request):
     render = {}
 
     render['form'] = SchoolSelectForm(request.GET)
-
 
     objects = MembershipChange.objects.all()
 
@@ -209,7 +263,9 @@ def report_membershipchanges(request):
         render['objects'] = paginator.page(paginator.num_pages)
     render['paginator'] = paginator.num_pages - 1
 
-    return render_to_response('~reports/report_membershipchanges.html', render, context_instance = RequestContext(request))
+    return render_to_response('~reports/report_membershipchanges.html',
+                              render,
+                              context_instance = RequestContext(request))
 
 
 @login_required
@@ -219,8 +275,10 @@ def report_marks(request, mode = 'all'):
     from odaybook.marks.forms import StatForm
 
     class PupilSelectForm(forms.Form):
-        from smart_selects.form_fields import ChainedModelChoiceField, SimpleChainedModelChoiceField
-        school = forms.ModelChoiceField(queryset = School.objects.all(), label = u'Школа', required = False)
+        from smart_selects.form_fields import ChainedModelChoiceField
+        school = forms.ModelChoiceField(queryset = School.objects.all(),
+                                        label = u'Школа',
+                                        required = False)
         grade = ChainedModelChoiceField(app_name = 'userextended',
                                         model_name = 'Grade',
                                         chain_field = 'school',
@@ -261,7 +319,8 @@ def report_marks(request, mode = 'all'):
 
         if request.user.grade: grades.append(request.user.grade.id)
 
-        if request.user.edu_admin: grades += [g.id for g in Grade.objects.filter(school = request.user.school)]
+        if request.user.edu_admin:
+            grades += [g.id for g in Grade.objects.filter(school = request.user.school)]
 
         school = request.user.school
 
@@ -279,12 +338,13 @@ def report_marks(request, mode = 'all'):
 
 
 
-    render['pupilSelectForm'] = pupilSelectForm = PupilSelectForm(school = school,
-                                                                  grade = grade,
-                                                                  grades = grades,
-                                                                  pupil = pupil,
-                                                                  data = request.GET
-                                                                  )
+    render['pupilSelectForm'] = pupilSelectForm = PupilSelectForm(
+            school = school,
+            grade = grade,
+            grades = grades,
+            pupil = pupil,
+            data = request.GET
+    )
 
     start = datetime.date.today() - datetime.timedelta(weeks = 2)
     end = datetime.date.today() + datetime.timedelta(days = 1)
@@ -315,7 +375,9 @@ def report_marks(request, mode = 'all'):
 
     render['mode'] = mode
     
-    return render_to_response('~reports/report_marks.html', render, context_instance = RequestContext(request))
+    return render_to_response('~reports/report_marks.html',
+                              render,
+                              context_instance=RequestContext(request))
 
 
 
@@ -326,10 +388,14 @@ def viewMarks(request, id):
     pupil = request.user.current_pupil
     subject = get_object_or_404(Subject, id = id, school = pupil.school)
     subject.teacher = pupil.get_teacher(subject)
-    subject.avg = Mark.objects.filter(pupil = pupil, absent = False, lesson__date__gte = datetime.datetime.now() - datetime.timedelta(weeks = 4), lesson__subject = subject).aggregate(Avg('mark'))['mark__avg']
-    if subject.avg<3:
+    subject.avg = Mark.objects.filter(pupil = pupil,
+                                      absent = False,
+                                      lesson__date__gte = datetime.datetime.now() - datetime.timedelta(weeks = 4),
+                                      lesson__subject = subject
+                                      ).aggregate(Avg('mark'))['mark__avg']
+    if subject.avg < 3:
         subject.avg_type = "bad"
-    elif subject.avg>=4:
+    elif subject.avg >= 4:
         subject.avg_type = "good"
     else:
         subject.avg_type = "normal"
@@ -342,9 +408,10 @@ def viewMarks(request, id):
         6: u'Сб',
     }
     subject.days = []
-    lessons = UsalTimetable.objects.filter(grade = pupil.grade,
-                                           subject = subject,
-                                           group = pupil.groups[subject.id].group).order_by('workday')
+    lessons = UsalTimetable.objects.filter(
+            grade = pupil.grade,
+            subject = subject,
+            group = pupil.groups[subject.id].group).order_by('workday')
     for lesson in lessons:
         if int(lesson.workday) not in subject.days:
             subject.days.append(int(lesson.workday))
@@ -353,19 +420,25 @@ def viewMarks(request, id):
     start = datetime.date.today() - datetime.timedelta(weeks = 4)
     end = datetime.date.today() + datetime.timedelta(days = 1)
     if request.method == 'GET':
-        render['form'] = form = StatForm()
+        render['form'] = StatForm()
     else:
         render['form'] = form = StatForm(request.POST)
         if form.is_valid():
             start = form.cleaned_data['start']
             end = form.cleaned_data['end']
-    render['lessons'] = Lesson.objects.filter(grade = pupil.grade, date__gte = start, date__lte = end, subject = subject)
+    render['lessons'] = Lesson.objects.filter(grade = pupil.grade,
+                                              date__gte = start,
+                                              date__lte = end,
+                                              subject = subject)
     for lesson in render['lessons']:
         if Mark.objects.filter(pupil = pupil, lesson = lesson):
             lesson.mark = Mark.objects.get(pupil = pupil, lesson = lesson)
 
     render['subject'] = subject
-    return render_to_response('~marks/%s/marks.html' % request.user.type.lower(), render, context_instance = RequestContext(request))
+    return render_to_response(
+            '~marks/%s/marks.html' % request.user.type.lower(),
+            render,
+            context_instance = RequestContext(request))
 
 
 

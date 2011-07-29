@@ -1,6 +1,6 @@
 {% load formater %}
 <form method="post" action="?{{ params|urllibencode }}">{% csrf_token %}
-	<table class="table form">
+	<table class="table form no-hover">
 		{% for field in form %}
 		<tr>
 			<td class="label"><label for="{{ field.label }}">{{ field.label_tag }}:</label></td>

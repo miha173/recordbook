@@ -12,7 +12,8 @@ def get_fillability(lessons):
          * not_filed_from_10_to_15_days
          * not_filed_more_15_days
 
-        Каждому ключу, соответствует ключ с суффикосм _percent, содержащий относителбную величину.
+        Каждому ключу, соответствует ключ с суффикосм _percent,
+        содержащий относительную величину.
        '''
 
     result = {}
@@ -22,9 +23,12 @@ def get_fillability(lessons):
     if a == 0:
         result = {
             'all': 0, 'all_percent': 0,
-            'filled': 0, 'filled_percent': 0,
-            'not_filled_from_10_to_15_days': 0, 'not_filled_from_10_to_15_days_percent': 0,
-            'not_filled_more_15_days': 0, 'not_filled_more_15_days_percent': 0,
+            'filled': 0,
+            'filled_percent': 0,
+            'not_filled_from_10_to_15_days': 0,
+            'not_filled_from_10_to_15_days_percent': 0,
+            'not_filled_more_15_days': 0,
+            'not_filled_more_15_days_percent': 0,
         }
     else:
         result['filled'] = lessons.filter(fullness = True).count()

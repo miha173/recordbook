@@ -4,9 +4,11 @@ from django.db import models
 from django.conf import settings
 
 from odaybook.userextended.models import School
-from odaybook.rest.models import RestModel
 
 class RingTimetable(models.Model):
+    u'''
+        Заготовка для расписания звонков.
+    '''
     number = models.CharField(u"Номер урока", max_length = 1, choices = settings.LESSON_NUMBERS)
     start = models.TimeField(u'Начало урока')
     end = models.TimeField(u'Окончание урока')
@@ -15,12 +17,21 @@ class RingTimetable(models.Model):
         abstract = True
 
 class UsalRingTimetable(RingTimetable):
+    u'''
+        Регулярное расписание звонков, повторяющиеся каждую неделю.
+    '''
     workday = models.CharField(u"День недели", max_length = 1, choices = settings.WORKDAYS)
 
 class SpecicalRingTimetable(RingTimetable):
+    u'''
+        Заготовка специального расписания звонков. Нигде не используется
+    '''
     date = models.DateField(u"Дата")
 
-class Timetable(RestModel):
+class Timetable(models.Model):
+    u'''
+        Заготовка расписания занятий.
+    '''
     from odaybook.userextended.models import Grade, Subject
     grade = models.ForeignKey(Grade)
     number = models.CharField(u"Номер урока", max_length = 2, choices = settings.LESSON_NUMBERS)
@@ -33,12 +44,21 @@ class Timetable(RestModel):
         ordering = ['number']
 
 class UsalTimetable(Timetable):
+    u'''
+        Регулярное расписание занятий, повторяющиеся каждую неделю.
+    '''
     workday = models.CharField(u"День недели", max_length = 1, choices = settings.WORKDAYS)
 
 class SpecicalTimetable(Timetable):
-    date = models.DateField(u"Дата")    
+    u'''
+        Заготовка специального расписания занятий. Нигде не используется
+    '''
+    date = models.DateField(u"Дата")
 
 class Holiday(models.Model):
+    u'''
+        Заготовка каникулярных периодов. Нигде не используется
+    '''
     name = models.CharField(u"Имя", max_length = 255)
     start = models.DateField(u"Дата начала")
     end = models.DateField(u"Дата окончания")

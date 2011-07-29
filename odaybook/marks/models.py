@@ -1,22 +1,41 @@
 # -*- coding: UTF-8 -*-
+'''
+    Работа с оценками.
+'''
+
 
 from django.db import models
-from odaybook.rest.models import RestModel, RestModelManager
+from odaybook.rest.models import RestModel
 from odaybook.userextended.models import Pupil, Teacher, Subject, Grade, School
-from odaybook import settings
 
 class Lesson(RestModel):
-    teacher = models.ForeignKey(Teacher, verbose_name = u'Учитель', blank = True, null = True)
+    '''
+        Занятие. Содержит информацию об уроке. 
+    '''
+    teacher = models.ForeignKey(Teacher,
+                                verbose_name = u'Учитель',
+                                blank = True,
+                                null = True)
     date = models.DateField(u'Дата')
-    topic = models.CharField(u'Тема урока', max_length = 200, blank = True, null = True)
-    task = models.CharField(u'Домашнее задание', max_length = 200, blank = True, null = True)
+    topic = models.CharField(u'Тема урока',
+                             max_length = 200,
+                             blank = True,
+                             null = True)
+    task = models.CharField(u'Домашнее задание',
+                            max_length = 200,
+                            blank = True,
+                            null = True)
     subject = models.ForeignKey(Subject, verbose_name = u'Предмет')
     grade = models.ManyToManyField(Grade, verbose_name = u'Класс')
-    file = models.FileField(verbose_name = u'Приложить файл', null = True, blank = True, upload_to = 'lessons')
+    file = models.FileField(verbose_name = u'Приложить файл',
+                            null = True,
+                            blank = True,
+                            upload_to = 'lessons')
     resultdate = models.ForeignKey('ResultDate', null = True, blank = True)
     fullness = models.BooleanField(default = False)
 
-    serialize_fields = ['id', 'teacher_id', 'date', 'topic', 'task', 'subject_id', 'grade']
+    serialize_fields = ['id', 'teacher_id', 'date', 'topic',
+                        'task', 'subject_id', 'grade']
     serialize_name = 'lesson'
     
     class Meta:
@@ -24,11 +43,14 @@ class Lesson(RestModel):
 
     def save(self, safe = False, *args, **kwargs):
         if not safe and not self.fullness:
-            if self.topic and Mark.objects.filter(lesson = self).count()>4:
+            if self.topic and Mark.objects.filter(lesson = self).count() > 4:
                 self.fullness = True
         super(Lesson, self).save(*args, **kwargs)
 
 class Mark(RestModel):
+    '''
+        Оценка или пропуск за 1 урок.
+    '''
     pupil = models.ForeignKey(Pupil, verbose_name = u'Ученик')
     lesson = models.ForeignKey(Lesson, verbose_name = u'Занятие')
     mark = models.IntegerField(u'Отметка', blank = True, null = True)
@@ -40,11 +62,14 @@ class Mark(RestModel):
     serialize_name = 'mark'
     
     def get_type(self):
+        '''
+            Для выделение класса с помощью CSS.
+        '''
         if self.absent:
             return "bad"
-        elif self.mark<3:
+        elif self.mark < 3:
             return "bad"
-        elif self.mark>=4:
+        elif self.mark >= 4:
             return "good"
         else:
             return "normal"
@@ -58,7 +83,7 @@ class Mark(RestModel):
     def save(self, *args, **kwargs):
         from odaybook.userextended.models import Notify
         if not self.lesson.fullness:
-            if self.lesson.topic and Mark.objects.filter(lesson = self.lesson)>4:
+            if self.lesson.topic and Mark.objects.filter(lesson = self.lesson) > 4:
                 self.lesson.fullness = True
                 self.lesson.save(safe = True)
         super(Mark, self).save(*args, **kwargs)
@@ -68,8 +93,12 @@ class Mark(RestModel):
         ordering = ['-date']
 
 class ResultDate(models.Model):
+    '''
+        Итоговый период. 
+    '''
     school = models.ForeignKey(School, null = True, blank = True)
-    name = models.CharField(max_length=255, verbose_name = u'Имя периода', null = True, blank = True)
+    name = models.CharField(max_length=255, verbose_name = u'Имя периода',
+                            null = True, blank = True)
     date = models.DateField(verbose_name = u'Дата подведения итога')
     grades = models.ManyToManyField(Grade, verbose_name = u'Классы')
 
@@ -77,7 +106,6 @@ class ResultDate(models.Model):
         pk = self.pk
         super(ResultDate, self).save(*args, **kwargs)
         if not self.school and not pk:
-            from odaybook.userextended.models import School
             for school in School.objects.all():
                 ResultDate(school = school, name = self.name, date = self.date).save()
 
@@ -85,12 +113,3 @@ class ResultDate(models.Model):
         ordering = ['date']
     def __unicode__(self):
         return self.name
-
-class Result(RestModel):
-    resultdate = models.ForeignKey(ResultDate, verbose_name = u'Период')
-    subject = models.ForeignKey(Subject, verbose_name = u'Предмет')
-    pupil = models.ForeignKey(Pupil, verbose_name = u'Ученик')
-    mark = models.IntegerField(u'Отметка')
-
-    serialize_fields = ['id', 'resultdate_id', 'subject_id', 'pupil_id', 'mark']
-    serialize_name = 'result'
