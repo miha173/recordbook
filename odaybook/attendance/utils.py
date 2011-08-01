@@ -27,7 +27,8 @@ class TimetableDay(object):
             if date:
                 self.date = pytils.dt.ru_strftime(u"%d %B", inflected=True, date=day_date)
             else:
-                self.date = pytils.dt.ru_strftime(u"%d %B", inflected=True, date=date.today() + timedelta(days = (workday - today)))
+                self.date = pytils.dt.ru_strftime(u"%d %B", inflected=True,
+                                                  date=date.today() + timedelta(days = (workday - today)))
         self.timestamp = (date.today() + timedelta(days = (workday - today))).isoformat()
         self.rings = {}
 
@@ -69,6 +70,7 @@ class TimetableDayGrade(TimetableDay):
         super(TimetableDayGrade, self).__init__(workday, *args, **kwargs)
         self.grade = grade
         self.lessons = {}
-        for lesson in xrange(10): self.lessons[lesson+1] = []
+        for lesson in xrange(10):
+            self.lessons[lesson+1] = []
         for lesson in UsalTimetable.objects.filter(grade = grade, workday = workday):
             self.lessons[int(lesson.number)].append(lesson)

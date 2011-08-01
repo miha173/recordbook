@@ -39,9 +39,9 @@ def connectionsList(request):
 
 @login_required
 @user_passes_test(lambda u: u.type == 'Teacher')
-def connectionEdit(request, connection_id, mode):
+def connectionEdit(request, mode, connection_id = 0):
     '''
-        Связки пока можно только удалять.
+        Связки пока можно только добавлять и удалять.
     '''
     if mode == 'delete':
         connection = get_object_or_404(Connection, id = connection_id)
@@ -49,6 +49,10 @@ def connectionEdit(request, connection_id, mode):
         if connection.grade == teacher.grade:
             connection.delete()
         return HttpResponseRedirect('/curatorship/connections/')
+    elif mode == 'add':
+        from odaybook.userextended.views import objectEdit
+        request.grade = request.user.grade
+        return objectEdit(request, 'curatorship', 'Connection', 'add', request.user.grade.id)
 
 @login_required
 @user_passes_test(lambda u: u.type == 'Teacher')

@@ -119,7 +119,8 @@ def importTimetable(request, school):
     import csv
     render = {}
     if request.user.type == 'EduAdmin':
-        if request.user.school.id != int(school): raise Http404
+        if request.user.school.id != int(school):
+            raise Http404
     render['school'] = school = get_object_or_404(School, id = school)
 
     if request.method == 'GET':
@@ -135,19 +136,21 @@ def importTimetable(request, school):
             i = 0
             for row in rows:
                 i += 1
-                if len(row)<4:
+                if len(row) < 4:
                     errors.append({'line': i, 'column': 0, 'error': u'неверное количество столбцов'})
                     continue
                 try:
                     row = ";".join(row)
                     row = row.decode('cp1251')
                 except:
-                    errors.append({'line': i, 'column': 0, 'error': u'некорректное значение (невозможно определить кодировку)'})
+                    errors.append({'line': i, 'column': 0,
+                                   'error': u'некорректное значение (невозможно определить кодировку)'})
                     continue
                 row = row.split(';')
                 if last_grade != row[0]:
-                   workday = 0
-                if int(row[1]) == 1: workday += 1
+                    workday = 0
+                if int(row[1]) == 1:
+                    workday += 1
 
                 number = int(row[1])
 
@@ -171,19 +174,24 @@ def importTimetable(request, school):
 
                 ut_kwargs = {'school': school, 'grade': grade, 'workday': workday, 'number': number}
                 if len(subjects) == 1 and len(rooms)==1:
-                   for j in xrange(1, 3): objects.append(UsalTimetable(subject = subjects[0], room = rooms[0], group = j, **ut_kwargs))
+                    for j in xrange(1, 3):
+                        objects.append(UsalTimetable(subject = subjects[0], room = rooms[0], group = j, **ut_kwargs))
 
                 elif len(subjects) == 1 and len(rooms)==2:
-                   for j in xrange(1, 3): objects.append(UsalTimetable(subject = subjects[0], room = rooms[j-1], group = j, **ut_kwargs))
+                    for j in xrange(1, 3):
+                        objects.append(UsalTimetable(subject = subjects[0], room = rooms[j-1], group = j, **ut_kwargs))
 
                 elif (len(subjects) == 2 and len(rooms)==2) or (len(subjects) == 2 and len(rooms)==3):
-                   for j in xrange(1, 3): objects.append(UsalTimetable(subject = subjects[j-1], room = rooms[j-1], group = j, **ut_kwargs))
+                    for j in xrange(1, 3):
+                        objects.append(UsalTimetable(subject = subjects[j-1], room = rooms[j-1],
+                                                     group = j, **ut_kwargs))
 
                 elif len(subjects) == 1 and len(rooms)==3:
-                   for j in xrange(1, 4): objects.append(UsalTimetable(subject = subjects[0], room = rooms[j-1], group = j, **ut_kwargs))
+                    for j in xrange(1, 4):
+                        objects.append(UsalTimetable(subject = subjects[0], room = rooms[j-1], group = j, **ut_kwargs))
 
                 else:
-                   errors.append({'line': i, 'column': 0, 'error': u'неверный формат строки'})
+                    errors.append({'line': i, 'column': 0, 'error': u'неверный формат строки'})
 
             if len(errors) == 0:
                 for obj in objects:

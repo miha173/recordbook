@@ -14,12 +14,23 @@ class ConnectionForm(forms.ModelForm):
     class Meta:
         model = Connection
         fields = ('teacher', 'subject', 'grade', 'connection')
-    def __init__(self, grade__school, *args, **kwargs):
+    def __init__(self, grade__school, grade = None, *args, **kwargs):
         super(ConnectionForm, self).__init__(*args, **kwargs)
         kwargs = {'school': grade__school}
-        self.fields['teacher'].queryset = Teacher.objects.filter(**kwargs)
-        self.fields['subject'].queryset = Subject.objects.queryset.filter(**kwargs)
+        if grade:
+            self.fields['teacher'].queryset = Teacher.objects.filter(grades = grade, **kwargs)
+        self.fields['subject'].queryset = Subject.objects.filter(**kwargs)
         self.fields['grade'].queryset = Grade.objects.filter(**kwargs)
+        if grade:
+            del self.fields['grade']
+        self.grade = grade
+
+    def save(self, *args, **kwargs):
+        result = super(ConnectionForm, self).save(commit = False)
+        if self.grade:
+            result.grade = self.grade
+        result.save()
+        return result
         
 class PupilForm(forms.ModelForm):
     '''

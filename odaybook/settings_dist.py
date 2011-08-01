@@ -1,5 +1,9 @@
 # -*- coding: UTF-8 -*-
-# Don't modify this file!
+'''
+    Не меняйте этот файл. Содержат настройки по умолчанию.
+
+    Пожалуйста, переопределяйте ADMINS, там email автора.
+'''
 
 import os
 
@@ -12,7 +16,7 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-PROJECT_DIR = os.path.dirname(os.path.abspath(__file__));
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 DATABASES = {
     'default': {
@@ -53,7 +57,8 @@ USE_I18N = True
 
 USE_L10 = True
 
-SOUTH_APPS = ['odaybook.attendance', 'odaybook.billing', 'odaybook.curatorship', 'odaybook.marks', 'odaybook.pages', 'odaybook.tests', 'odaybook.userextended']
+SOUTH_APPS = ['odaybook.attendance', 'odaybook.billing', 'odaybook.curatorship',
+              'odaybook.marks', 'odaybook.pages', 'odaybook.tests', 'odaybook.userextended']
 
 MEDIA_URL = '/media/'
 

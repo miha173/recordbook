@@ -12,6 +12,5 @@ urlpatterns = patterns("odaybook.attendance.views",
                        (r'^timetable/set/(?P<id>\d+)/$', 'timetableSet'),
                        
                        
-                       (r'^ringtimetable/(?P<school>\d+)/$', 'ringtimetableList'),
 
                        )

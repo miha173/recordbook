@@ -1,38 +1,45 @@
 # -*- coding: UTF-8 -*-
+'''
+    Представления отсюда могут быть заимствованы в других приложениях.
+'''
 
 import demjson
 import csv
-import re
 
 from django.template import RequestContext
 from django.shortcuts import render_to_response, get_object_or_404
-from django.template.loader import render_to_string
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib.auth.models import User
 from django.contrib import messages
 from django.conf import settings
 from django.db.models import get_model
-from django.core.urlresolvers import resolve, reverse
-from django.core.validators import validate_email
+from django.core.urlresolvers import reverse
+from django.core.validators import validate_email, ValidationError
 
-from models import School, Clerk, Superviser, Teacher, Pupil, Parent, BaseUser, Superuser, Subject, Grade, MembershipChange
+from models import School, Clerk, Superviser, Teacher, Pupil, Parent, BaseUser, Superuser, Subject, Grade, \
+    MembershipChange
 from forms import ClerkForm, PupilConnectionForm, ClerkRegisterForm, ImportForm
 import odaybook.userextended.forms
-import odaybook.attendance.forms
 import odaybook.curatorship.forms
 import odaybook.marks.forms
 from odaybook.utils import PlaningError
 
 def index(request):
+    '''Нет в этом модуле главной страницы.'''
     return HttpResponseRedirect('/')
-#    return render_to_response('page.html', context_instance = RequestContext(request))
 
 
 @login_required
 @user_passes_test(lambda u: u.type in ['Superuser', 'Teacher'])
 def objectList(request, app, model, filter_id = None):
+    '''
+        Универсальный отображатель списка экземпляров моделей.
+
+        app - приложение модели
+        model - название модели
+        filter_id - id объекта, по которому следует фильтровать список
+    '''
     render = {}
     ext = {}
     app_model = '%s.%s' % (app, model)
@@ -76,12 +83,14 @@ def objectList(request, app, model, filter_id = None):
             'userextended.Grade', 'userextended.Subject', 'userextended.Pupil',
             'userextended.Teacher', 'userextended.Staff', 'userextended.School',
             'userextended.Option', 'userextended.Achievement', 'marks.ResultDate',
-            'curatorship.Connection', 'marks.ResultDate',
+            'curatorship.Connection',
     ]
-    if request.user.type == 'Superuser': allowed_apps += 'userextended.Clerk', 
+    if request.user.type == 'Superuser':
+        allowed_apps += 'userextended.Clerk',
     if app + '.' + model not in allowed_apps:
         raise Http404('Object %s not allowed for usertype %s' % (app + '.' + model, request.user.type))
-    if model == 'Clerk': render['schools'] = School.objects.all()
+    if model == 'Clerk':
+        render['schools'] = School.objects.all()
     template = render['object_name'] = model.lower()
     Object = get_model(app, model)
 
@@ -103,11 +112,20 @@ def objectList(request, app, model, filter_id = None):
         render['objects'] = paginator.page(paginator.num_pages)
     render['paginator'] = paginator.num_pages - 1
 
-    return render_to_response('~userextended/%sList.html' % template, render, context_instance = RequestContext(request))
+    return render_to_response('~userextended/%sList.html' % template, render,
+                              context_instance = RequestContext(request))
 
 @login_required
 @user_passes_test(lambda u: u.type in ['Superuser', 'Teacher'])
 def objectEdit(request, app, model, mode, filter_id = None, id = 0):
+    '''
+        Универсальное представление для работы с экзмеплярами моделей.
+
+        app - приложение модели
+        model - название модели
+        filter_id - id объекта, по которому следует фильтровать список
+        id - id редактируемого объекта
+    '''
     render = {}
     ext = {}
     app_model = '%s.%s' % (app, model)
@@ -116,9 +134,10 @@ def objectEdit(request, app, model, mode, filter_id = None, id = 0):
             'userextended.Grade', 'userextended.Subject', 'userextended.Pupil',
             'userextended.Teacher', 'userextended.Staff', 'userextended.School',
             'userextended.Option', 'userextended.Achievement', 'marks.ResultDate',
-            'curatorship.Connection', 'marks.ResultDate',
+            'curatorship.Connection', 
     ]
-    if app + '.' + model not in allowed_apps: raise Http404('Object not allowed')
+    if app + '.' + model not in allowed_apps:
+        raise Http404('Object not allowed')
     template = render['object_name'] = model.lower()
     Object = get_model(app, model)
     Form = getattr(getattr(__import__('odaybook'), app).forms, model + 'Form')
@@ -133,6 +152,8 @@ def objectEdit(request, app, model, mode, filter_id = None, id = 0):
     elif app_model == 'curatorship.Connection':
         if request.user.type == 'Teacher':
             ext['grade__school'] = request.user.school
+            if hasattr(request, 'grade'):
+                ext['grade'] = request.grade
         elif request.user.type == 'Superuser':
             ext['grade__school'] = get_object_or_404(School, id = filter_id)
     elif app_model == 'userextended.Option':
@@ -164,7 +185,8 @@ def objectEdit(request, app, model, mode, filter_id = None, id = 0):
             render['form'] = Form(instance = get_object_or_404(Object, id = id, **ext), **ext)
             if model == 'Pupil':
                 pupil = get_object_or_404(Object, id = id, **ext)
-                render['groups'] = [PupilConnectionForm(sbj, pupil, prefix = sbj.id) for sbj in pupil.grade.get_subjects() if sbj.groups]
+                render['groups'] = [PupilConnectionForm(sbj, pupil, prefix = sbj.id)
+                                    for sbj in pupil.grade.get_subjects() if sbj.groups]
         elif mode == 'delete':
             try:
                 get_object_or_404(Object, id = id, **ext).delete()
@@ -177,15 +199,19 @@ def objectEdit(request, app, model, mode, filter_id = None, id = 0):
         else:
             render['form'] = Form(**ext)
             if model == 'Pupil':
-                render['groups'] = [PupilConnectionForm(sbj, prefix = sbj.id) for sbj in Subject.objects.filter(school = ext['school']) if sbj.groups]
-        return render_to_response('~userextended/%s.html' % template, render, context_instance = RequestContext(request))
+                render['groups'] = [PupilConnectionForm(sbj, prefix = sbj.id)
+                                    for sbj in Subject.objects.filter(school = ext['school']) if sbj.groups]
+        return render_to_response('~userextended/%s.html' % template, render,
+                                  context_instance = RequestContext(request))
     if request.method == 'POST':
         if mode == 'edit':
-            form = Form(data = request.POST, files = request.FILES, instance = get_object_or_404(Object, id = id, **ext), **ext)
+            form = Form(data = request.POST, files = request.FILES,
+                        instance = get_object_or_404(Object, id = id, **ext), **ext)
             form_factory_valid = True
             if model == 'Pupil':
                 pupil = get_object_or_404(Object, id = id, **ext)
-                render['groups'] = [PupilConnectionForm(sbj, pupil, data = request.POST, prefix = sbj.id) for sbj in pupil.grade.get_subjects() if sbj.groups]
+                render['groups'] = [PupilConnectionForm(sbj, pupil, data = request.POST, prefix = sbj.id)
+                                    for sbj in pupil.grade.get_subjects() if sbj.groups]
                 form_factory_valid = all([f.is_valid() for f in render['groups']])
             if form.is_valid() and form_factory_valid:
                 form.save()
@@ -194,11 +220,13 @@ def objectEdit(request, app, model, mode, filter_id = None, id = 0):
                 return HttpResponseRedirect(url)
             else:
                 render['form'] = form
-                return render_to_response('~userextended/%s.html' % template, render, context_instance = RequestContext(request))
+                return render_to_response('~userextended/%s.html' % template, render,
+                                          context_instance = RequestContext(request))
         else:
             form_factory_valid = True
             if model == 'Pupil':
-                render['groups'] = [PupilConnectionForm(sbj, data = request.POST, prefix = sbj.id) for sbj in Subject.objects.filter(school = ext['school']) if sbj.groups]
+                render['groups'] = [PupilConnectionForm(sbj, data = request.POST, prefix = sbj.id)
+                                    for sbj in Subject.objects.filter(school = ext['school']) if sbj.groups]
                 form_factory_valid = all([f.is_valid() for f in render['groups']])
             form = Form(data = request.POST, **ext)
             if form.is_valid() and form_factory_valid:
@@ -208,12 +236,16 @@ def objectEdit(request, app, model, mode, filter_id = None, id = 0):
                 return HttpResponseRedirect(url)
             else:
                 render['form'] = form
-                return render_to_response('~userextended/%s.html' % template, render, context_instance = RequestContext(request))
+                return render_to_response('~userextended/%s.html' % template, render,
+                                          context_instance = RequestContext(request))
 
 
 @login_required
 @user_passes_test(lambda u: u.type in ['Superuser'])
 def baseUserObjectEdit(request, mode, filter_id = None, id = 0):
+    '''
+        Редактирование концентрационной модели пользователя.
+    '''
     render = {}
 
     url = '/accounts/baseuser/'
@@ -224,7 +256,8 @@ def baseUserObjectEdit(request, mode, filter_id = None, id = 0):
     if request.method == 'GET':
 
         right = request.GET.get('set_right', None)
-        if right not in ['Superuser', 'Superviser', 'EduAdmin', 'Teacher', None]: raise Http404
+        if right not in ['Superuser', 'Superviser', 'EduAdmin', 'Teacher', None]:
+            raise Http404
 
         if mode == 'set_right':
 
@@ -232,8 +265,10 @@ def baseUserObjectEdit(request, mode, filter_id = None, id = 0):
                 if right in clerk.get_roles_list_simple():
                     messages.error(request, u'Права установлены ранее')
                 else:
-                    if right == 'Superviser': clerk.create_role(Superviser)
-                    if right == 'Superuser': clerk.create_role(Superuser)
+                    if right == 'Superviser':
+                        clerk.create_role(Superviser)
+                    if right == 'Superuser':
+                        clerk.create_role(Superuser)
 
             if right == 'EduAdmin':
                 school = get_object_or_404(School, id = request.GET.get('school_id', 0))
@@ -309,7 +344,8 @@ def baseUserObjectEdit(request, mode, filter_id = None, id = 0):
                 return HttpResponseRedirect(url)
             else:
                 render['form'] = form
-                return render_to_response('~userextended/clerk.html', render, context_instance = RequestContext(request))
+                return render_to_response('~userextended/clerk.html', render,
+                                          context_instance = RequestContext(request))
         else:
             form = ClerkForm(data = request.POST)
             if form.is_valid():
@@ -317,16 +353,23 @@ def baseUserObjectEdit(request, mode, filter_id = None, id = 0):
                 return HttpResponseRedirect(url)
             else:
                 render['form'] = form
-                return render_to_response('~userextended/clerk.html', render, context_instance = RequestContext(request))
+                return render_to_response('~userextended/clerk.html', render,
+                                          context_instance = RequestContext(request))
 
 @login_required
 def set_role(request, role_id):
+    '''
+        Установить текущую роль для текущего пользователя.
+    '''
     request.user.set_current_role(role_id)
     return HttpResponseRedirect('/')
 
 @login_required
 @user_passes_test(lambda u: reduce(lambda x, y: x or y, map(lambda a: a in ['Superuser', 'EduAdmin'], u.types)))
 def clerkAppendRole(request):
+    '''
+        Добавление существующего аккаунта к школе.
+    '''
     render = {}
     render['step'] = request.GET.get('step', '1')
     render['username'] = request.POST.get('username', '')
@@ -339,14 +382,17 @@ def clerkAppendRole(request):
                 clerk = Clerk.objects.get(username = request.POST.get('username'))
             except Clerk.DoesNotExist:
                 render['error'] = u'Пользователя с таким ID не существует.'
-                return render_to_response('~userextended/clerkAppendRole.html', render, context_instance = RequestContext(request))
+                return render_to_response('~userextended/clerkAppendRole.html',
+                                          render, context_instance = RequestContext(request))
             if 'Pupil' in clerk.get_roles_list():
                 render['error'] = u'Этот пользователь ученик.'
-                return render_to_response('~userextended/clerkAppendRole.html', render, context_instance = RequestContext(request))
+                return render_to_response('~userextended/clerkAppendRole.html', render,
+                                          context_instance = RequestContext(request))
             school = get_object_or_404(School, id = request.GET.get('school', '0'))
             if clerk.has_role('Teacher', school):
                 render['error'] = u'Этот пользователь уже приписан к данной школе.'
-                return render_to_response('~userextended/clerkAppendRole.html', render, context_instance = RequestContext(request))
+                return render_to_response('~userextended/clerkAppendRole.html', render,
+                                          context_instance = RequestContext(request))
 
             render['clerk'] = clerk
 
@@ -356,14 +402,17 @@ def clerkAppendRole(request):
                 clerk = Clerk.objects.get(username = request.POST.get('username'))
             except Clerk.DoesNotExist:
                 render['error'] = u'Пользователя с таким ID не существует.'
-                return render_to_response('~userextended/clerkAppendRole.html', render, context_instance = RequestContext(request))
+                return render_to_response('~userextended/clerkAppendRole.html', render,
+                                          context_instance = RequestContext(request))
             if 'Pupil' in clerk.get_roles_list():
                 render['error'] = u'Этот пользователь ученик.'
-                return render_to_response('~userextended/clerkAppendRole.html', render, context_instance = RequestContext(request))
+                return render_to_response('~userextended/clerkAppendRole.html', render,
+                                          context_instance = RequestContext(request))
             school = get_object_or_404(School, id = request.GET.get('school', '0'))
             if clerk.has_role('Teacher', school):
                 render['error'] = u'Этот пользователь уже приписан к данной школе.'
-                return render_to_response('~userextended/clerkAppendRole.html', render, context_instance = RequestContext(request))
+                return render_to_response('~userextended/clerkAppendRole.html', render,
+                                          context_instance = RequestContext(request))
 
             teacher = clerk.create_role(Teacher)
             teacher.school = school
@@ -374,10 +423,16 @@ def clerkAppendRole(request):
     return render_to_response('~userextended/clerkAppendRole.html', render, context_instance = RequestContext(request))
 
 def get_subject(request, id):
+    '''
+        Информация о предмете JSON.
+    '''
     subject = get_object_or_404(Subject, id = id)
     return HttpResponse(demjson.encode({'subject': subject.name, 'groups': subject.groups}))
 
 def register_clerk(request):
+    '''
+        Регистрация родителя.
+    '''
     render = {}
 
     is_parent = auto_login = False
@@ -403,11 +458,15 @@ def register_clerk(request):
     else:
         render['form'] = ClerkRegisterForm()
 
-    return render_to_response('~userextended/register_clerk.html', render, context_instance = RequestContext(request))
+    return render_to_response('~userextended/register_clerk.html', render,
+                              context_instance = RequestContext(request))
 
 @login_required
 @user_passes_test(lambda u: reduce(lambda x, y: x or y, map(lambda a: a in ['Superuser', 'EduAdmin'], u.types)))
 def exclude_pupil(request, filter_id, id):
+    '''
+        Исключить ученика из школы.
+    '''
     if request.user.type == 'EduAdmin':
         if request.user.school.id != int(id): raise Http404
     pupil = get_object_or_404(Pupil, id = id, school__id = filter_id)
@@ -419,10 +478,14 @@ def exclude_pupil(request, filter_id, id):
 @login_required
 @user_passes_test(lambda u: reduce(lambda x, y: x or y, map(lambda a: a in ['Superuser', 'EduAdmin'], u.types)))
 def connect_pupil(request, school):
+    '''
+        Зачислить ученика в школу.
+    '''
     render = {}
 
     render['school'] = school = get_object_or_404(School, id = school)
-    if request.user.type == 'EduAdmin' and request.user.school.id != school.id: raise Http404
+    if request.user.type == 'EduAdmin' and request.user.school.id != school.id:
+        raise Http404
     render['grades'] = Grade.objects.filter(school = school)
 
     if request.method == 'GET':
@@ -443,6 +506,9 @@ def connect_pupil(request, school):
 @login_required
 @user_passes_test(lambda u: u.type == 'Parent')
 def set_current_pupil(request, id):
+    '''
+        Установка родителем текущего ученика.
+    '''
     pupil = get_object_or_404(Pupil, id = id)
     if pupil in request.user.pupils.all():
         request.user.current_pupil = pupil
@@ -454,9 +520,13 @@ def set_current_pupil(request, id):
 @login_required
 @user_passes_test(lambda u: reduce(lambda x, y: x or y, map(lambda a: a in ['Superuser', 'EduAdmin'], u.types)))
 def import_grade(request, filter_id):
+    '''
+        Импорт классов.
+    '''
     render = {}
     if request.user.type == 'EduAdmin':
-        if request.user.school.id != int(filter_id): raise Http404
+        if request.user.school.id != int(filter_id):
+            raise Http404
     render['school'] = school = get_object_or_404(School, id = filter_id)
 
     if request.method == 'GET':
@@ -470,7 +540,7 @@ def import_grade(request, filter_id):
             i = 0
             for row in rows:
                 i += 1
-                if len(row)<3:
+                if len(row) < 3:
                     errors.append({'line': i, 'column': 0, 'error': u'недостаточное количество столбцов'})
                     continue
                 try:
@@ -480,17 +550,26 @@ def import_grade(request, filter_id):
                     continue
                 try:
                     row[1], row[2] = row[1].decode('cp1251'), row[2].decode('cp1251')
-                except:
-                    errors.append({'line': i, 'column': 0, 'error': u'некорректное значение (невозможно определить кодировку)'})
+                except UnicodeError:
+                    errors.append({'line': i, 'column': 0,
+                                   'error': u'некорректное значение (невозможно определить кодировку)'})
                     continue
                 grades.append(Grade(number = row[0], long_name = row[1], small_name = row[2], school = school))
             if len(errors) == 0:
-                for grade in grades: grade.save()
+                for grade in grades:
+                    grade.save()
                 messages.success(request, u'Классы импортированы')
                 return HttpResponseRedirect('..')
     return render_to_response('~userextended/gradeImport.html', render, context_instance = RequestContext(request))
 
 def get_grade(grade_string):
+    '''
+        Функция для получения словаря из строки с названием класса.
+
+        Ключи словаря:
+         * number - порядковый номер класса
+         * long_name - имя класса
+     '''
     import re
     if re.search('\d+', grade_string):
         number = int(re.search('\d+', grade_string).group(0))
@@ -502,9 +581,13 @@ def get_grade(grade_string):
 @login_required
 @user_passes_test(lambda u: reduce(lambda x, y: x or y, map(lambda a: a in ['Superuser', 'EduAdmin'], u.types)))
 def import_teacher(request, filter_id):
+    '''
+        Импорт учителей.
+    '''
     render = {}
     if request.user.type == 'EduAdmin':
-        if request.user.school.id != int(filter_id): raise Http404
+        if request.user.school.id != int(filter_id):
+            raise Http404
     render['school'] = school = get_object_or_404(School, id = filter_id)
 
     if request.method == 'GET':
@@ -518,30 +601,33 @@ def import_teacher(request, filter_id):
             i = 0
             for row in rows:
                 i += 1
-                if len(row)<7:
+                if len(row) < 7:
                     errors.append({'line': i, 'column': 0, 'error': u'неверное количество столбцов'})
                     continue
                 try:
                     row = ";".join(row)
                     row = row.decode('cp1251')
-                except:
-                    errors.append({'line': i, 'column': 0, 'error': u'некорректное значение (невозможно определить кодировку)'})
+                except UnicodeError:
+                    errors.append({'line': i, 'column': 0,
+                                   'error': u'некорректное значение (невозможно определить кодировку)'})
                     continue
                 row = row.split(';')
-                if len(row[0])<2 or len(row[1])<2 or len(row[2])<2:
+                if len(row[0]) < 2 or len(row[1]) < 2 or len(row[2]) < 2:
                     errors.append({'line': i, 'column': 0, 'error': u'сликшом короткое ФИО'})
                     continue
                 try:
                     validate_email(row[3])
-                except:
+                except ValidationError:
                     errors.append({'line': i, 'column': 4, 'error': u'email указан неверно'})
                     continue
-                teacher = Teacher(school = school, last_name = row[0], first_name = row[1], middle_name = row[2], email = row[3])
+                teacher = Teacher(school = school, last_name = row[0],
+                                  first_name = row[1], middle_name = row[2], email = row[3])
                 teacher._subjects = []
                 t = [j.strip() for j in row[4].split(',')]
                 for sbj in t:
                     try: teacher._subjects.append(Subject.objects.get(name = sbj, school = school))
-                    except Subject.DoesNotExist: errors.append({'line': i, 'column': 5, 'error': u'предмет "%s" не найден' % sbj})
+                    except Subject.DoesNotExist: errors.append({'line': i, 'column': 5,
+                                                                'error': u'предмет "%s" не найден' % sbj})
                 teacher._grades = []
                 t = [j.strip() for j in row[5].split(',')]
                 for grade in t:
@@ -549,7 +635,8 @@ def import_teacher(request, filter_id):
                         errors.append({'line': i, 'column': 5, 'error': u'класс "%s" не найден' % grade})
                         continue
                     try: teacher._grades.append(Grade.objects.get(school = school, **get_grade(grade)))
-                    except Grade.DoesNotExist: errors.append({'line': i, 'column': 5, 'error': u'класс "%s" не найден' % grade})
+                    except Grade.DoesNotExist: errors.append({'line': i, 'column': 5,
+                                                              'error': u'класс "%s" не найден' % grade})
                 if row[6]:
                     if not get_grade(row[6]):
                         errors.append({'line': i, 'column': 6, 'error': u'класс "%s" не найден' % row[6]})
@@ -574,9 +661,13 @@ def import_teacher(request, filter_id):
 @login_required
 @user_passes_test(lambda u: reduce(lambda x, y: x or y, map(lambda a: a in ['Superuser', 'EduAdmin'], u.types)))
 def import_pupil(request, filter_id):
+    '''
+        Импорт учеников.
+    '''
     render = {}
     if request.user.type == 'EduAdmin':
-        if request.user.school.id != int(filter_id): raise Http404
+        if request.user.school.id != int(filter_id):
+            raise Http404
     render['school'] = school = get_object_or_404(School, id = filter_id)
 
     if request.method == 'GET':
@@ -590,17 +681,18 @@ def import_pupil(request, filter_id):
             i = 0
             for row in rows:
                 i += 1
-                if len(row)<12:
+                if len(row) < 12:
                     errors.append({'line': i, 'column': 0, 'error': u'неверное количество столбцов'})
                     continue
                 try:
                     row = ";".join(row)
                     row = row.decode('cp1251')
-                except:
-                    errors.append({'line': i, 'column': 0, 'error': u'некорректное значение (невозможно определить кодировку)'})
+                except UnicodeError:
+                    errors.append({'line': i, 'column': 0,
+                                   'error': u'некорректное значение (невозможно определить кодировку)'})
                     continue
                 row = row.split(';')
-                if len(row[0])<2 or len(row[1])<2 or len(row[2])<2:
+                if len(row[0]) < 2 or len(row[1]) < 2 or len(row[2]) < 2:
                     errors.append({'line': i, 'column': 0, 'error': u'сликшом короткое ФИО'})
                     continue
                 try:

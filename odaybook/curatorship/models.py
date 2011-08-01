@@ -11,14 +11,13 @@ from django.core.mail import send_mail
 from smart_selects.db_fields import SimpleChainedForeignKey
 
 from odaybook.userextended.models import Teacher, Subject, Grade
-from odaybook.rest.models import RestModel
 from odaybook.userextended.models import Parent, Pupil
 from django.conf import settings
 
 GROUPS = zip(*([str(i) for i in range(1, 11)], )*2)
 GROUPS.insert(0, ('0', u'Весь класс'))
 
-class Connection(RestModel):
+class Connection(models.Model):
     '''
         Данная связка позволяет устоновить точное соответветсвие между
         учителем, предметом, классом и группой.

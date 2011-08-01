@@ -65,7 +65,7 @@ def index(request):
 
 
 @login_required()
-@user_passes_test(lambda u: u.user.type == 'Parent')
+@user_passes_test(lambda u: u.type == 'Parent')
 def grade(request):
     '''
         Список класса в интерфейсе родителя
@@ -81,7 +81,7 @@ def grade(request):
     )
 
 @login_required()
-@user_passes_test(lambda u: u.user.type == 'Parent')
+@user_passes_test(lambda u: u.type == 'Parent')
 def teachers(request):
     '''
         Список учителей в интерфейсе родителя
@@ -109,7 +109,7 @@ def teacher(request, id):
     )
 
 @login_required()
-@user_passes_test(lambda u: u.user.type == 'Parent')
+@user_passes_test(lambda u: u.type == 'Parent')
 def subjects(request):
     '''
         Список предметов с информацией в интерфейсе родителя.

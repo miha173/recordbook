@@ -5,10 +5,9 @@
 
 
 from django.db import models
-from odaybook.rest.models import RestModel
 from odaybook.userextended.models import Pupil, Teacher, Subject, Grade, School
 
-class Lesson(RestModel):
+class Lesson(models.Model):
     '''
         Занятие. Содержит информацию об уроке. 
     '''
@@ -47,7 +46,7 @@ class Lesson(RestModel):
                 self.fullness = True
         super(Lesson, self).save(*args, **kwargs)
 
-class Mark(RestModel):
+class Mark(models.Model):
     '''
         Оценка или пропуск за 1 урок.
     '''
