@@ -27,7 +27,7 @@ def index(request):
 
 @login_required
 @user_passes_test(lambda u: reduce(lambda x, y: x or y, map(lambda a: a in ['Superuser', 'EduAdmin'], u.types)))
-def timetableSelect(request, school = 0):
+def timetable_select(request, school = 0):
     u'''
         Выбор класс для заполнения расписания.s
     '''
@@ -42,7 +42,7 @@ def timetableSelect(request, school = 0):
     
 @login_required
 @user_passes_test(lambda u: reduce(lambda x, y: x or y, map(lambda a: a in ['Superuser', 'EduAdmin'], u.types)))
-def timetableSet(request, id, school = 0):
+def timetable_set(request, id, school = 0):
     u'''
         Форма заполнения расписания.
 
@@ -112,7 +112,7 @@ def timetableSet(request, id, school = 0):
 
 @login_required
 @user_passes_test(lambda u: reduce(lambda x, y: x or y, map(lambda a: a in ['Superuser', 'EduAdmin'], u.types)))
-def importTimetable(request, school):
+def import_timetable(request, school):
     '''
         Представление для импорта расписания. Не тестировалась.
     '''
@@ -142,7 +142,7 @@ def importTimetable(request, school):
                 try:
                     row = ";".join(row)
                     row = row.decode('cp1251')
-                except:
+                except UnicodeError:
                     errors.append({'line': i, 'column': 0,
                                    'error': u'некорректное значение (невозможно определить кодировку)'})
                     continue

@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-from django.conf.urls.defaults import *
+from django.conf.urls.defaults import patterns
 from django.contrib.auth.views import login, logout, password_change, \
     password_reset, password_reset_done, password_reset_confirm, password_reset_complete
 from forms import PasswordChangeForm

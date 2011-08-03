@@ -78,7 +78,8 @@ class School(models.Model):
         '''Возвращает кортедж из кириллических названий учебных дней школы.'''
         result = ()
         for d in settings.WORKDAYS:
-            if int(d[0]) in self.get_workdays(): result += (d, )
+            if int(d[0]) in self.get_workdays():
+                result += (d, )
         return result
 
     def get_workdays_dict(self):
@@ -88,7 +89,8 @@ class School(models.Model):
         '''
         result = {}
         for d in settings.WORKDAYS:
-            if int(d[0]) in self.get_workdays(): result[int(d[0])] = d
+            if int(d[0]) in self.get_workdays():
+                result[int(d[0])] = d
         return result
 
     def save(self, *args, **kwargs):
@@ -103,7 +105,8 @@ class School(models.Model):
                         u'Химия', u'Физика', u'Биология', u'История', 
                         u'ОБЖ', u'Алгебра', u'Геометрия', u'Ин. яз.']
             
-            for subject in subjects: Subject(school = self, name = subject).save()
+            for subject in subjects:
+                Subject(school = self, name = subject).save()
 
 class Option(models.Model):
     '''

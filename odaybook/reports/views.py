@@ -21,7 +21,7 @@ class Array(object):
         Инструмент для работы с таблицой данных.
 
         Сейчас можно загружать данные, читать их в шаблоне и экспортировать
-        в CSV. Возможно скоро можно будет подговтоить данные для кэша. 
+        в CSV. Возможно скоро можно будет подготовить данные для кэша.
     '''
 
     n = 0 # столбцы
@@ -116,8 +116,10 @@ def report_health(request):
                                      health_group = group)
             rows.append_col(c.count())
             total[group] = total.get(group, 0) + c.count()
-            if all == 0: rows.append_col(0)
-            else: rows.append_col((c.count()/all)*100)
+            if all == 0:
+                rows.append_col(0)
+            else:
+                rows.append_col((c.count()/all)*100)
         rows.append_col(str(all))
 
     rows.insert_row()
@@ -195,7 +197,6 @@ def report_fillability(request):
     '''
     render = {}
 
-    total = {}
     rows = Array()
     rows.insert_row()
     rows.append_cols('',
@@ -243,6 +244,9 @@ def report_fillability(request):
 @login_required
 @user_passes_test(lambda u: u.type == 'Superviser')
 def report_membershipchanges(request):
+    '''
+        Отчёт о поступивших и исключённых по школам.
+    '''
     render = {}
 
     render['form'] = SchoolSelectForm(request.GET)
@@ -271,10 +275,17 @@ def report_membershipchanges(request):
 @login_required
 @user_passes_test(lambda u: u.type in ['Superviser', 'Teacher', 'Parent'])
 def report_marks(request, mode = 'all'):
+    '''
+        Отчёт по оценкам.
+    '''
     from django import forms
-    from odaybook.marks.forms import StatForm
 
     class PupilSelectForm(forms.Form):
+        '''
+            Выбор ученика по школе и классу. 
+
+            Используется только здесь.
+        '''
         from smart_selects.form_fields import ChainedModelChoiceField
         school = forms.ModelChoiceField(queryset = School.objects.all(),
                                         label = u'Школа',
@@ -301,10 +312,12 @@ def report_marks(request, mode = 'all'):
                 if grades:
                     self.fields['grade'] = forms.ModelChoiceField(queryset = grades, label = u'Класс')
                 else:
-                    self.fields['grade'] = forms.ModelChoiceField(queryset = Grade.objects.filter(school = school), label = u'Класс')
+                    self.fields['grade'] = forms.ModelChoiceField(queryset = Grade.objects.filter(school = school),
+                                                                  label = u'Класс')
             if grade:
                 del self.fields['grade']
-                self.fields['pupil'] = forms.ModelChoiceField(queryset = Pupil.objects.filter(grade = grade), label = u'Ученик')
+                self.fields['pupil'] = forms.ModelChoiceField(queryset = Pupil.objects.filter(grade = grade),
+                                                              label = u'Ученик')
             if pupil:
                 del self.fields['school']
                 del self.fields['grade']
@@ -317,7 +330,8 @@ def report_marks(request, mode = 'all'):
     if request.user.type == 'Teacher':
         grades = [g.id for g in request.user.grades.all()]
 
-        if request.user.grade: grades.append(request.user.grade.id)
+        if request.user.grade:
+            grades.append(request.user.grade.id)
 
         if request.user.edu_admin:
             grades += [g.id for g in Grade.objects.filter(school = request.user.school)]
@@ -338,7 +352,7 @@ def report_marks(request, mode = 'all'):
 
 
 
-    render['pupilSelectForm'] = pupilSelectForm = PupilSelectForm(
+    render['pupilSelectForm'] = pupil_select_form = PupilSelectForm(
             school = school,
             grade = grade,
             grades = grades,
@@ -355,9 +369,9 @@ def report_marks(request, mode = 'all'):
     else:
         render['form'] = StatForm()
 
-    if pupilSelectForm.is_valid() or pupil:
-        pupil = render['pupil'] = pupil or pupilSelectForm.cleaned_data['pupil']
-        if pupilSelectForm.is_valid():
+    if pupil_select_form.is_valid() or pupil:
+        pupil = render['pupil'] = pupil or pupil_select_form.cleaned_data['pupil']
+        if pupil_select_form.is_valid():
             render['params'] = {}
             for param in 'school', 'grade', 'pupil':
                 render['params'][param] = request.GET.get(param, None)
@@ -382,7 +396,10 @@ def report_marks(request, mode = 'all'):
 
 
 @login_required
-def viewMarks(request, id):
+def view_marks(request, id):
+    '''
+        Просмотр оценок по определённым предметам. 
+    '''
     from django.db.models import Avg
     render = {}
     pupil = request.user.current_pupil

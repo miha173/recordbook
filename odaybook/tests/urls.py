@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-from django.conf.urls.defaults import *
+from django.conf.urls.defaults import patterns
 
 urlpatterns = patterns("odaybook.tests.views",
                        (r'^$', 'index'),

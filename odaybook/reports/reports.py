@@ -34,11 +34,14 @@ def get_fillability(lessons):
         result['filled'] = lessons.filter(fullness = True).count()
         result['filled_percent'] = 100*result['filled']/a
         result['not_filled_from_10_to_15_days'] = lessons.filter(fullness = False, date__range = (
-                                                                        datetime.date.today() - datetime.timedelta(days = 15),
-                                                                        datetime.date.today() - datetime.timedelta(days = 10))
+                                                  datetime.date.today() - datetime.timedelta(days = 15),
+                                                  datetime.date.today() - datetime.timedelta(days = 10))
                                                   ).count()
         result['not_filled_from_10_to_15_days_percent'] = 100*result['not_filled_from_10_to_15_days']/a
-        result['not_filled_more_15_days'] = lessons.filter(fullness = False, date__lte = datetime.date.today() - datetime.timedelta(days = 15)).count()
+        result['not_filled_more_15_days'] = lessons.filter(
+                fullness = False,
+                date__lte = datetime.date.today() - datetime.timedelta(days = 15)
+        ).count()
         result['not_filled_more_15_days_percent'] = 100*result['not_filled_more_15_days']/a
 
     return result

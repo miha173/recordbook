@@ -24,7 +24,7 @@ def index(request):
 
 @login_required
 @user_passes_test(lambda u: u.type == 'Teacher')
-def connectionsList(request):
+def connections_list(request):
     '''
     Список связок.
     '''
@@ -39,7 +39,7 @@ def connectionsList(request):
 
 @login_required
 @user_passes_test(lambda u: u.type == 'Teacher')
-def connectionEdit(request, mode, connection_id = 0):
+def connection_edit(request, mode, connection_id = 0):
     '''
         Связки пока можно только добавлять и удалять.
     '''
@@ -56,7 +56,7 @@ def connectionEdit(request, mode, connection_id = 0):
 
 @login_required
 @user_passes_test(lambda u: u.type == 'Teacher')
-def pupilList(request):
+def pupil_list(request):
     '''
         Работа с учениками
     '''
@@ -68,7 +68,7 @@ def pupilList(request):
 
 @login_required
 @user_passes_test(lambda u: u.type == 'Teacher')
-def pupilEdit(request, mode, id = 0):
+def pupil_edit(request, mode, id = 0):
     '''
         Работа с учениками
     '''

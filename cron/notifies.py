@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
+'''
+    Создание уведомлений. 
+'''
 import os
 import sys
 import datetime

@@ -14,7 +14,7 @@ class TimetableDay(object):
     def __init__(self, workday, day_date = None):
         workday = int(workday)
         self.day_n = workday
-        self.day_ru = self.numDay2ruday(workday)
+        self.day_ru = self.numday_2_ruday(workday)
         today = date.today().isoweekday()
         if today == workday:
             self.date = u'Сегодня'
@@ -33,7 +33,7 @@ class TimetableDay(object):
         self.rings = {}
 
 
-    def numDay2ruday(self, workday):
+    def numday_2_ruday(self, workday):
         u'''Руссификация'''
         days = {1: u'Понедельник',
                 2: u'Вторник',

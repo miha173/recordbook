@@ -52,6 +52,8 @@ class ParentRequestForm(forms.Form):
     first_name = forms.CharField(label = u'Имя', required=True)
     middle_name = forms.CharField(label = u'Отчество', required=True)
 
+    pupil = None
+
     def clean(self, *args, **kwargs):
         super(ParentRequestForm, self).clean(*args, **kwargs)
         if not self.errors:

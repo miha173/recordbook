@@ -1,18 +1,18 @@
 # -*- coding: UTF-8 -*-
 
-from django.conf.urls.defaults import *
+from django.conf.urls.defaults import patterns
 
 urlpatterns = patterns("odaybook.curatorship.views",
    (r'^$', 'index'),
 
-   (r'connections/$', 'connectionsList'),
-   (r'connections/add/$', 'connectionEdit', {'mode': 'add'}),
-   (r'connections/delete/(?P<connection_id>\d+)$', 'connectionEdit', {'mode': 'delete'}),
+   (r'connections/$', 'connections_list'),
+   (r'connections/add/$', 'connection_edit', {'mode': 'add'}),
+   (r'connections/delete/(?P<connection_id>\d+)$', 'connection_edit', {'mode': 'delete'}),
 
-   (r'^pupil/$', 'pupilList'),
-   (r'^pupil/add/$', 'pupilEdit', {'mode': 'add'}),
-   (r'^pupil/edit/(?P<id>\d+)/$', 'pupilEdit', {'mode': 'edit'}),
-   (r'^pupil/delete/(?P<id>\d+)/$', 'pupilEdit', {'mode': 'delete'}),
+   (r'^pupil/$', 'pupil_list'),
+   (r'^pupil/add/$', 'pupil_edit', {'mode': 'add'}),
+   (r'^pupil/edit/(?P<id>\d+)/$', 'pupil_edit', {'mode': 'edit'}),
+   (r'^pupil/delete/(?P<id>\d+)/$', 'pupil_edit', {'mode': 'delete'}),
 
    (r'^send-append-request/$', 'send_parent_request'),
 

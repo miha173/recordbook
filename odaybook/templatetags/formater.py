@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-
+'''
+    Всякие штуки для форматирования текста
+'''
 import urllib
 
 from django import template
@@ -8,6 +10,9 @@ register = template.Library()
 
 @register.filter(name='number_format')
 def number(value, places = None):
+    '''
+        Форматирование числа согласно русской типографики.
+    '''
     try:
         float(value)
     except ValueError:
@@ -34,10 +39,23 @@ def number(value, places = None):
 
 @register.filter
 def urllibencode(value):
+    '''
+        Вывод HTTP-encode текста. Используется в формах.
+    '''
     return urllib.urlencode(value)
 
 @register.tag
 def main_menu_block(parser, token):
+    '''
+        Ускорялка отрисовки кнопки в главном меню.
+
+        Аргументы:
+         * наименование ссылки
+         * адрес ссылки (значение атрибута href)
+         * наименование css-класса для расцветки активного меню. Если передан пустой текст, выбирается автоматмечски
+         * два аргумента, при соответствии которых ссылка считается активной
+
+      '''
     args_names = ['name', 'link', 'color', 'bool_arg1', 'bool_arg2']
     args = token.split_contents()
     args = args[1:]
@@ -49,6 +67,9 @@ def main_menu_block(parser, token):
     return MenuBlockNode(**kwargs)
 
 class MenuBlockNode(template.Node):
+    '''
+        Рисовалка для главного меню
+    '''
 
     colors = ['blue', 'yellow', 'green', 'red', 'purple', 'gay']
     current_color = 0
@@ -86,7 +107,7 @@ class MenuBlockNode(template.Node):
 @register.simple_tag
 def padding_menu_block(name, link, arg):
     '''
-        {% if SM == "connections" %}<h1>Связки</h1> {% else %}<a href="/curatorship/connections/">Связки</a>{% endif %}
+        Вывод подменю.
     '''
     if link.split('/')[2] == arg:
         return '<h1>%s</h1>' % name

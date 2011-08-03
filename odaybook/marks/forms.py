@@ -28,7 +28,7 @@ class StatForm(forms.Form):
         super(StatForm, self).__init__(*args, **kwargs)
         self.fields['start'].widget.format = '%d.%m.%Y'
         self.fields['end'].widget.format = '%d.%m.%Y'
-    start = forms.DateField(('%d.%m.%Y','%d.%m.%y'),
+    start = forms.DateField(('%d.%m.%Y', '%d.%m.%y'),
                             label = u'Дата начала периода',
                             initial = date.today() - timedelta(weeks = 2))
     end = forms.DateField(('%d.%m.%Y','%d.%m.%y'),
@@ -58,4 +58,4 @@ class ResultDateForm(forms.ModelForm):
         result.save()
         self.save_m2m()
         return result
-    date = forms.DateField(('%d.%m.%y','%d.%m.%Y',), label = u'Дата подведения итога')
+    date = forms.DateField(('%d.%m.%y', '%d.%m.%Y',), label = u'Дата подведения итога')

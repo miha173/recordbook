@@ -130,8 +130,6 @@ def index(request):
             d = date_start - timedelta(days = i)
             kwargs['workday'] = str(d.weekday()+1)
             if UsalTimetable.objects.filter(**kwargs):
-#                lessons = set([tt.number
-#                               for tt in UsalTimetable.objects.filter(**kwargs)])
                 kwargs4lesson = {'teacher': request.user,
                                  'date': d,
                                  'subject': request.user.current_subject}
