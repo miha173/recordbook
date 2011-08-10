@@ -462,7 +462,10 @@ class BaseClerk(models.Model):
 
     def get_current_role_cyrillic(self):
         '''Вывод кириллического названия текущей роли'''
-        return self.get_role_display(self.current_role.type)
+        if self.current_role:
+            return self.get_role_display(self.current_role.type)
+        else:
+            return ''
 
     def set_current_role(self, id):
         '''Установка текущей роли аккаунта'''
