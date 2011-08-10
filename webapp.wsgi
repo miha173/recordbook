@@ -4,12 +4,13 @@
 import os
 import sys
 import logging
-import django.core.handlers.wsgi
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'libs'))
 activate_this = os.path.dirname(os.path.abspath(__file__)) + '/.env/bin/activate_this.py'
 execfile(activate_this, dict(__file__=activate_this))
+
+import django.core.handlers.wsgi
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'odaybook.settings'
 
